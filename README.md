@@ -2,6 +2,8 @@
 
 A JARVIS like assistant for researchers, using AI client, agents, skills, and MCP architecture.
 
+简易安装说明 see [notion notes](https://zhliu25.notion.site/stable-jarvis-3191d1c4d39280b68608e1430ef82dcb)
+
 ## 开发计划
 
 ### 第一部分：基础设施重组 (Infrastructure Reassembly)
