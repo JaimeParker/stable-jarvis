@@ -224,4 +224,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgements
 
-Some of the built-in AI agent skills in this repository (`arxiv-search`, `pptx`, `obsidian-markdown`, `skill-creator`, and `web-research`) are not my original creations. They are adapted from the official [Gemini CLI / Deepagents Skills ecosystem](https://github.com/google/gemini-cli-skills) or related open-source agent skill repositories. All credit goes to their original authors.
+Some of the built-in AI agent skills in this repository are adapted from the following open-source ecosystems:
+
+-   **`arxiv-search`**, **`skill-creator`**, **`web-research`**: Adapted from [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/master/libs/deepagents-cli/examples/skills/).
+-   **`pptx`**: Adapted from [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills).
+-   **`obsidian-markdown`**: Adapted from [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills).
+
+All credit goes to the original authors for these foundational capabilities.
