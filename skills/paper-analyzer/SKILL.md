@@ -1,23 +1,53 @@
 ---
 name: paper-analyzer
-description: 自动分析Zotero库中的文献，生成带LaTeX公式的Markdown报告，并将报告上传为Zotero Note。
-version: 1.5.0
+description: 自动分析Zotero库中的文献，生成带LaTeX公式的Markdown报告，使用Auto-Annotation工具将AI的深度见解以无损批注形式注入回 Zotero，并将报告上传为Zotero Note。
+version: 1.6.0
 author: Zhaohong Liu
 tags:
   - zotero
   - paper-analysis
+  - auto-annotation
 ---
 
 # Paper Analyzer
 
 ## 🎯 目标 (Objective)
-你是一个顶级的 Robotics & AI 系统级研究员。你的核心任务是根据用户的 Prompt，连接本地 Zotero 数据库与 Cyber Brain 缓存。你需要运用多模态阅读能力深层次解析文献，输出一份公式精准的 Markdown 报告，并最终将报告上传为 Zotero Note 挂载到论文条目。
+你是一个顶级的 Robotics & AI 系统级研究员。你的核心任务是根据用户的 Prompt，连接本地 Zotero 数据库与 Cyber Brain 缓存。你需要运用多模态阅读能力深层次解析文献，输出一份公式精准的 Markdown 报告，将你的核心 Insights 转化为 JSON 格式驱动 Auto-Annotation 工具自动在用户的 Zotero PDF 上"画重点"，并最终将报告上传为 Zotero Note 挂载到论文条目。
 
 ## 🛠️ 可用工具 (Available CLI Tools)
 
-本 Skill 依赖以下 CLI 脚本，位于项目 `src/scripts/` 目录下。所有脚本必须在 `jarvis` conda 环境中执行。
+本 Skill 依赖以下两个 CLI 脚本，位于项目 `src/scripts/` 目录下。所有脚本必须在 `jarvis` conda 环境中执行。
 
-### `src/scripts/upload_report_note.py` - 报告上传工具
+### 1. `src/scripts/zotero_highlight.py` - Zotero 批注注入工具
+通过 Zotero Web API 向 PDF 添加高亮批注（无损注入，不修改原始 PDF）。
+
+**用法：**
+```bash
+# 查看 PDF 信息（页数、尺寸）
+python src/scripts/zotero_highlight.py --info <pdf_path>
+
+# 搜索文本位置（预检查）
+python src/scripts/zotero_highlight.py --search <pdf_path> <query>
+
+# JSON 文件模式（推荐）
+python src/scripts/zotero_highlight.py --json <json_file>
+```
+
+**参数：**
+| 参数 | 说明 |
+|------|------|
+| `--info`, `-i` | 显示 PDF 信息并退出 |
+| `--search`, `-s` | 跨页面搜索文本 |
+| `--json`, `-j` | 从 JSON 文件读取参数 |
+
+**可用颜色：**
+- `#ffd400` - 黄色（默认）
+- `#ff6666` - 红色（重要）
+- `#5fb236` - 绿色（支持论点）
+- `#2ea8e5` - 蓝色（定义/概念）
+- `#a28ae5` - 紫色（方法论）
+
+### 2. `src/scripts/upload_report_note.py` - 报告上传工具
 将 Markdown 报告转换为 HTML 并上传至 Zotero，作为论文条目的附属 Note。
 
 **用法：**
@@ -48,40 +78,30 @@ python src/scripts/upload_report_note.py --report "./temp/ABC123_report.md" --zo
 **返回值：**
 - 成功时返回退出码 `0`，并打印 `Successfully created note: <note_key>`
 - 失败时返回退出码 `1`，并打印错误信息
-
 ---
 
 ## 📋 工作流 (Execution Workflow)
 
-请严格按照以下阶段的顺序执行操作。前置阶段的输出必须作为后置阶段的输入。
+请严格按照以下五个阶段的顺序执行操作。
 
 ### 阶段 1：精准定位文献 (Locate via Zotero MCP)
 
-1. 调用 `zotero-mcp` 提供的检索工具，根据用户提供的标题或关键字找到对应的论文记录。
-2. 在返回的元数据中，提取当前 PDF 附件的最关键信息。
-3. **你必须明确获取并记录以下三个变量**：
-   - `item_key`: 父条目文献的 Item Key（用于挂载 Note，通常为 8 位字符）。
-   - `attachment_key`: PDF 附件的 Item Key（通常为 8 位字符，用于临时文件命名）。
-   - `pdf_path`: 本地硬盘中该 PDF 附件的绝对路径。
+1.  调用 `zotero-mcp` 提供的检索工具，根据用户提供的标题或关键字找到对应的论文记录。
+2.  在返回的元数据中，提取当前 PDF 附件的最关键信息。
+3.  **你必须明确获取并记录以下三个变量**：
+    *   `item_key`: 父条目文献的 Item Key（用于挂载 Note）。
+    *   `attachment_key`: PDF 附件的 Item Key（用于批注注入和临时文件命名）。
+    *   `pdf_path`: 本地硬盘中该 PDF 附件的绝对路径。
 
-**示例输出变量：**
-```
-item_key = "GEPUIWCR"       # 父条目（论文元数据，用于上传 Note）
-attachment_key = "SNX599P2" # PDF 附件（用于临时文件命名）
-pdf_path = "D:\Documents\Zotero\storage\SNX599P2\Liu et al. - 2025 - RESC.pdf"
-```
+### 阶段 2：多模态认知与双轨输出 (Multimodal Synthesis)
 
-⚠️ **注意**：`item_key` 和 `attachment_key` 是不同的！
-- `item_key`：用于阶段 3 的报告上传（指向论文条目本身）
-- `attachment_key`：用于临时文件命名（如 `{attachment_key}_report.md`）
+依靠你的原生多模态能力，根据 `pdf_path` 直接阅读 PDF 内容，生成以下两部分内容。
 
-### 阶段 2：多模态认知与报告生成 (Multimodal Synthesis)
+#### 输出 A：高级 Markdown 总结报告
 
-依靠你的原生多模态能力，根据pdf_path，直接阅读 PDF 内容，生成高级 Markdown 总结报告。
+在生成总结报告前，你必须**首先执行领域分类**，并严格根据分类结果加载对应的分析框架。
 
-#### 高级 Markdown 总结报告 (生成独立文件)
-
-在生成总结报告前，你必须**首先执行领域分类**，并严格根据分类结果加载对应的分析框架。最终生成的独立 Markdown 文件请保存为 `./temp/{attachment_key}_report.md`。
+最终生成的独立 Markdown 文件请保存为 `./temp/reports/{attachment_key}_report.md`。
 
 **第一步：文献领域分类与框架加载 (Classification & Template Selection)**
 请先阅读论文的摘要和引言，判断其所属的核心研究领域，并按以下优先级决定使用的分析模板：
@@ -130,8 +150,61 @@ $$
 - **学术框架**：按照 Motivation, Method, Experiments, Limitations 的框架组织
 - **公式无损**：所有数学公式使用 LaTeX 语法（`$...$` 或 `$$...$$`，使用 `$$...$$` 时需要上下各空一行）
 - **输出语言**：使用中文输出，但对专业术语保持英文原文
+---
+
+#### 输出 B：Auto-Annotation 批注动作列表
+
+-   **路径**: `./temp/annotation/{attachment_key}_annotations.json`
+-   **内容**: 一个 JSON 数组，包含 5-8 个最具决定性的句子及其批注。
+
+**🎨 强制颜色语义规范 (Strict Color Coding)**
+*   🟡 `"#ffd400"`: **研究动机与痛点**
+*   🔴 `"#ff6666"`: **核心创新与机制**
+*   🟢 `"#5fb236"`: **实验细节与关键结论**
+*   🟣 `"#a28ae5"`: **局限性与隐性假设**
+*   🔵 `"#2ea8e5"`: **关键定义与基础**
+
+**🧠 批注点评要求 (Comment Depth)**
+`comment` 字段必须以 **"💡 AI Insight: "** 或 **"⚠️ 批判性思考: "** 开头，深入解释引文在论文逻辑链中的作用。
+
+**📝 JSON 格式示例**
+```json
+[
+  {
+    "pdf_path": "D:/Zotero/storage/ABC123/paper.pdf",
+    "attachment_key": "ABC123",
+    "target_text": "However, traditional search-based methods suffer from...",
+    "page": 0,
+    "comment": "💡 AI Insight: 核心痛点 - 点出了传统规划器的实时性缺陷。",
+    "color": "#ffd400"
+  },
+  {
+    "pdf_path": "D:/Zotero/storage/ABC123/paper.pdf",
+    "attachment_key": "ABC123",
+    "target_text": "We formulate the problem as a Markov Decision Process...",
+    "page": 2,
+    "comment": "💡 AI Insight: 核心创新点 - 本文最关键的MDP设计。",
+    "color": "#ff6666"
+  }
+]
 ```
-### 阶段 3：上传报告至 Zotero (Upload Report as Note)
+**注意**: `target_text` 字段应为要高亮的原文文本。避免在其中包含数学符号或希腊字母。
+
+### 阶段 3：执行无损批注注入 (Trigger Auto-Annotation)
+
+1.  **创建目录**: 确保 `./temp/annotation/` 目录存在。
+2.  **写入 JSON**: 将阶段 2 生成的批注列表写入 `./temp/annotation/{attachment_key}_annotations.json`。
+3.  **强制预检查**: 在注入批注前，使用 `--search` 模式验证文本位置，确保页码正确。
+    ```bash
+    python src/scripts/zotero_highlight.py --search "{pdf_path}" "你想高亮的纯英文关键词"
+    ```
+4.  **执行注入**: 调用 `zotero_highlight.py` 工具，使用 `--json` 模式执行批注。
+    ```bash
+    python src/scripts/zotero_highlight.py --json "./temp/annotation/{attachment_key}_annotations.json"
+    ```
+    该工具会逐条处理 JSON 文件中的所有批注对象。
+
+### 阶段 4：上传报告至 Zotero (Upload Report as Note)
 
 将阶段 2 生成的 Markdown 报告转换为 HTML 并上传至 Zotero，作为论文条目的附属 Note。
 
@@ -143,109 +216,50 @@ $$
 
 **执行命令模板：**
 ```bash
-python src/scripts/upload_report_note.py --report "./temp/{attachment_key}_report.md" --zotero-key {item_key} --tags summary,auto-generated
+python src/scripts/upload_report_note.py --report "./temp/reports/{attachment_key}_report.md" --zotero-key {item_key} --tags summary,auto-generated
 ```
-
-**具体示例：**
-```bash
-python src/scripts/upload_report_note.py --report "./temp/SNX599P2_report.md" --zotero-key GEPUIWCR --tags summary,auto-generated
-```
+**注意**: `--zotero-key` 必须使用阶段 1 获取的 `item_key` (父条目)。
 
 **参数说明：**
 | 参数 | 说明 | 示例 |
 |------|------|------|
-| `--report` | Markdown 报告文件路径 | `./temp/SNX599P2_report.md` |
+| `--report` | Markdown 报告文件路径 | `./temp/reports/SNX599P2_report.md` |
 | `--zotero-key` | **父条目 Item Key**（非 attachment_key） | `GEPUIWCR` |
 | `--tags` | 可选，逗号分隔的标签列表 | `summary,auto-generated` |
 
-⚠️ **重要**：`--zotero-key` 必须使用阶段 1 获取的 `item_key`（父条目），而不是 `attachment_key`（PDF 附件）。
+⚠️ **重要**：`--zotero-key` 必须使用阶段 1 获取的 `item_key`（父条目）.
 
 **成功标志：**
 - 返回退出码 `0`
 - 打印 `Successfully created note: XXXXXXXX`
 
-**验证：**
-在 Zotero 桌面客户端中打开该论文条目，应能在右侧面板看到新创建的 Note，内容为 HTML 格式的报告摘要。
+### 阶段 5：同步归档至 Obsidian (Sync to Obsidian Vault)
 
-### 阶段 4：同步归档至 Obsidian (Sync to Obsidian Vault)
+将生成的 Markdown 报告归档到 Obsidian。
 
-为了构建完整的第二大脑，除了上传到 Zotero 外，你还必须将生成的 Markdown 报告保存到本地 Obsidian 库中，并利用 `obsidian-auto-classifier` 进行智能归类。
-
-#### 步骤 A：写入 Obsidian Inbox
-
-首先，将论文的PDF文件复制到 obsidian vault 的 `40 Resources\42 Assets\References` 下，并将名称重命名为论文 title；如果遇到非法字符如 `:`，直接删除此字符即可。之后执行下列步骤：
-
-1. **读取内容**：读取本地临时文件 `./temp/{attachment_key}_report.md` 的内容。
-2. **写入文件**：将内容写入 Obsidian 的收件箱路径（通常为 `00 Inbox/{Paper_Title}.md`）。如果由于权限或路径问题无法直接写入，请使用文件系统工具将文件移动或复制到该位置。
+1. **读取内容**：读取本地临时文件 `./temp/reports/{attachment_key}_report.md` 的内容。
+2. **写入文件**：将内容写入 Obsidian 的收件箱路径（通常为 `00 Inbox/{Paper_Title}.md`）。Use Obsidian MCP.
 3. **添加 Frontmatter**：确保 Markdown 文件头包含 YAML Frontmatter，以便后续分类器识别。如果生成的报告中没有，请在写入时添加：
    ```yaml
    ---
    tags: [robotics]
-   date: 2025-01-01
-   status: reading
-   pdf: [pdf path in obsidian vault]
+   title: {Paper_Title}
    ---
    ```
-  具体tag, date根据论文和实际时间填入
-
-#### 步骤 B：触发智能归档
-
-调用 `obsidian-auto-classifier` 能力（或告知用户手动触发），对刚刚存入 Inbox 的笔记进行自动分类。
-
-**指令示例：**
-> "我刚刚将一篇名为 '{Paper_Title}' 的论文笔记放入了 00 Inbox，请使用 obsidian-auto-classifier 将其移动到合适的 Literature 文件夹中。"
-
-**Agent 动作：**
-1. 识别 `00 Inbox` 中的新笔记。
-2. 分析笔记均属于 "Literature" 或 "Reading Notes" 类型。
-3. 将其移动到 `30 Zettelkasten/31 Literature` 或用户定义的论文存放目录。
+  具体tag, date根据论文和实际时间填入; For tags, do not use brackets, just a comma-separated string.
 
 ---
-
-## 🧠 系统指令与学术准则 (System Instructions)
-
-### Critical Thinking
-作为 Robotics 领域专家，在报告的 Limitations 部分，你需要保持学术审视：
-- Sim-to-real Gap：仿真到真实环境的迁移难度
-- Real-time Performance：计算实时性约束
-- Sensor Latency：感知延迟对控制的影响
-- Generalization：方法的泛化能力边界
-
-### 环境要求
-所有 Python 脚本必须在正确的 conda 环境中执行：
-```bash
-conda activate jarvis
-```
-
-如果遇到 import 错误，确保项目已安装：
-```bash
-pip install -e .
-```
+## 🧠 系统指令与学术准则
+-   **Critical Thinking**: 在报告和批注中，需保持对 Sim-to-real Gap, Real-time Performance, Sensor Latency, Generalization 等方面的学术审视。
+-   **Error Recovery**: 如果批注注入时发生坐标定位错误，请尝试缩短 `target_text` 并避免使用数学符号。
+-   **环境要求**: 所有 Python 脚本必须在 `jarvis` conda 环境中执行。
 
 ---
-
 ## 🔧 故障排除 (Troubleshooting)
-
-### 常见问题与解决方案
-
-#### 1. SSL 连接错误
-
-**症状：** `SSL: UNEXPECTED_EOF_WHILE_READING` 或 `ConnectionError`
-
-**解决方案：**
-- 内置指数退避重试（最多 3 次）
-- 如果仍然失败，检查网络连接
-- 尝试增加 Zotero 同步间隔
-
-#### 2. PowerShell 语法错误
-
-**症状：** `The token '&&' is not a valid statement separator`
-
-**解决方案：**
-```powershell
-# ❌ PowerShell 不支持 &&
-conda activate jarvis && python script.py
-
-# ✅ 使用分号代替
-conda activate jarvis ; python script.py
-```
+-   **文本匹配失败**:
+    1.  使用 `--search` 预检查文本位置和页码。
+    2.  确保 `target_text` 不含数学符号/希腊字母，优先使用纯英文。
+    3.  工具会自动尝试缩短文本，但手动缩短至 10-20 词可能更有效。
+-   **JSON 路径解析错误**: 确保 JSON 中的文件路径使用正斜杠 `/` 或双反斜杠 ``。
+-   **中文乱码**: `zotero_highlight.py` 的 `--json` 模式默认使用 UTF-8，可解决此问题。
+-   **SSL 连接错误**: 工具内置了指数退避重试。如果持续失败，请检查网络和 Zotero 同步状态。

@@ -269,11 +269,49 @@ class CoordinateExtractor:
                 norm = norm.split(dash)[-1]
         return norm == target_token.strip(".,;:!?—–-")
     
+    @staticmethod
+    def _group_wrapped_search_results(hits: List[pymupdf.Rect]) -> List[List[pymupdf.Rect]]:
+        """
+        Groups consecutive search hits that belong to one wrapped multi-line match.
+
+        This is adapted from the zotero-paper-coach project to improve multi-line
+        text matching. PyMuPDF's search_for returns one rect per line fragment
+        for a wrapped match. This function merges nearby vertical fragments into
+        a single logical group.
+        """
+        if not hits:
+            return []
+
+        groups: List[List[pymupdf.Rect]] = [[hits[0]]]
+        prev_rect = hits[0]
+        for hit in hits[1:]:
+            rect = hit
+            
+            # Check if the current hit is on the next line and close vertically
+            prev_h = max(prev_rect.height, 1)
+            curr_h = max(rect.height, 1)
+            
+            # Not on the same horizontal line
+            same_line = abs(rect.y0 - prev_rect.y0) <= max(prev_h, curr_h) * 0.25
+            
+            # Vertical gap is small and positive (current rect is below previous)
+            vertical_gap = rect.y0 - prev_rect.y1
+            
+            # Heuristic for a wrapped line
+            wrapped_next_line = (not same_line) and (0 <= vertical_gap <= max(prev_h, curr_h) * 1.5)
+
+            if wrapped_next_line:
+                groups[-1].append(rect)
+            else:
+                groups.append([rect])
+            prev_rect = rect
+        return groups
+
     def _search_primary(
         self, page: pymupdf.Page, target_text: str
     ) -> Optional[List[List[float]]]:
         """
-        Primary search using page.search_for().
+        Primary search using page.search_for() with multi-line grouping.
         
         Uses optimized flags:
         - TEXT_DEHYPHENATE: finds hyphenated words across lines
@@ -299,7 +337,17 @@ class CoordinateExtractor:
         
         if not bboxes:
             return None
-        return [[bbox.x0, bbox.y0, bbox.x1, bbox.y1] for bbox in bboxes]
+            
+        # Group the results to handle multi-line matches
+        grouped_hits = self._group_wrapped_search_results(bboxes)
+        
+        if not grouped_hits:
+            return None
+            
+        # Return the first logical group of rectangles. This assumes we only want
+        # the first occurrence of the target text on the page.
+        first_group = grouped_hits[0]
+        return [[bbox.x0, bbox.y0, bbox.x1, bbox.y1] for bbox in first_group]
     
     def _search_word_match(
         self, page: pymupdf.Page, target_text: str
