@@ -1,0 +1,21 @@
+description = "根据 Obsidian 往日笔记和项目进度自动生成并写入今日计划"
+prompt = """
+作为 JARVIS，请执行以下工作流来规划我今天的工作：
+
+1. **研究阶段**：
+   - 读取最近 5 天的每日笔记（位于 `50 Archive/Daily Notes/`）。
+   - 识别所有“今日已毕”中提到的项目（如 Project A、Project B 等）的最新进度。
+   - 提取之前计划中未完成的任务以及在“明日先思”或“明日计划”中提到的预想任务。
+   - Check the projects in obsidian vault 10 Projects/ to see if there are any updates or deadlines that should be considered for today's plan.
+
+2. **策略阶段**：
+   - 综合考虑项目的紧迫性（如硬件寄送、代码验证）和研究的连续性。
+   - Scientific research should has the first priority, followed by engineering tasks.
+   - 制定一个结构化、带优先级（高/中/低）的今日计划。
+
+3. **执行阶段**：
+   - 将生成的计划通过 `patch_note` 写入今天（{{datetime 'YYYY-MM-DD'}}）的每日笔记中，替换掉 `### 今日计划` 下的默认内容。
+   - 如果今天的笔记尚未创建，请先根据模板创建, template is at `40 Resources/42 Assets/Templates/Daily Note Template.md`，然后再写入计划。
+
+请保持专业、简洁，并确保计划符合我的科研和工程习惯。Give me a encouraging sentence at the end of the plan to motivate me for the day.
+"""
