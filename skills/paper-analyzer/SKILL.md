@@ -2,7 +2,7 @@
 name: paper-analyzer
 description: 自动分析Zotero库中的文献，生成带LaTeX公式的Markdown报告，并将报告上传为Zotero Note。
 version: 1.5.0
-author: [Your Name]
+author: Zhaohong Liu
 tags:
   - zotero
   - paper-analysis
