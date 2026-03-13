@@ -73,8 +73,8 @@ The system is built on a composite architecture that executes the following auto
 
 ```bash
 # Clone the repository
-git clone https://github.com/JaimeParker/JARVIS-Dev.git
-cd JARVIS-Dev
+git clone https://github.com/JaimeParker/stable-jarvis.git
+cd stable-jarvis
 
 # Ensure you are in your preferred virtual environment (e.g., conda activate jarvis)
 # Install the package in editable mode with dependencies
