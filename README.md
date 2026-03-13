@@ -85,7 +85,7 @@ pip install -e .
 
 ## ⚙️ 配置
 
-批注引擎需要 Zotero API 凭证。你可以通过环境变量或配置文件提供这些信息。
+批注引擎需要 Zotero API 凭证。你可以通过环境变量或配置文件提供这些信息。[Notion helper page](https://zhliu25.notion.site/stable-jarvis-3191d1c4d39280b68608e1430ef82dcb)
 
 ### 🛠️ 个性化定制 (必读)
 

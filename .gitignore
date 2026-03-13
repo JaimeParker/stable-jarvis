@@ -208,5 +208,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 GEMINI.md
+CLAUDE.md
 .gemini/commands/daily/plan.toml
 config/zotero.json
