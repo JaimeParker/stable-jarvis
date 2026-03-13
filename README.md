@@ -89,29 +89,11 @@ pip install -e .
 
 ### 🛠️ 个性化定制 (必读)
 
-在正式开始使用之前，你**必须**定制自己的科研身份和目标，以确保智能体的逻辑与你的实际工作对齐。
+在开始使用之前，您**必须**通过重命名以下模板文件并填写您的个人信息来初始化您的科研身份：
 
-1.  **GEMINI.md**: 打开此文件，将占位符 `I am a PhD student working in the field of xxx.` 替换为您具体的科研领域、研究资历和核心兴趣。该文件是您的 JARVIS 核心“系统提示词”。
-2.  **每日计划**: 修改 `.gemini/commands/daily/plan.toml`，以反映您真实的项目名称和 Obsidian 库结构。
-3.  **周报生成**: 如果使用 `weekly-report-generator`，请更新 `skills/weekly-report-generator/SKILL.md`，以符合您实验室特定的报告要求和命名规范。
-
-### 📂 推荐的 Obsidian 目录结构
-
-内置的技能（如每日计划和周报生成）针对以下 “Cyber Brain” 文件夹结构进行了优化。建议您据此组织您的 Obsidian 库：
-
-```text
-Cyber Brain/
-├── 00 Inbox/               # 存放新笔记和生成的报告的临时存储区
-├── 10 Projects/            # 活跃的科研和工程项目
-├── 20 Areas/               # 长期责任领域（如：实验室管理）
-├── 30 Zettelkasten/        # 永久性原子知识笔记
-├── 40 Resources/           
-│   └── 42 Assets/
-│       └── Templates/      # 每日笔记和周报的模板
-├── 50 Archive/
-│   └── Daily Notes/        # 存放您的 YYYY-MM-DD.md 每日笔记
-└── 60 System/              # Obsidian 配置与附件
-```
+1.  **系统提示词**: 将 `GEMINI.md.template` 重命名为 `GEMINI.md`。将占位符替换为您具体的研究领域和姓名。该文件定义了智能体的核心逻辑。
+2.  **每日计划**: 将 `.gemini/commands/daily/plan.toml.template` 重命名为 `.gemini/commands/daily/plan.toml`，并根据您的实际项目进行更新。
+3.  **Zotero 凭证**: 将 `config/zotero.json.template` 重命名为 `config/zotero.json` 并填入您的 API 密钥（或者使用下方的环境变量方式）。
 
 ### 选项 1：环境变量（推荐用于 CI/生产环境）
 

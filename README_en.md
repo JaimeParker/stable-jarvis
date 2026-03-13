@@ -87,29 +87,11 @@ Configure Zotero credentials using one of these methods (in priority order):
 
 ### 🛠️ Personalization (Mandatory)
 
-Before using the assistant, you **must** customize your research identity and goals to ensure the agent's logic aligns with your work.
+Before using the assistant, you **must** initialize your research identity by renaming the following template files and filling in your details:
 
-1.  **GEMINI.md**: Open this file and replace the placeholder `I am a PhD student working in the field of xxx.` with your specific research area, seniority, and primary interests. This file serves as the core "System Prompt" for your JARVIS.
-2.  **Daily Plan**: Modify `.gemini/commands/daily/plan.toml` to reflect your actual project names and Obsidian vault structure.
-3.  **Weekly Report**: If you use the `weekly-report-generator`, update `skills/weekly-report-generator/SKILL.md` with your lab's specific reporting requirements and naming conventions.
-
-### 📂 Recommended Obsidian Structure
-
-The built-in skills (like Daily Planning and Weekly Reporting) are optimized for the following "Cyber Brain" folder structure. We recommend organizing your Obsidian vault accordingly:
-
-```text
-Cyber Brain/
-├── 00 Inbox/               # Temporary storage for new notes and generated reports
-├── 10 Projects/            # Active research and engineering projects
-├── 20 Areas/               # Long-term responsibilities (e.g., Lab Management)
-├── 30 Zettelkasten/        # Permanent atomic knowledge notes
-├── 40 Resources/           
-│   └── 42 Assets/
-│       └── Templates/      # Templates for Daily Notes and Reports
-├── 50 Archive/
-│   └── Daily Notes/        # Where your YYYY-MM-DD.md notes live
-└── 60 System/              # Obsidian configuration and attachments
-```
+1.  **System Prompt**: Rename `GEMINI.md.template` to `GEMINI.md`. Replace the placeholders with your research area and name. This file defines the agent's logic.
+2.  **Daily Plan**: Rename `.gemini/commands/daily/plan.toml.template` to `.gemini/commands/daily/plan.toml` and update it with your active project names.
+3.  **Zotero Credentials**: Rename `config/zotero.json.template` to `config/zotero.json` and enter your API keys. (Alternatively, use environment variables below).
 
 ### Option 1: Environment Variables (Recommended)
 
