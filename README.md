@@ -210,8 +210,8 @@ stable-jarvis/
 
 本仓库内置的部分 AI 智能体技能改编自以下开源生态系统：
 
--   **`arxiv-search`**, **`skill-creator`**, **`web-research`**: 改编自 [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/master/libs/deepagents-cli/examples/skills/)。
--   **`pptx`**: 改编自 [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills)。
+-   **`arxiv-search`**, **`web-research`**: 改编自 [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/master/libs/deepagents-cli/examples/skills/)。
+-   **`skill-creator`**, **`pptx`**: 改编自 [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills)。
 -   **`obsidian-markdown`**: 改编自 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills)。
 
 感谢原作者提供的这些核心能力。

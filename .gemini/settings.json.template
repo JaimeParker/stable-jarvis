@@ -19,5 +19,10 @@
   },
   "security": {
     "enablePermanentToolApproval": true
+  },
+  "context": {
+    "includeDirectories": [
+      ""
+    ]
   }
 }
