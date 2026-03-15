@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.1.0",
+  "profile_id": "example-research-interest",
+  "profile_name": "Example Research Interest",
+  "updated_at": "2026-03-08T00:00:00+00:00",
+  "maintainer": "codex-research-assist",
+  "zotero_basis": {
+    "collections": [],
+    "tags": [],
+    "notes": "Replace this example with a Zotero-derived profile maintained by the skill workflow."
+  },
+  "retrieval_defaults": {
+    "logic": "AND",
+    "sort_by": "lastUpdatedDate",
+    "sort_order": "descending",
+    "since_days": 7,
+    "max_results_per_interest": 10,
+    "max_pages": 10,
+    "state_path": ".state/arxiv_profile_seen.json"
+  },
+  "interests": [
+    {
+      "interest_id": "bilevel-pinn",
+      "label": "Bilevel + PINN",
+      "enabled": true,
+      "categories": ["cs.LG", "math.NA"],
+      "method_keywords": ["Bilevel", "PINN"],
+      "query_aliases": [
+        "bilevel optimization",
+        "physics-informed neural network"
+      ],
+      "exclude_keywords": [],
+      "logic": "AND",
+      "notes": "Example only. Keep method labels short and let aliases handle minimal query expansion."
+    },
+    {
+      "interest_id": "elm-meshless",
+      "label": "ELM + Meshless",
+      "enabled": true,
+      "categories": ["cs.LG", "math.NA"],
+      "method_keywords": ["ELM"],
+      "query_aliases": [
+        "extreme learning machine",
+        "meshless PDE"
+      ],
+      "exclude_keywords": ["classification"],
+      "logic": "AND",
+      "notes": "Example only. Prefer method tags first, then add only the minimum retrieval aliases."
+    }
+  ]
+}

@@ -24,6 +24,39 @@ def _coalesce_non_empty(*values: str | None) -> str | None:
     return None
 
 
+def load_semantic_model_settings_from_env() -> dict[str, str]:
+    """
+    Load semantic model settings from environment variables.
+
+    Supported vars (preferred):
+    - STABLE_JARVIS_SEMANTIC_API_BASE_URL
+    - STABLE_JARVIS_SEMANTIC_API_KEY
+    - STABLE_JARVIS_SEMANTIC_MODEL
+
+    Compatibility fallbacks:
+    - OPENAI_BASE_URL
+    - OPENAI_API_KEY
+    - OPENAI_EMBEDDING_MODEL
+    """
+    return {
+        "api_base_url": _coalesce_non_empty(
+            os.getenv("STABLE_JARVIS_SEMANTIC_API_BASE_URL"),
+            os.getenv("OPENAI_BASE_URL"),
+        )
+        or "",
+        "api_key": _coalesce_non_empty(
+            os.getenv("STABLE_JARVIS_SEMANTIC_API_KEY"),
+            os.getenv("OPENAI_API_KEY"),
+        )
+        or "",
+        "model": _coalesce_non_empty(
+            os.getenv("STABLE_JARVIS_SEMANTIC_MODEL"),
+            os.getenv("OPENAI_EMBEDDING_MODEL"),
+        )
+        or "",
+    }
+
+
 def load_semantic_model_settings(api_keys_path: str | None = None) -> dict[str, str]:
     """
     Load semantic model settings from config/api_keys.json.
@@ -314,21 +347,26 @@ def build_semantic_search_fn(config: SemanticConfig):
     except ImportError as exc:
         raise ImportError("chromadb is required for semantic ranking") from exc
 
+    semantic_env_settings = load_semantic_model_settings_from_env()
     semantic_model_settings = load_semantic_model_settings(config.api_keys_path)
     resolved_base_url = _coalesce_non_empty(
         config.base_url,
+        semantic_env_settings.get("api_base_url"),
         semantic_model_settings.get("api_base_url"),
-        os.getenv("OPENAI_BASE_URL"),
     )
     resolved_api_key = _coalesce_non_empty(
         config.api_key,
+        semantic_env_settings.get("api_key"),
         semantic_model_settings.get("api_key"),
-        os.getenv("OPENAI_API_KEY"),
     )
     default_model = SemanticConfig.__dataclass_fields__["embedding_model"].default
     resolved_model = config.embedding_model
     if resolved_model == default_model:
-        resolved_model = _coalesce_non_empty(semantic_model_settings.get("model"), resolved_model) or default_model
+        resolved_model = _coalesce_non_empty(
+            semantic_env_settings.get("model"),
+            semantic_model_settings.get("model"),
+            resolved_model,
+        ) or default_model
 
     chroma_dir = Path(config.chroma_dir)
     chroma_dir.mkdir(parents=True, exist_ok=True)

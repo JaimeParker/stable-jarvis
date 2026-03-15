@@ -91,7 +91,7 @@ Configure Zotero credentials using one of these methods (in priority order):
 Before using the assistant, you **must** initialize your research identity by renaming the following template files and filling in your details:
 
 1.  **System Prompt**: Rename `GEMINI.md.template` to `GEMINI.md`. Replace the placeholders with your research area and name. This file defines the agent's logic.
-2.  **Daily Plan**: Rename `.gemini/commands/daily/plan.toml.template` to `.gemini/commands/daily/plan.toml` and update it with your active project names.
+2.  **Daily Plan Command**: The `daily plan` command must be configured by yourself. We provide a template at `commands/daily/plan.toml.template`; copy it to `commands/daily/plan.toml` and customize it for your active projects.
 3.  **Zotero Credentials**: Rename `config/zotero.json.template` to `config/zotero.json` and enter your API keys. (Alternatively, use environment variables below).
 
 ### Option 1: Environment Variables (Recommended)

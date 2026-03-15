@@ -9,7 +9,7 @@ from stable_jarvis.paper_finder.parser import parse_feed
 from stable_jarvis.paper_finder.query import build_search_query
 from stable_jarvis.paper_finder.ranker import rank_candidates, score_map_match
 from stable_jarvis.paper_finder.review import build_system_review
-from stable_jarvis.paper_finder.semantic import load_semantic_model_settings
+from stable_jarvis.paper_finder.semantic import load_semantic_model_settings, load_semantic_model_settings_from_env
 
 
 def _profile_payload() -> dict[str, object]:
@@ -204,3 +204,15 @@ def test_load_semantic_model_settings_from_api_keys_file(tmp_path):
     assert settings["api_base_url"] == "https://example.com/v1"
     assert settings["api_key"] == "test-key"
     assert settings["model"] == "my-embed-model"
+
+
+def test_load_semantic_model_settings_from_env(monkeypatch):
+    monkeypatch.setenv("STABLE_JARVIS_SEMANTIC_API_BASE_URL", "https://env.example.com/v1")
+    monkeypatch.setenv("STABLE_JARVIS_SEMANTIC_API_KEY", "env-key")
+    monkeypatch.setenv("STABLE_JARVIS_SEMANTIC_MODEL", "env-model")
+
+    settings = load_semantic_model_settings_from_env()
+
+    assert settings["api_base_url"] == "https://env.example.com/v1"
+    assert settings["api_key"] == "env-key"
+    assert settings["model"] == "env-model"

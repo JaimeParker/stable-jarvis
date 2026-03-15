@@ -93,7 +93,7 @@ pip install -e .
 在开始使用之前，您**必须**通过重命名以下模板文件并填写您的个人信息来初始化您的科研身份：
 
 1.  **系统提示词**: 将 `GEMINI.md.template` 重命名为 `GEMINI.md`。将占位符替换为您具体的研究领域和姓名。该文件定义了智能体的核心逻辑。
-2.  **每日计划**: 将 `.gemini/commands/daily/plan.toml.template` 重命名为 `.gemini/commands/daily/plan.toml`，并根据您的实际项目进行更新。
+2.  **每日计划命令**: `daily plan` 需要您自行配置；项目已提供模板 `commands/daily/plan.toml.template`，请复制为 `commands/daily/plan.toml` 后按您的项目实际情况修改。
 3.  **Zotero 凭证**: 将 `config/zotero.json.template` 重命名为 `config/zotero.json` 并填入您的 API 密钥（或者使用下方的环境变量方式）。
 
 ### 选项 1：环境变量（推荐用于 CI/生产环境）
