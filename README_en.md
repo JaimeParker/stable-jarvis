@@ -15,6 +15,24 @@ This framework is built upon a specific hierarchy of knowledge management to ens
 -   **Obsidian (The Local Cyber Brain)**: A curated, local knowledge base. It is a "clean room" containing only summarized, user-verified, and high-signal information. It functions as an external logical engine for coding agents to read and reference, effectively forming your "Cyber Brain." In this ecosystem, Obsidian is strictly for **ingestion and synthesis**—it is the source of truth, not a broad distribution channel.
 -   **Notion (The Exchange & Input Box)**: A dynamic platform for collaboration, quick notes, database management, and cross-team discussion. It acts as the "Inbox" for raw information and the "Output" for shared results and sharing.
 
+### 📁 Recommended Obsidian Vault Structure
+
+To maximize the efficiency of Stable-JARVIS skills (like `paper-finder` and `daily plan`), we recommend structuring your Obsidian vault using the following logic:
+
+```text
+/ (Vault Root)
+├── 00 Inbox/                # Inbox for new notes, paper drafts, and uncategorized info
+├── 10 Projects/             # Active Research Projects
+├── 20 Areas/                # Long-term research areas and interests
+├── 30 Zettelkasten/         # Permanent, atomic knowledge notes
+├── 40 Resources/            # Reference materials
+│   └── 42 Assets/
+│       └── Templates/       # Core templates (e.g., Daily Note Template.md)
+├── 50 Archive/              # Archived or inactive projects
+│   └── Daily Notes/         # Daily logs in YYYY-MM-DD.md format
+└── 60 System/               # Vault metadata and configuration
+```
+
 ## 🛠️ Built-in Skills
 
 The framework includes several specialized skills that can be activated by the agent:

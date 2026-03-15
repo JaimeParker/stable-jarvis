@@ -17,6 +17,24 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 -   **Obsidian (本地数字大脑)**：经过精选的本地知识库。它是一个“无尘室”，仅包含经过总结、用户验证和高信号的信息。它充当编程智能体读取和引用的外部逻辑引擎，构成了您的“数字大脑”。在这个生态系统中，Obsidian 严格用于**知识摄取与合成**——它是事实的来源，而非信息分发渠道。
 -   **Notion (交换站与输入框)**：用于协作、快速记录、数据库管理和跨团队讨论的动态平台。它充当原始信息的“收件箱”以及共享结果和发布的“输出口”。
 
+### 📁 推荐的 Obsidian 库架构 (Recommended Vault Structure)
+
+为了让 Stable-JARVIS 技能（如 `paper-finder` 和 `daily plan`）发挥最佳性能，建议您的 Obsidian 库采用以下层次结构：
+
+```text
+/ (Vault Root)
+├── 00 Inbox/                # 新建笔记、论文草案及待分类信息的收件箱
+├── 10 Projects/             # 当前正在进行的科研项目 (Active Projects)
+├── 20 Areas/                # 持续关注的研究领域 (Research Areas)
+├── 30 Zettelkasten/         # 永久性的知识点原子笔记 (Permanent Notes)
+├── 40 Resources/            # 长期参考资料
+│   └── 42 Assets/
+│       └── Templates/       # 包含 Daily Note Template.md 等核心模板
+├── 50 Archive/              # 已完成或非活跃的项目归档
+│   └── Daily Notes/         # 存放 YYYY-MM-DD.md 格式的每日笔记
+└── 60 System/               # 库自身的元数据与配置
+```
+
 ## 🛠️ 内置技能 (Built-in Skills)
 
 框架包含多个可供智能体调用的专用技能：
