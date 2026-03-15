@@ -82,6 +82,9 @@ cd stable-jarvis
 # 确保你处于首选的虚拟环境中（如：conda activate jarvis）
 # 以开发者模式安装该包及其依赖
 pip install -e .
+
+# 如需使用 paper-finder 的语义搜索（--semantic），请安装 semantic 扩展依赖
+pip install -e '.[semantic]'
 ```
 
 ## ⚙️ 配置
@@ -95,6 +98,7 @@ pip install -e .
 1.  **系统提示词**: 将 `GEMINI.md.template` 重命名为 `GEMINI.md`。将占位符替换为您具体的研究领域和姓名。该文件定义了智能体的核心逻辑。
 2.  **每日计划命令**: `daily plan` 需要您自行配置；项目已提供模板 `commands/daily/plan.toml.template`，请复制为 `commands/daily/plan.toml` 后按您的项目实际情况修改。
 3.  **Zotero 凭证**: 将 `config/zotero.json.template` 重命名为 `config/zotero.json` 并填入您的 API 密钥（或者使用下方的环境变量方式）。
+4.  **语义搜索凭证（可选）**: 如果您要使用 `paper-finder --semantic`，请基于 `config/api_keys.json.template` 创建 `config/api_keys.json`，并填写 `semantic_model.api_base_url`、`semantic_model.api_key` 与 `semantic_model.model`（或改用环境变量方式）。
 
 ### 选项 1：环境变量（推荐用于 CI/生产环境）
 
@@ -119,6 +123,28 @@ export ZOTERO_LIBRARY_TYPE="user"  # 可选，默认为 "user"
     "library_type": "user"
 }
 ```
+
+如需启用 `paper-finder` 的语义搜索，还需要准备 `config/api_keys.json`。可直接复制模板 `config/api_keys.json.template`，并填写如下字段：
+
+```json
+{
+    "semantic_model": {
+        "api_base_url": "https://api.your-provider.com/v1",
+        "api_key": "your_semantic_api_key",
+        "model": "your-embedding-model"
+    }
+}
+```
+
+或者也可以直接使用环境变量配置语义搜索：
+
+```bash
+export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
+export STABLE_JARVIS_SEMANTIC_API_KEY="your_semantic_api_key"
+export STABLE_JARVIS_SEMANTIC_MODEL="your-embedding-model"
+```
+
+如果您使用的是 SiliconFlow 的 embedding 服务，建议从 `Qwen/Qwen3-Embedding-8B` 开始尝试，参考[SiliconFlow Embedding Models](https://cloud.siliconflow.cn/me/models?types=embedding)。比如 `api_base_url` 可以是 `https://api.siliconflow.cn/v1`，`model` 则是 `Qwen/Qwen3-Embedding-8B`。
 
 ## 📖 快速开始
 

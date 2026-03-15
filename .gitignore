@@ -213,3 +213,4 @@ CLAUDE.md
 config/zotero.json
 config/api_keys.json
 .gemini/settings.json
+.state

@@ -321,9 +321,12 @@ class OpenAIEmbeddingFunction:
             client_kwargs["base_url"] = self.base_url
         self.client = openai.OpenAI(**client_kwargs)
 
-    def __call__(self, input_texts: list[str]) -> list[list[float]]:
-        response = self.client.embeddings.create(model=self.model_name, input=input_texts)
+    def __call__(self, input: list[str]) -> list[list[float]]:
+        response = self.client.embeddings.create(model=self.model_name, input=input)
         return [item.embedding for item in response.data]
+
+    def name(self) -> str:
+        return "openai"
 
 
 @dataclass(slots=True)

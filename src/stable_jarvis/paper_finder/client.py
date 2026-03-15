@@ -11,8 +11,8 @@ ARXIV_HTTPS = "https://export.arxiv.org/api/query"
 ARXIV_HTTP = "http://export.arxiv.org/api/query"
 DEFAULT_TIMEOUT = float(os.getenv("ARXIV_TIMEOUT", "45"))
 MAX_ATTEMPTS = int(os.getenv("ARXIV_MAX_ATTEMPTS", "6"))
-BASE_PAUSE = float(os.getenv("ARXIV_PAUSE", "1.5"))
-MAX_SLEEP = float(os.getenv("ARXIV_MAX_SLEEP", "20"))
+BASE_PAUSE = float(os.getenv("ARXIV_PAUSE", "5.0"))
+MAX_SLEEP = float(os.getenv("ARXIV_MAX_SLEEP", "60"))
 RETRYABLE_STATUS = {429, 500, 502, 503, 504}
 HEADERS = {
     "User-Agent": os.getenv(

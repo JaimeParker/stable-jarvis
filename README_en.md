@@ -80,6 +80,9 @@ cd stable-jarvis
 # Ensure you are in your preferred virtual environment (e.g., conda activate jarvis)
 # Install the package in editable mode with dependencies
 pip install -e .
+
+# If you want semantic search in paper-finder (--semantic), install semantic extras
+pip install -e '.[semantic]'
 ```
 
 ## ⚙️ Configuration
@@ -93,6 +96,7 @@ Before using the assistant, you **must** initialize your research identity by re
 1.  **System Prompt**: Rename `GEMINI.md.template` to `GEMINI.md`. Replace the placeholders with your research area and name. This file defines the agent's logic.
 2.  **Daily Plan Command**: The `daily plan` command must be configured by yourself. We provide a template at `commands/daily/plan.toml.template`; copy it to `commands/daily/plan.toml` and customize it for your active projects.
 3.  **Zotero Credentials**: Rename `config/zotero.json.template` to `config/zotero.json` and enter your API keys. (Alternatively, use environment variables below).
+4.  **Semantic Search Credentials (Optional)**: If you want to use `paper-finder --semantic`, create `config/api_keys.json` from `config/api_keys.json.template` and fill in `semantic_model.api_base_url`, `semantic_model.api_key`, and `semantic_model.model` (or use environment variables instead).
 
 ### Option 1: Environment Variables (Recommended)
 
@@ -117,6 +121,28 @@ Create a `zotero.json` file in one of the following locations (searched in order
     "library_type": "user"
 }
 ```
+
+To enable semantic search in `paper-finder`, you also need `config/api_keys.json`. You can copy `config/api_keys.json.template` and fill it like this:
+
+```json
+{
+    "semantic_model": {
+        "api_base_url": "https://api.your-provider.com/v1",
+        "api_key": "your_semantic_api_key",
+        "model": "your-embedding-model"
+    }
+}
+```
+
+Or configure semantic search directly with environment variables:
+
+```bash
+export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
+export STABLE_JARVIS_SEMANTIC_API_KEY="your_semantic_api_key"
+export STABLE_JARVIS_SEMANTIC_MODEL="your-embedding-model"
+```
+
+If you are using SiliconFlow's embedding service, a good starting choice is `Qwen/Qwen3-Embedding-8B`, refer to [SiliconFlow Embedding Models](https://cloud.siliconflow.cn/me/models?types=embedding).
 
 ## 📖 Quick Start
 
