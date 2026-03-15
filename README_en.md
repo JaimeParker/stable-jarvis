@@ -20,6 +20,7 @@ This framework is built upon a specific hierarchy of knowledge management to ens
 The framework includes several specialized skills that can be activated by the agent:
 
 -   **`paper-analyzer`**: The core research skill. Orchestrates Zotero-MCP, multi-modal PDF reading, and Zotero Web API to generate deep technical reports and native annotations.
+-   **`paper-finder`**: A profile-driven paper discovery skill. It queries arXiv with your research-interest profile, ranks candidates (lexical + optional semantic), and writes Obsidian-ready Markdown notes.
 -   **`arxiv-search`**: Direct integration with arXiv to retrieve the latest preprints in computer science, physics, and mathematics.
 -   **`web-research`**: Executes structured, deep-dive investigations using sub-agents to synthesize information from across the web.
 -   **`weekly-report-generator`**: Automatically synthesizes your progress from Obsidian daily notes into a professional one-page PPTX slide.
@@ -172,6 +173,21 @@ converter.save_image_manifest(metadata, "./figures/manifest.json")
 # Output example: [{"filename": "ABC12345_fig1.png", "page": 1, "description": "Figure at the top of page 1"}]
 ```
 
+### 4. Profile-driven Paper Finder (Obsidian notes)
+
+```bash
+# Run profile-based retrieval and write markdown notes
+conda run -n jarvis python skills/paper-finder/find_papers.py \
+    --profile path/to/research-interest.json \
+    --output path/to/obsidian/inbox
+
+# Enable semantic ranking (reads semantic_model from config/api_keys.json)
+conda run -n jarvis python skills/paper-finder/find_papers.py \
+    --profile path/to/research-interest.json \
+    --output path/to/obsidian/inbox \
+    --semantic
+```
+
 ## 📁 Project Structure
 
 ```text
@@ -211,5 +227,6 @@ Some of the built-in AI agent skills in this repository are adapted from the fol
 -   **`arxiv-search`**, **`web-research`**: Adapted from [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/master/libs/deepagents-cli/examples/skills/).
 -   **`skill-creator`**, **`pptx`**: Adapted from [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills).
 -   **`obsidian-markdown`**: Adapted from [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills).
+-   **`paper-finder`**: Adapted from [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist).
 
 All credit goes to the original authors for these foundational capabilities.

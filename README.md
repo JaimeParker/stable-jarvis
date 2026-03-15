@@ -22,6 +22,7 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 框架包含多个可供智能体调用的专用技能：
 
 -   **`paper-analyzer`**: 核心科研技能。编排 Zotero-MCP、多模态 PDF 阅读和 Zotero Web API，生成深度技术报告和原生批注。
+-   **`paper-finder`**: 基于研究兴趣画像的论文发现技能。按 profile 检索 arXiv，执行词法+可选语义排序，并输出 Obsidian 可直接摄取的 Markdown 笔记。
 -   **`arxiv-search`**: 直接集成 arXiv，检索计算机科学、物理和数学领域的最新预印本。
 -   **`web-research`**: 使用子智能体执行结构化的深度调研，从全网合成并提炼信息。
 -   **`weekly-report-generator`**: 自动将 Obsidian 每日笔记中的进度合成到专业的单页 PPTX 幻灯片中。
@@ -174,6 +175,21 @@ converter.save_image_manifest(metadata, "./figures/manifest.json")
 # 输出示例: [{"filename": "ABC12345_fig1.png", "page": 1, "description": "Figure at the top of page 1"}]
 ```
 
+### 4. 画像驱动的论文发现（输出 Obsidian 笔记）
+
+```bash
+# 运行基于 profile 的检索与排序，输出 Markdown 笔记
+conda run -n jarvis python skills/paper-finder/find_papers.py \
+    --profile path/to/research-interest.json \
+    --output path/to/obsidian/inbox
+
+# 启用语义排序（自动读取 config/api_keys.json 中 semantic_model）
+conda run -n jarvis python skills/paper-finder/find_papers.py \
+    --profile path/to/research-interest.json \
+    --output path/to/obsidian/inbox \
+    --semantic
+```
+
 ## 📁 项目结构
 
 ```text
@@ -213,5 +229,6 @@ stable-jarvis/
 -   **`arxiv-search`**, **`web-research`**: 改编自 [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/master/libs/deepagents-cli/examples/skills/)。
 -   **`skill-creator`**, **`pptx`**: 改编自 [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills)。
 -   **`obsidian-markdown`**: 改编自 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills)。
+-   **`paper-finder`**: 改编自 [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist)。
 
 感谢原作者提供的这些核心能力。

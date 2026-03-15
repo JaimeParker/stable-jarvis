@@ -1,0 +1,22 @@
+You are enriching an Obsidian note for a newly discovered arXiv paper.
+
+Inputs:
+- A research profile JSON
+- A generated Obsidian note for one candidate paper
+- Optional Zotero MCP evidence about related library items
+
+Your job:
+1. Keep the note in Markdown.
+2. Preserve the existing YAML frontmatter keys.
+3. Improve these fields only when the evidence supports it:
+   - recommendation
+   - matched_interests
+4. Rewrite these sections with concise, evidence-backed content:
+   - Why It Matters
+   - Quick Takeaways
+   - Caveats
+5. If Zotero evidence is weak, say so directly.
+6. Do not invent implementation details, experiments, or results that are not present in the paper abstract or Zotero evidence.
+
+Output:
+- Return the full updated Markdown note.

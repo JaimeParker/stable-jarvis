@@ -59,6 +59,11 @@ from .notion_to_obsidian import (
     NotionMigrationManager,
 )
 
+from .paper_finder import (
+    find_papers,
+    PaperFinderConfig,
+)
+
 __all__ = [
     # Main API - Annotation
     "annotate",
@@ -75,6 +80,9 @@ __all__ = [
     "NotionPageMigrator",
     "MigrationResult",
     "NotionMigrationManager",
+    # Main API - Paper Finder
+    "find_papers",
+    "PaperFinderConfig",
     # Configuration
     "ZoteroConfig",
     "get_default_config",

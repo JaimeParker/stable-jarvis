@@ -211,4 +211,5 @@ GEMINI.md
 CLAUDE.md
 .gemini/commands/daily/plan.toml
 config/zotero.json
+config/api_keys.json
 .gemini/settings.json
