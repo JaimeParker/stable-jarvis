@@ -40,27 +40,28 @@ def _render_neighbors(neighbors: list[SemanticNeighbor]) -> list[str]:
 
 
 def render_obsidian_note(candidate: CandidateCard) -> str:
-    frontmatter: list[str] = ["---"]
-    frontmatter.append(f"title: {_yaml_scalar(candidate.paper.title)}")
-    frontmatter.extend(_yaml_list("authors", candidate.paper.authors))
-    frontmatter.append(f"year: {_yaml_scalar(candidate.paper.year)}")
-    frontmatter.append(f"arxiv_id: {_yaml_scalar(candidate.paper.arxiv_id)}")
-    frontmatter.append(f"doi: {_yaml_scalar(candidate.paper.doi)}")
-    frontmatter.append(f"url: {_yaml_scalar(candidate.paper.url)}")
-    frontmatter.append(f"pdf_url: {_yaml_scalar(candidate.paper.pdf_url)}")
-    frontmatter.extend(_yaml_list("categories", candidate.paper.categories))
-    frontmatter.append(f"recommendation: {_yaml_scalar(candidate.review.recommendation)}")
-    frontmatter.append(f"map_match_score: {candidate.scores.map_match:.4f}")
-    frontmatter.append(f"semantic_score: {candidate.scores.zotero_semantic:.4f}")
-    frontmatter.append(f"total_score: {candidate.scores.total:.4f}")
-    tags = [f"arxiv/{category.lower()}" for category in candidate.paper.categories]
-    tags.append(f"recommendation/{candidate.review.recommendation}")
-    frontmatter.extend(_yaml_list("tags", tags))
-    frontmatter.extend(_yaml_list("matched_interests", candidate.triage.matched_interest_labels))
-    frontmatter.append("---")
+    metadata = [
+        "## Metadata",
+        f"- **Authors**: {', '.join(candidate.paper.authors)}",
+        f"- **Year**: {candidate.paper.year}",
+        f"- **arXiv ID**: {candidate.paper.arxiv_id}",
+        f"- **DOI**: {candidate.paper.doi or 'N/A'}",
+        f"- **Categories**: {', '.join(candidate.paper.categories)}",
+        f"- **Recommendation**: {candidate.review.recommendation}",
+        f"- **Scores**: Map Match: {candidate.scores.map_match:.4f} | Semantic: {candidate.scores.zotero_semantic:.4f} | Total: {candidate.scores.total:.4f}",
+        f"- **Matched Interests**: {', '.join(candidate.triage.matched_interest_labels)}",
+    ]
+    
+    tags = [f"#arxiv/{category.lower()}" for category in candidate.paper.categories]
+    tags.append(f"#recommendation/{candidate.review.recommendation}")
+    metadata.append(f"- **Tags**: {' '.join(tags)}")
 
     body = [
         f"# {candidate.paper.title}",
+        "",
+    ]
+    body.extend(metadata)
+    body.extend([
         "",
         "## Abstract",
         candidate.paper.abstract or "No abstract was available from arXiv.",
@@ -69,7 +70,7 @@ def render_obsidian_note(candidate: CandidateCard) -> str:
         candidate.review.why_it_matters or "Not yet enriched.",
         "",
         "## Quick Takeaways",
-    ]
+    ])
     body.extend([f"- {item}" for item in candidate.review.quick_takeaways] or ["- No takeaways yet."])
     body.extend([
         "",
@@ -95,9 +96,8 @@ def render_obsidian_note(candidate: CandidateCard) -> str:
         body.append(f"- Project: {url}")
     for url in candidate.paper.other_urls:
         body.append(f"- Link: {url}")
-    if len(body) == 2:
-        body.append("- No links extracted.")
-    return "\n".join(frontmatter + [""] + body).strip() + "\n"
+    
+    return "\n".join(body).strip() + "\n"
 
 
 def write_notes(candidates: list[CandidateCard], output_dir: str | Path, overwrite: bool = False) -> list[Path]:

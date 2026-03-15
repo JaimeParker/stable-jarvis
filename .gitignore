@@ -209,8 +209,8 @@ marimo/_lsp/
 __marimo__/
 GEMINI.md
 CLAUDE.md
-.gemini/commands/daily/plan.toml
 config/zotero.json
 config/api_keys.json
+.gemini/commands/
 .gemini/settings.json
-.state
+.state/

@@ -1,2 +1,0 @@
-description = "Analyze paper using paper-analyzer skill"
-prompt = "Activate the `paper-analyzer` skill to analyze the paper: {{args}}"

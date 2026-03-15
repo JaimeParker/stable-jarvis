@@ -70,6 +70,44 @@ The system is built on a composite architecture that executes the following auto
    - **Locate**: Scans the PDF to find the absolute page coordinates (bounding boxes) for the exact quotes returned by the LLM.
    - **Inject**: Transforms these coordinates into Zotero's native `annotationPosition` format and pushes them via the Zotero API, making the highlights and notes natively accessible and editable within Zotero's built-in PDF reader.
 
+## 💻 Client Installation & Integration
+
+The functionalities of Stable-JARVIS are extended through **Commands** and **Skills**. To enable your AI client to recognize these features, follow the integration steps for your specific platform:
+
+### 1. Gemini CLI
+Gemini CLI automatically registers `.toml` files located in `.gemini/commands/` and manages skills via the `skills` command.
+
+- **Installing Commands**:
+  ```bash
+  # Symlink commands to the project-local configuration (Recommended)
+  mkdir -p .gemini/commands
+  ln -s $(pwd)/commands/daily/plan.toml .gemini/commands/daily:plan.toml
+  ln -s $(pwd)/commands/paper/analyze.toml .gemini/commands/paper:analyze.toml
+  # To reload commands in Gemini CLI: /commands reload
+  ```
+- **Installing Skills**:
+  ```bash
+  gemini skills install ./skills
+  ```
+
+### 2. Claude Code
+Claude Code and other modern agents typically look for Markdown-based instructions or skill definitions in `.claude/skills/`.
+
+- **Integration**:
+  ```bash
+  mkdir -p .claude/skills
+  # Link skill directories (Claude will recognize the SKILL.md within)
+  ln -s $(pwd)/skills/paper-analyzer .claude/skills/paper-analyzer
+  ```
+
+### 3. Codex / GitHub Copilot
+For GitHub Copilot CLI or custom agents, we recommend using repository-level instruction files.
+
+- **Global Instructions**: Link or copy the content of `GEMINI.md` to `.github/copilot-instructions.md`.
+- **Specific Agents**: Create symlinks in `.github/instructions/` pointing to the skill definitions in this repository.
+
+---
+
 ## 🚀 Installation
 
 ```bash
@@ -217,7 +255,14 @@ conda run -n jarvis python skills/paper-finder/find_papers.py \
 ## 📁 Project Structure
 
 ```text
-JARVIS-Dev/
+stable-jarvis/
+├── config/                          # Local config templates and credential files
+│   ├── zotero.json.template         # Zotero API config template
+│   ├── api_keys.json.template       # Semantic search config template for paper-finder
+│   └── research-interest.example.json  # Example research profile
+├── commands/                        # Client / agent command templates
+│   ├── daily/                       # Daily planning commands
+│   └── paper/                       # Paper-related commands
 ├── src/
 │   ├── stable_jarvis/
 │   │   ├── annotation/              # Non-destructive Zotero annotation engine
@@ -225,13 +270,18 @@ JARVIS-Dev/
 │   │   │   ├── config.py            # Credential configuration
 │   │   │   ├── coordinates.py       # PyMuPDF coordinate extraction
 │   │   │   └── zotero_client.py     # Zotero Web API interactions
+│   │   ├── notion_to_obsidian/      # Notion-to-Obsidian migration utilities
+│   │   ├── paper_finder/            # Profile-driven arXiv retrieval, ranking, and Obsidian note output
 │   │   └── report_generator/        # PDF extraction and conversion
-│   │       └── converter.py         # PDF-to-MD and Image extraction
+│   │       └── converter.py         # PDF-to-Markdown and image extraction
 │   ├── scripts/                     # CLI execution scripts for skills
 │   └── tests/                       # Unit tests
 ├── skills/                          # Specialized AI agent skills
+│   ├── paper-finder/                # Paper discovery skill wrapper and prompts
+│   ├── paper-analyzer/              # Deep paper analysis skill
+│   └── ...
 ├── pyproject.toml                   # Project metadata and build configuration
-└── README.md
+└── README.md                        # Chinese documentation
 ```
 
 ## 🤝 Contributing & Community Flywheel
