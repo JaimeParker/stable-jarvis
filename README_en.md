@@ -64,6 +64,23 @@ Stable-JARVIS relies on a core context file to guide the AI agent's personality 
 -   **Claude Code**: Uses `CLAUDE.md` (You can simply copy `GEMINI.md` to `CLAUDE.md`)
 -   **Other Clients**: Refer to your client's documentation for its specific context file naming convention.
 
+### 1. Claude Code Agent Registration
+
+Claude Code allows defining specialized sub-agents via Markdown files. To enable the agents in this project:
+
+- **Project-Level Registration**: Copy `agents/*.md` to the `.claude/agents/` directory.
+- **Global Registration**: Copy `agents/*.md` to the `~/.claude/agents/` directory.
+- **Usage**: You can invoke them using slash commands in the Claude Code CLI, e.g., `/planner` or `/python-reviewer`.
+
+### 2. Gemini CLI Agent Support (Persona Adoption)
+
+Gemini CLI **does not natively support** registering static Markdown files as slash-command agents via a `/agent` command.
+
+**Solution**:
+You can leverage Gemini's powerful long-context window by instructing it to adopt the personas defined in the `agents/` directory:
+- **Manual Adoption**: Send a prompt like: "Please read `agents/architect.md` and adopt the Architect persona to review my design."
+- **Dynamic Orchestration**: As your Cyber Brain Custodian, I will automatically consult these files and execute the SOPs (Standard Operating Procedures) defined within them when the task demands specialized expertise.
+
 ## 🌟 Key Features
 
 - **Non-Destructive PDF Annotation**: Extracts text coordinates using `PyMuPDF` and injects highlights, comments, and notes directly via the Zotero Web API. The original PDF file hash remains completely unchanged.
