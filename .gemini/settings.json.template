@@ -15,6 +15,9 @@
         "mcp-remote",
         "https://mcp.notion.com/mcp"
       ]
+    },
+    "exa": {
+      "httpUrl": "https://mcp.exa.ai/mcp"
     }
   },
   "security": {
