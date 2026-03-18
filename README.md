@@ -83,7 +83,7 @@ Gemini CLI 目前**不原生支持**通过 `/agent` 命令注册静态 Markdown 
 - **手动启用**：在对话开始时发送：“请读取 `agents/architect.md` 并作为架构师人设为我的设计提供建议。”
 - **动态调用**：作为您的 Cyber Brain 托管者，我会在任务需要时主动读取这些文件并执行其定义的 SOP（标准作业程序）。
 
-## 🌟 核心功能特
+## 🌟 核心功能
 
 - **无损 PDF 批注**：使用 `PyMuPDF` 提取文本坐标，并通过 Zotero Web API 直接注入高亮、评论和笔记。原始 PDF 文件的哈希值保持完全不变。
 - **高保真 PDF 转 Markdown**：利用 `pymupdf4llm` 和 LaTeX 源码检索技术，将复杂的学术论文（包括数学公式）转换为对大模型友好的 Markdown 格式。
