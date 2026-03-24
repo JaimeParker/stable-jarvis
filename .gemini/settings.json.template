@@ -8,6 +8,14 @@
       "timeout": 60000,
       "trust": true
     },
+    "obsidian": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@bitbonsai/mcpvault@latest",
+        "/path_to_your_obsidian_vault"
+      ]
+    },
     "notion": {
       "command": "npx",
       "args": [

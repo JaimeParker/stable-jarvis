@@ -383,5 +383,6 @@ stable-jarvis/
 -   **`obsidian-markdown`**: 改编自 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills)。
 -   **`paper-finder`**: 改编自 [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist)。
 -   **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`exa-search`**, **`tech-doc-writing`**: 改编自 [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)。
+-   **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: 改编自 [obra/superpowers](https://github.com/obra/superpowers)。
 
 感谢原作者提供的这些核心能力。

@@ -4,12 +4,12 @@ prompt = """
 
 1. **研究阶段**：
    - 读取最近 5 天的每日笔记（位于 `50 Archive/Daily Notes/`）。
-   - 识别所有“今日已毕”中提到的项目（如 Project A、Project B 等）的最新进度。
-   - 提取之前计划中未完成的任务以及在“明日先思”或“明日计划”中提到的预想任务。
-   - Check the projects in obsidian vault 10 Projects/ to see if there are any updates or deadlines that should be considered for today's plan.
+   - 识别所有“今日已毕”中提到的项目（如 Project A、Project B 等）的最新进度, read the MOC to locate recent progress.
+   - 提取之前计划中未完成的任务以及在“明日先思”或“明日计划” (tomorrow plan) 中提到的预想任务。
+   - Check the projects' MOC in obsidian vault 10 Projects/ to see if there are any updates or deadlines that should be considered for today's plan.
 
 2. **策略阶段**：
-   - 综合考虑项目的紧迫性（如硬件寄送、代码验证）和研究的连续性。
+   - 综合考虑项目的紧迫性和研究的连续性。
    - Scientific research should has the first priority, followed by engineering tasks.
    - 制定一个结构化、带优先级（高/中/低）的今日计划。
 

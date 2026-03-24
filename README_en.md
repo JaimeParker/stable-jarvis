@@ -383,5 +383,6 @@ Some of the built-in AI agent skills in this repository are adapted from the fol
 -   **`obsidian-markdown`**: Adapted from [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills).
 -   **`paper-finder`**: Adapted from [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist).
 -   **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`exa-search`**, **`tech-doc-writing`**: Adapted from [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code).
+-   **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: Adapted from [obra/superpowers](https://github.com/obra/superpowers).
 
 All credit goes to the original authors for these foundational capabilities.
