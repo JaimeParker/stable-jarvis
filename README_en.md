@@ -129,17 +129,20 @@ Claude Code looks for agent definitions and skills in `.claude/` directories.
   ```
 
 ### 3. Codex / GitHub Copilot
-For GitHub Copilot Extensions or custom agents, instructions and skills can be linked as follows:
+For Codex, use `AGENTS.md` as the repository instruction file. For GitHub Copilot or custom agents, instructions and skills can be linked as follows:
 
-- **Installing Agents**:
+- **Installing Instructions**:
   ```bash
-  # Global instructions (Recommended)
-  mkdir -p ~/.copilot/instructions
-  ln -s $(pwd)/GEMINI.md ~/.copilot/instructions/stable-jarvis.md
+  # Codex repo-local instructions (Recommended for beginners)
+  cp AGENTS.md.template AGENTS.md
 
-  # Workspace-local (Optional)
+  # GitHub Copilot global instructions (Optional)
+  mkdir -p ~/.copilot/instructions
+  ln -s $(pwd)/AGENTS.md ~/.copilot/instructions/stable-jarvis.md
+
+  # GitHub Copilot workspace-local (Optional)
   mkdir -p .github/instructions
-  ln -s $(pwd)/GEMINI.md .github/instructions/stable-jarvis.md
+  ln -s $(pwd)/AGENTS.md .github/instructions/stable-jarvis.md
   ```
 - **Installing Skills**:
   ```bash
@@ -201,7 +204,7 @@ Configure Zotero credentials using one of these methods (in priority order):
 
 Before using the assistant, you **must** initialize your research identity by renaming the following template files and filling in your details:
 
-1.  **System Prompt**: Rename `GEMINI.md.template` to `GEMINI.md`. Replace the placeholders with your research area and name. This file defines the agent's logic.
+1.  **Instruction Files**: Choose the file that matches your client. For Gemini, rename `GEMINI.md.template` to `GEMINI.md`. For Codex, copy `AGENTS.md.template` to `AGENTS.md`. Replace the placeholders with your research area and name. These files define the agent's core behavior.
 2.  **Daily Plan Command**: The `daily plan` command must be configured by yourself. We provide a template at `commands/daily/plan.toml.template`; copy it to `commands/daily/plan.toml` and customize it for your active projects.
 3.  **Zotero Credentials**: Rename `config/zotero.json.template` to `config/zotero.json` and enter your API keys. (Alternatively, use environment variables below).
 4.  **Semantic Search Credentials (Optional)**: If you want to use `paper-finder --semantic`, create `config/api_keys.json` from `config/api_keys.json.template` and fill in `semantic_model.api_base_url`, `semantic_model.api_key`, and `semantic_model.model` (or use environment variables instead).

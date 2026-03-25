@@ -131,17 +131,20 @@ Claude Code 在 `.claude/` 目录下查找智能体定义和技能。
   ```
 
 ### 3. Codex / GitHub Copilot
-对于 GitHub Copilot 扩展或自定义智能体，可以通过以下方式链接指令和技能：
+对于 Codex，请使用 `AGENTS.md` 作为仓库级指令文件。对于 GitHub Copilot 扩展或自定义智能体，可以通过以下方式链接指令和技能：
 
-- **安装智能体 (Agents)**:
+- **安装指令文件**:
   ```bash
-  # 全局指令链接 (推荐)
+  # Codex 仓库内指令 (推荐新手使用)
+  cp AGENTS.md.template AGENTS.md
+
+  # GitHub Copilot 全局指令链接 (可选)
   mkdir -p ~/.copilot/instructions
-  ln -s $(pwd)/GEMINI.md ~/.copilot/instructions/stable-jarvis.md
+  ln -s $(pwd)/AGENTS.md ~/.copilot/instructions/stable-jarvis.md
 
   # 项目局部链接 (可选)
   mkdir -p .github/instructions
-  ln -s $(pwd)/GEMINI.md .github/instructions/stable-jarvis.md
+  ln -s $(pwd)/AGENTS.md .github/instructions/stable-jarvis.md
   ```
 - **安装技能 (Skills)**:
   ```bash
@@ -203,7 +206,7 @@ pip install -e '.[semantic]'
 
 在开始使用之前，您**必须**通过重命名以下模板文件并填写您的个人信息来初始化您的科研身份：
 
-1.  **系统提示词**: 将 `GEMINI.md.template` 重命名为 `GEMINI.md`。将占位符替换为您具体的研究领域和姓名。该文件定义了智能体的核心逻辑。
+1.  **指令文件**: 根据您使用的客户端选择对应文件。Gemini 用户请将 `GEMINI.md.template` 重命名为 `GEMINI.md`；Codex 用户请将 `AGENTS.md.template` 复制为 `AGENTS.md`。将占位符替换为您具体的研究领域和姓名。这些文件定义了智能体的核心行为。
 2.  **每日计划命令**: `daily plan` 需要您自行配置；项目已提供模板 `commands/daily/plan.toml.template`，请复制为 `commands/daily/plan.toml` 后按您的项目实际情况修改。
 3.  **Zotero 凭证**: 将 `config/zotero.json.template` 重命名为 `config/zotero.json` 并填入您的 API 密钥（或者使用下方的环境变量方式）。
 4.  **语义搜索凭证（可选）**: 如果您要使用 `paper-finder --semantic`，请基于 `config/api_keys.json.template` 创建 `config/api_keys.json`，并填写 `semantic_model.api_base_url`、`semantic_model.api_key` 与 `semantic_model.model`（或改用环境变量方式）。
