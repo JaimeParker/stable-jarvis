@@ -56,61 +56,12 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 
 > 💡 **即将到来**：敬请关注我们即将推出的 **Feishu (飞书) MCP** 集成！
 
-## 🖥️ 客户端配置
-
-Stable-JARVIS 依赖核心上下文文件来指导 AI 智能体的人设和逻辑。根据您选择的客户端，请确保项目根目录中存在相应的文件：
-
--   **Gemini CLI**: 使用 `GEMINI.md`
--   **Claude Code**: 使用 `CLAUDE.md` (您可以直接将 `GEMINI.md` 复制为 `CLAUDE.md`)
--   **其他客户端**: 请参考您所用客户端的文档，了解其特定的上下文文件命名规范。
-
-### 1. Claude Code 智能体 (Agents) 注册
-
-Claude Code 允许通过 Markdown 定义专门的子智能体。要使本项目中的智能体生效：
-
-- **项目内注册**：将 `agents/*.md` 复制到 `.claude/agents/` 目录下。
-- **全局注册**：将 `agents/*.md` 复制到 `~/.claude/agents/` 目录下。
-- **使用方法**：在 Claude Code CLI 中直接输入斜杠命令，例如 `/planner` 或 `/python-reviewer`。
-
-### 2. Gemini CLI 智能体支持 (Persona Adoption)
-
-Gemini CLI 目前**不原生支持**通过 `/agent` 命令注册静态 Markdown 文件作为智能体。
-
-**解决方案 (Solution)**:
-您可以利用其强大的长上下文能力，通过指令要求 Gemini 采用 `agents/` 目录下的特定人设：
-- **手动启用**：在对话开始时发送：“请读取 `agents/architect.md` 并作为架构师人设为我的设计提供建议。”
-- **动态调用**：作为您的 Cyber Brain 托管者，我会在任务需要时主动读取这些文件并执行其定义的 SOP（标准作业程序）。
-
-## 🌟 核心功能
-
-- **无损 PDF 批注**：使用 `PyMuPDF` 提取文本坐标，并通过 Zotero Web API 直接注入高亮、评论和笔记。原始 PDF 文件的哈希值保持完全不变。
-- **高保真 PDF 转 Markdown**：利用 `pymupdf4llm` 和 LaTeX 源码检索技术，将复杂的学术论文（包括数学公式）转换为对大模型友好的 Markdown 格式。
-- **语义图像提取**：自动从 PDF 中提取图表，并在本地保存时附带结构化的元数据清单。
-- **Zotero MCP 集成**：与 Zotero 库无缝对接，根据自然语言提示检索论文元数据、条目 ID 以及本地附件 Key。
-- **Agentic 工作流就绪**：专为由 AI 智能体（如 Gemini-CLI）驱动的多步自动化科研任务而设计。
-
-## 🏗️ 架构与工作流
-
-该系统基于组合式架构构建。在分析论文时，系统会执行以下自动化工作流：
-
-1. **降维与提取 (Dimensionality Reduction & Extraction)**
-   - **检索**：使用 Zotero-MCP 查找目标论文及其本地 PDF 附件 Key。
-   - **解析**：将 PDF 转换为 Markdown 文本（保留公式），并提取本地的结构化图像以供多模态分析。
-
-2. **智能锚点 (Smart Anchoring)**
-   - AI 智能体读取解析后的文本并生成结构化的研究报告。
-   - 同时，它会输出一个 JSON 格式的“批注动作列表”，记录文本中的精确引用、指定的颜色以及分析评论。
-
-3. **无损批注映射引擎 (Non-Destructive Annotation Engine)**
-   - **定位**：扫描 PDF，查找 LLM 返回的精确引文在页面上的绝对坐标（边界框 bounding boxes）。
-   - **注入**：将这些坐标转换为 Zotero 的原生 `annotationPosition` 格式，并通过 Zotero API 推送。如此一来，高亮和笔记就可以在 Zotero 内置的 PDF 阅读器中原生访问并进行二次编辑。
-
 ## 💻 客户端安装与集成 (Client Installation & Integration)
 
-Stable-JARVIS 的功能通过 **Commands (命令)** 和 **Skills (技能)** 扩展。为了让您的 AI 客户端识别这些功能，请根据所用平台执行以下集成操作：
+Stable-JARVIS 支持多种 AI 客户端。为了获得最佳体验，我们建议使用 **符号链接 (Symlink)** 来注册提供的智能体和技能，这样仓库中的更新将自动反映在您的客户端中。
 
 ### 1. Gemini CLI
-Gemini CLI 自动识别 `.gemini/commands/` 下的 `.toml` 文件，并通过 `skills` 指令管理技能。
+Gemini CLI 自动识别 `.gemini/commands/` 下的 `.toml` 文件，通过 `skills` 命令管理技能，并支持通过 Markdown 文件定义的子智能体。
 
 - **配置 Exa Search (MCP)**:
   在 `~/.gemini/settings.json` 中添加以下配置以启用远程 Exa MCP 服务：
@@ -123,33 +74,84 @@ Gemini CLI 自动识别 `.gemini/commands/` 下的 `.toml` 文件，并通过 `s
     }
   }
   ```
+- **安装子智能体 (Subagents)**:
+  ```bash
+  # 全局安装 (推荐)
+  mkdir -p ~/.gemini/agents
+  ln -s $(pwd)/agents/*.md ~/.gemini/agents/
+
+  # 项目局部安装 (可选)
+  mkdir -p .gemini/agents
+  ln -s $(pwd)/agents/*.md .gemini/agents/
+  ```
 - **安装命令 (Commands)**:
   ```bash
-  # 将本项目命令链接到项目局部配置（推荐）
+  # 将本项目命令链接到项目局部配置
   mkdir -p .gemini/commands
   ln -s $(pwd)/commands/daily/plan.toml .gemini/commands/daily:plan.toml
   ln -s $(pwd)/commands/paper/analyze.toml .gemini/commands/paper:analyze.toml
-  # 刷新命令
-  # 在 Gemini CLI 中输入: /commands reload
+  # 在 Gemini CLI 中刷新命令: /commands reload
   ```
 - **安装技能 (Skills)**:
   ```bash
-  gemini skills install ./skills
+  # 链接技能到全局作用域 (推荐)
+  gemini skills link ./skills
+
+  # 链接到项目局部作用域 (可选)
+  gemini skills link ./skills --scope workspace
   ```
 
 ### 2. Claude Code
-Claude Code (及相关 Agent) 倾向于在 `.claude/skills/` 目录下寻找以 `.md` 结尾的指令或技能定义。同时，集成 Exa Search 需要配置 MCP 服务器。
+Claude Code 在 `.claude/` 目录下查找智能体定义和技能。
 
-- **集成技能**:
+- **安装智能体 (Agents)**:
   ```bash
+  # 全局注册 (推荐)
+  mkdir -p ~/.claude/agents
+  ln -s $(pwd)/agents/*.md ~/.claude/agents/
+
+  # 项目内注册 (可选)
+  mkdir -p .claude/agents
+  ln -s $(pwd)/agents/*.md .claude/agents/
+  ```
+- **集成技能 (Skills)**:
+  ```bash
+  # 全局链接技能目录 (推荐)
+  mkdir -p ~/.claude/skills
+  ln -s $(pwd)/skills/* ~/.claude/skills/
+
+  # 项目内局部链接 (可选)
   mkdir -p .claude/skills
-  # 链接技能目录（Claude 会识别其中的 SKILL.md）
-  ln -s $(pwd)/skills/paper-analyzer .claude/skills/paper-analyzer
+  ln -s $(pwd)/skills/* .claude/skills/
   ```
 - **配置 Exa Search (MCP)**:
   ```bash
   # 运行以下命令添加 Exa MCP 服务器，将 YOUR_API_KEY 替换为您的真实 Key
   claude mcp add --transport http exa "https://mcp.exa.ai/mcp?exaApiKey=YOUR_API_KEY&tools=web_search_exa,get_code_context_exa"
+  ```
+
+### 3. Codex / GitHub Copilot
+对于 GitHub Copilot 扩展或自定义智能体，可以通过以下方式链接指令和技能：
+
+- **安装智能体 (Agents)**:
+  ```bash
+  # 全局指令链接 (推荐)
+  mkdir -p ~/.copilot/instructions
+  ln -s $(pwd)/GEMINI.md ~/.copilot/instructions/stable-jarvis.md
+
+  # 项目局部链接 (可选)
+  mkdir -p .github/instructions
+  ln -s $(pwd)/GEMINI.md .github/instructions/stable-jarvis.md
+  ```
+- **安装技能 (Skills)**:
+  ```bash
+  # 全局链接技能目录 (推荐)
+  mkdir -p ~/.copilot/skills
+  ln -s $(pwd)/skills/* ~/.copilot/skills/
+
+  # 项目局部链接 (可选)
+  mkdir -p .github/skills
+  ln -s $(pwd)/skills/* .github/skills/
   ```
 
 ---
@@ -175,12 +177,6 @@ export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
 ```
 
 > 💡 **注意**：如果您已经设置了环境变量，Stable-JARVIS 将**优先**使用它们，而忽略 `config/api_keys.json` 或 `config/zotero.json` 中的相应字段。这能有效防止 API Key 被误提交到版本库中。
-
-### 3. Codex / GitHub Copilot
-对于 GitHub Copilot CLI 或自定义 Agent，建议使用项目级指令文件。
-
-- **全局指令**: 将 `GEMINI.md` 的内容引用或复制到 `.github/copilot-instructions.md`。
-- **特定 Agent**: 在 `.github/instructions/` 目录下创建符号链接，指向本项目的技能文档。
 
 ---
 
@@ -305,7 +301,7 @@ metadata = converter.extract_images_with_metadata(
     "paper.pdf",
     output_dir="./figures",
     quality="high",  # 选项: low, medium, high, epic
-    name_prefix="ABC12345",
+    name_prefix="ABC12345"
 )
 
 # 保存清单 JSON 以供 LLM 引用

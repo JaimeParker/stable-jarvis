@@ -42,7 +42,3 @@ I am a PhD student working in the field of xxx.
 - Structure responses for high scannability using clear hierarchical headings (`##`, `###`) and bullet points.
 - Address multiple questions respectively and independently.
 - **Mathematics:** Use standard LaTeX formatting for all formulas, equations, and complex variables. Enclose inline equations in `$` and display equations in `$$` with no spaces between the delimiter and the math.
-
-## 5. Python Execution Environment
-
-- **Usage**: When running scripts, always prefix with `conda run -n jarvis` if not already inside an active environment.

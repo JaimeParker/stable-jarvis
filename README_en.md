@@ -54,61 +54,12 @@ To unlock the full power of Stable-JARVIS, you must have the following MCP serve
 
 > 💡 **Coming Soon**: Keep an eye out for our upcoming **Feishu MCP** integration!
 
-## 🖥️ Client Configuration
-
-Stable-JARVIS relies on a core context file to guide the AI agent's personality and logic. Depending on your chosen client, you should ensure the appropriate file exists in your project root:
-
--   **Gemini CLI**: Uses `GEMINI.md`
--   **Claude Code**: Uses `CLAUDE.md` (You can simply copy `GEMINI.md` to `CLAUDE.md`)
--   **Other Clients**: Refer to your client's documentation for its specific context file naming convention.
-
-### 1. Claude Code Agent Registration
-
-Claude Code allows defining specialized sub-agents via Markdown files. To enable the agents in this project:
-
-- **Project-Level Registration**: Copy `agents/*.md` to the `.claude/agents/` directory.
-- **Global Registration**: Copy `agents/*.md` to the `~/.claude/agents/` directory.
-- **Usage**: You can invoke them using slash commands in the Claude Code CLI, e.g., `/planner` or `/python-reviewer`.
-
-### 2. Gemini CLI Agent Support (Persona Adoption)
-
-Gemini CLI **does not natively support** registering static Markdown files as slash-command agents via a `/agent` command.
-
-**Solution**:
-You can leverage Gemini's powerful long-context window by instructing it to adopt the personas defined in the `agents/` directory:
-- **Manual Adoption**: Send a prompt like: "Please read `agents/architect.md` and adopt the Architect persona to review my design."
-- **Dynamic Orchestration**: As your Cyber Brain Custodian, I will automatically consult these files and execute the SOPs (Standard Operating Procedures) defined within them when the task demands specialized expertise.
-
-## 🌟 Key Features
-
-- **Non-Destructive PDF Annotation**: Extracts text coordinates using `PyMuPDF` and injects highlights, comments, and notes directly via the Zotero Web API. The original PDF file hash remains completely unchanged.
-- **High-Fidelity PDF to Markdown**: Converts complex academic papers (including math formulas) into LLM-friendly Markdown using `pymupdf4llm` and LaTeX source retrieval.
-- **Semantic Image Extraction**: Automatically pulls figures and diagrams from PDFs, saving them locally with structural metadata manifests.
-- **Zotero MCP Integration**: Seamlessly interfaces with the Zotero library to retrieve paper metadata, Item IDs, and local attachment keys based on natural language prompts.
-- **Agentic Workflow Ready**: Designed to be driven by AI agents (like Gemini-CLI) executing multi-step research tasks autonomously.
-
-## 🏗️ Architecture & Workflow
-
-The system is built on a composite architecture that executes the following automated workflow when analyzing a paper:
-
-1. **Dimensionality Reduction & Extraction**
-   - **Retrieval**: Uses Zotero-MCP to find the target paper and its local PDF attachment key.
-   - **Parsing**: Converts the PDF into Markdown text (preserving equations) and extracts local structural images for multimodal analysis.
-
-2. **Smart Anchoring**
-   - The AI Agent reads the parsed text and generates a structured research report.
-   - Simultaneously, it outputs an "annotation action list" in JSON format, capturing exact quotes from the text, assigned colors, and analytical commentary.
-
-3. **Non-Destructive Annotation Engine**
-   - **Locate**: Scans the PDF to find the absolute page coordinates (bounding boxes) for the exact quotes returned by the LLM.
-   - **Inject**: Transforms these coordinates into Zotero's native `annotationPosition` format and pushes them via the Zotero API, making the highlights and notes natively accessible and editable within Zotero's built-in PDF reader.
-
 ## 💻 Client Installation & Integration
 
-The functionalities of Stable-JARVIS are extended through **Commands** and **Skills**. To enable your AI client to recognize these features, follow the integration steps for your specific platform:
+Stable-JARVIS supports multiple AI clients. For the best experience, we recommend **symlinking** the provided agents and skills so that updates in this repository are automatically reflected in your client.
 
 ### 1. Gemini CLI
-Gemini CLI automatically registers `.toml` files located in `.gemini/commands/` and manages skills via the `skills` command.
+Gemini CLI automatically registers `.toml` files in `.gemini/commands/` and manages skills via the `skills` command. It also supports sub-agents defined in Markdown files.
 
 - **Configure Exa Search (MCP)**:
   Add the following to `~/.gemini/settings.json` to enable the remote Exa MCP service:
@@ -121,32 +72,84 @@ Gemini CLI automatically registers `.toml` files located in `.gemini/commands/` 
     }
   }
   ```
+- **Installing Subagents (Recommended)**:
+  ```bash
+  # Global Installation (Recommended)
+  mkdir -p ~/.gemini/agents
+  ln -s $(pwd)/agents/*.md ~/.gemini/agents/
+
+  # Workspace-local (Optional)
+  mkdir -p .gemini/agents
+  ln -s $(pwd)/agents/*.md .gemini/agents/
+  ```
 - **Installing Commands**:
   ```bash
-  # Symlink commands to the project-local configuration (Recommended)
+  # Symlink commands to the project-local configuration
   mkdir -p .gemini/commands
   ln -s $(pwd)/commands/daily/plan.toml .gemini/commands/daily:plan.toml
   ln -s $(pwd)/commands/paper/analyze.toml .gemini/commands/paper:analyze.toml
-  # To reload commands in Gemini CLI: /commands reload
+  # Reload in Gemini CLI: /commands reload
   ```
 - **Installing Skills**:
   ```bash
-  gemini skills install ./skills
+  # Link skills to global scope (Recommended)
+  gemini skills link ./skills
+
+  # Workspace-local (Optional)
+  gemini skills link ./skills --scope workspace
   ```
 
 ### 2. Claude Code
-Claude Code and other modern agents typically look for Markdown-based instructions or skill definitions in `.claude/skills/`. Integrating Exa Search requires an MCP server configuration.
+Claude Code looks for agent definitions and skills in `.claude/` directories.
 
+- **Installing Agents (Recommended)**:
+  ```bash
+  # Global Registration (Recommended)
+  mkdir -p ~/.claude/agents
+  ln -s $(pwd)/agents/*.md ~/.claude/agents/
+
+  # Project-Level Registration (Optional)
+  mkdir -p .claude/agents
+  ln -s $(pwd)/agents/*.md .claude/agents/
+  ```
 - **Integrating Skills**:
   ```bash
+  # Link skill directories globally (Recommended)
+  mkdir -p ~/.claude/skills
+  ln -s $(pwd)/skills/* ~/.claude/skills/
+
+  # Project-Level (Optional)
   mkdir -p .claude/skills
-  # Link skill directories (Claude will recognize the SKILL.md within)
-  ln -s $(pwd)/skills/paper-analyzer .claude/skills/paper-analyzer
+  ln -s $(pwd)/skills/* .claude/skills/
   ```
 - **Configure Exa Search (MCP)**:
   ```bash
   # Run the following to add the Exa MCP server. Replace YOUR_API_KEY with your actual key.
   claude mcp add --transport http exa "https://mcp.exa.ai/mcp?exaApiKey=YOUR_API_KEY&tools=web_search_exa,get_code_context_exa"
+  ```
+
+### 3. Codex / GitHub Copilot
+For GitHub Copilot Extensions or custom agents, instructions and skills can be linked as follows:
+
+- **Installing Agents**:
+  ```bash
+  # Global instructions (Recommended)
+  mkdir -p ~/.copilot/instructions
+  ln -s $(pwd)/GEMINI.md ~/.copilot/instructions/stable-jarvis.md
+
+  # Workspace-local (Optional)
+  mkdir -p .github/instructions
+  ln -s $(pwd)/GEMINI.md .github/instructions/stable-jarvis.md
+  ```
+- **Installing Skills**:
+  ```bash
+  # Link skill directories globally (Recommended)
+  mkdir -p ~/.copilot/skills
+  ln -s $(pwd)/skills/* ~/.copilot/skills/
+
+  # Workspace-local (Optional)
+  mkdir -p .github/skills
+  ln -s $(pwd)/skills/* .github/skills/
   ```
 
 ---
@@ -172,15 +175,6 @@ export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
 ```
 
 > 💡 **Note**: If environment variables are set, Stable-JARVIS will **prioritize** them and ignore the corresponding fields in `config/api_keys.json` or `config/zotero.json`. This prevents accidental commits of sensitive keys to the repository.
-
-### 3. Codex / GitHub Copilot
-For GitHub Copilot CLI or custom agents, we recommend using repository-level instruction files.
-
-### 3. Codex / GitHub Copilot
-For GitHub Copilot CLI or custom agents, we recommend using repository-level instruction files.
-
-- **Global Instructions**: Link or copy the content of `GEMINI.md` to `.github/copilot-instructions.md`.
-- **Specific Agents**: Create symlinks in `.github/instructions/` pointing to the skill definitions in this repository.
 
 ---
 
