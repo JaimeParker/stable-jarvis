@@ -41,12 +41,10 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 
 -   **`paper-analyzer`**: 核心科研技能。编排 Zotero-MCP、多模态 PDF 阅读和 Zotero Web API，生成深度技术报告和原生批注。
 -   **`paper-finder`**: 基于研究兴趣画像的论文发现技能。按 profile 检索 arXiv，执行词法+可选语义排序，并输出 Obsidian 可直接摄取的 Markdown 笔记。
--   **`arxiv-search`**: 直接集成 arXiv，检索计算机科学、物理和数学领域的最新预印本。
--   **`web-research`**: 使用子智能体执行结构化的深度调研，从全网合成并提炼信息。
 -   **`weekly-report-generator`**: 自动将 Obsidian 每日笔记中的进度合成到专业的单页 PPTX 幻灯片中。
 -   **`notion-to-markdown`**: 将 Notion 页面无缝迁移到本地 Obsidian 库中，并实现完美的 LaTeX 公式和图像本地化。
 -   **`obsidian-auto-classifier`**: 根据内容和意图，智能地对库中的笔记进行分类和归档。
--   **`pptx` / `obsidian-markdown`**: 用于编排幻灯片生成和管理复杂 Obsidian 语法（双向链接、呼出块等）的底层工具。
+-   ...
 
 ## 🧩 依赖与 MCP 服务器
 

@@ -39,12 +39,10 @@ The framework includes several specialized skills that can be activated by the a
 
 -   **`paper-analyzer`**: The core research skill. Orchestrates Zotero-MCP, multi-modal PDF reading, and Zotero Web API to generate deep technical reports and native annotations.
 -   **`paper-finder`**: A profile-driven paper discovery skill. It queries arXiv with your research-interest profile, ranks candidates (lexical + optional semantic), and writes Obsidian-ready Markdown notes.
--   **`arxiv-search`**: Direct integration with arXiv to retrieve the latest preprints in computer science, physics, and mathematics.
--   **`web-research`**: Executes structured, deep-dive investigations using sub-agents to synthesize information from across the web.
 -   **`weekly-report-generator`**: Automatically synthesizes your progress from Obsidian daily notes into a professional one-page PPTX slide.
 -   **`notion-to-markdown`**: Seamlessly migrates Notion pages into your local Obsidian vault with perfect LaTeX and image localization.
 -   **`obsidian-auto-classifier`**: Intelligently categorizes and archives notes within your vault based on their content and intent.
--   **`pptx` / `obsidian-markdown`**: Low-level utilities for programmatic slide generation and managing complex Obsidian syntax (wikilinks, callouts, etc.).
+-   ...
 
 ## 🧩 Dependencies & MCP Servers
 

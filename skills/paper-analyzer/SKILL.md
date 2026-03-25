@@ -233,20 +233,22 @@ python src/scripts/upload_report_note.py --report "./temp/reports/{attachment_ke
 - 返回退出码 `0`
 - 打印 `Successfully created note: XXXXXXXX`
 
-### 阶段 5：同步归档至 Obsidian (Sync to Obsidian Vault)
+### 阶段 5：同步归档至 Notion Paper Inbox (Sync to Notion Workspace)
 
-将生成的 Markdown 报告归档到 Obsidian。
+将生成的 Markdown 报告归档到 Notion 的 Paper Inbox 数据库中，并同步 Zotero 的元数据。
 
-1. **读取内容**：读取本地临时文件 `./temp/reports/{attachment_key}_report.md` 的内容。
-2. **写入文件**：将内容写入 Obsidian 的收件箱路径（通常为 `00 Inbox/{Paper_Title}.md`）。Use Obsidian MCP.
-3. **添加 Frontmatter**：确保 Markdown 文件头包含 YAML Frontmatter，以便后续分类器识别。如果生成的报告中没有，请在写入时添加：
-   ```yaml
-   ---
-   tags: [robotics]
-   title: {Paper_Title}
-   ---
-   ```
-  具体tag, date根据论文和实际时间填入; For tags, do not use brackets, just a comma-separated string.
+1. **获取 Zotero 元数据**：
+   - 使用 Zotero MCP (`zotero-mcp_get_item_details`) 获取该文献（`item_key`）的详细元数据，包含 URL/DOI、摘要 (Abstract) 和标签。
+2. **创建 Notion 页面**：
+   - 读取本地临时文件 `./temp/reports/{attachment_key}_report.md` 的内容。
+   - 使用 Notion MCP (`notion-create-pages`) 在 "Paper Inbox" 数据库中创建新页面。将报告的 Markdown 文本作为内容，页面 `title` 设为论文标题。
+3. **完善 Notion 页面属性 (Properties)**：
+   - **Links/DOI**：填入从 Zotero 获取的 URL 或 DOI。
+   - **Remarks**：根据 Zotero 中的论文摘要，提炼成一句简短的中文总结并填入。
+   - **Tags**：
+     - 首先，通过 `notion-fetch` 获取 Paper Inbox 数据库的 Schema，读取已存在的 Tags 选项。
+     - 根据文献内容挑选合适的现有 Tag。如果没有完全贴合的，使用 `notion-update-data-source` 为 Tags 属性添加新的多选 (multi-select) 选项。
+     - 使用 `notion-update-page` 将确定的 Tags 更新到该页面的属性中。
 
 ---
 ## 🧠 系统指令与学术准则
@@ -263,3 +265,4 @@ python src/scripts/upload_report_note.py --report "./temp/reports/{attachment_ke
 -   **JSON 路径解析错误**: 确保 JSON 中的文件路径使用正斜杠 `/` 或双反斜杠 ``。
 -   **中文乱码**: `zotero_highlight.py` 的 `--json` 模式默认使用 UTF-8，可解决此问题。
 -   **SSL 连接错误**: 工具内置了指数退避重试。如果持续失败，请检查网络和 Zotero 同步状态。
+-   **MCP要求**：确保已正确安装并配置 `zotero-mcp` 和 `notion-mcp`。
