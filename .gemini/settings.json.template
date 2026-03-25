@@ -8,6 +8,14 @@
       "timeout": 60000,
       "trust": true
     },
+    "obsidian": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@bitbonsai/mcpvault@latest",
+        "/path_to_your_obsidian_vault"
+      ]
+    },
     "notion": {
       "command": "npx",
       "args": [
@@ -15,6 +23,9 @@
         "mcp-remote",
         "https://mcp.notion.com/mcp"
       ]
+    },
+    "exa": {
+      "httpUrl": "https://mcp.exa.ai/mcp"
     }
   },
   "security": {

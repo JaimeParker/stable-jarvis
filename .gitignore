@@ -213,4 +213,5 @@ config/zotero.json
 config/api_keys.json
 .gemini/commands/
 .gemini/settings.json
+.claude/settings.json
 .state/

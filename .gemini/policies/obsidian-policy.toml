@@ -1,0 +1,27 @@
+[[rule]]
+mcpName = "obsidian"
+toolName = "mcp_obsidian_read_note"
+decision = "allow"
+priority = 100
+modes = ["plan"]
+
+[[rule]]
+mcpName = "obsidian"
+toolName = "mcp_obsidian_search_notes"
+decision = "allow"
+priority = 100
+modes = ["plan"]
+
+[[rule]]
+mcpName = "obsidian"
+toolName = "mcp_obsidian_get_vault_stats"
+decision = "allow"
+priority = 100
+modes = ["plan"]
+
+[[rule]]
+mcpName = "obsidian"
+toolName = "mcp_obsidian_list_directory"
+decision = "allow"
+priority = 100
+modes = ["plan"]

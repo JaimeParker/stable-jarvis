@@ -39,12 +39,10 @@ The framework includes several specialized skills that can be activated by the a
 
 -   **`paper-analyzer`**: The core research skill. Orchestrates Zotero-MCP, multi-modal PDF reading, and Zotero Web API to generate deep technical reports and native annotations.
 -   **`paper-finder`**: A profile-driven paper discovery skill. It queries arXiv with your research-interest profile, ranks candidates (lexical + optional semantic), and writes Obsidian-ready Markdown notes.
--   **`arxiv-search`**: Direct integration with arXiv to retrieve the latest preprints in computer science, physics, and mathematics.
--   **`web-research`**: Executes structured, deep-dive investigations using sub-agents to synthesize information from across the web.
 -   **`weekly-report-generator`**: Automatically synthesizes your progress from Obsidian daily notes into a professional one-page PPTX slide.
 -   **`notion-to-markdown`**: Seamlessly migrates Notion pages into your local Obsidian vault with perfect LaTeX and image localization.
 -   **`obsidian-auto-classifier`**: Intelligently categorizes and archives notes within your vault based on their content and intent.
--   **`pptx` / `obsidian-markdown`**: Low-level utilities for programmatic slide generation and managing complex Obsidian syntax (wikilinks, callouts, etc.).
+-   ...
 
 ## 🧩 Dependencies & MCP Servers
 
@@ -63,6 +61,23 @@ Stable-JARVIS relies on a core context file to guide the AI agent's personality 
 -   **Gemini CLI**: Uses `GEMINI.md`
 -   **Claude Code**: Uses `CLAUDE.md` (You can simply copy `GEMINI.md` to `CLAUDE.md`)
 -   **Other Clients**: Refer to your client's documentation for its specific context file naming convention.
+
+### 1. Claude Code Agent Registration
+
+Claude Code allows defining specialized sub-agents via Markdown files. To enable the agents in this project:
+
+- **Project-Level Registration**: Copy `agents/*.md` to the `.claude/agents/` directory.
+- **Global Registration**: Copy `agents/*.md` to the `~/.claude/agents/` directory.
+- **Usage**: You can invoke them using slash commands in the Claude Code CLI, e.g., `/planner` or `/python-reviewer`.
+
+### 2. Gemini CLI Agent Support (Persona Adoption)
+
+Gemini CLI **does not natively support** registering static Markdown files as slash-command agents via a `/agent` command.
+
+**Solution**:
+You can leverage Gemini's powerful long-context window by instructing it to adopt the personas defined in the `agents/` directory:
+- **Manual Adoption**: Send a prompt like: "Please read `agents/architect.md` and adopt the Architect persona to review my design."
+- **Dynamic Orchestration**: As your Cyber Brain Custodian, I will automatically consult these files and execute the SOPs (Standard Operating Procedures) defined within them when the task demands specialized expertise.
 
 ## 🌟 Key Features
 
@@ -95,6 +110,17 @@ The functionalities of Stable-JARVIS are extended through **Commands** and **Ski
 ### 1. Gemini CLI
 Gemini CLI automatically registers `.toml` files located in `.gemini/commands/` and manages skills via the `skills` command.
 
+- **Configure Exa Search (MCP)**:
+  Add the following to `~/.gemini/settings.json` to enable the remote Exa MCP service:
+  ```json
+  {
+    "mcpServers": {
+      "exa": {
+        "httpUrl": "https://mcp.exa.ai/mcp"
+      }
+    }
+  }
+  ```
 - **Installing Commands**:
   ```bash
   # Symlink commands to the project-local configuration (Recommended)
@@ -109,14 +135,46 @@ Gemini CLI automatically registers `.toml` files located in `.gemini/commands/` 
   ```
 
 ### 2. Claude Code
-Claude Code and other modern agents typically look for Markdown-based instructions or skill definitions in `.claude/skills/`.
+Claude Code and other modern agents typically look for Markdown-based instructions or skill definitions in `.claude/skills/`. Integrating Exa Search requires an MCP server configuration.
 
-- **Integration**:
+- **Integrating Skills**:
   ```bash
   mkdir -p .claude/skills
   # Link skill directories (Claude will recognize the SKILL.md within)
   ln -s $(pwd)/skills/paper-analyzer .claude/skills/paper-analyzer
   ```
+- **Configure Exa Search (MCP)**:
+  ```bash
+  # Run the following to add the Exa MCP server. Replace YOUR_API_KEY with your actual key.
+  claude mcp add --transport http exa "https://mcp.exa.ai/mcp?exaApiKey=YOUR_API_KEY&tools=web_search_exa,get_code_context_exa"
+  ```
+
+---
+
+## 🔒 Security & Environment Variables
+
+To protect your API keys from leakage, Stable-JARVIS recommends using **System Environment Variables** instead of local configuration files.
+
+### Core API Key Configuration
+Add the following lines to your `~/.bashrc` or `~/.zshrc`:
+
+```bash
+# Exa Search API Key (Shared by Claude Code and Gemini-CLI)
+export EXA_API_KEY="YOUR_EXA_API_KEY"
+
+# Zotero Credentials
+export ZOTERO_LIBRARY_ID="YOUR_ID"
+export ZOTERO_API_KEY="YOUR_KEY"
+
+# Semantic Search Embedding API (If using paper-finder --semantic)
+export STABLE_JARVIS_SEMANTIC_API_KEY="YOUR_KEY"
+export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
+```
+
+> 💡 **Note**: If environment variables are set, Stable-JARVIS will **prioritize** them and ignore the corresponding fields in `config/api_keys.json` or `config/zotero.json`. This prevents accidental commits of sensitive keys to the repository.
+
+### 3. Codex / GitHub Copilot
+For GitHub Copilot CLI or custom agents, we recommend using repository-level instruction files.
 
 ### 3. Codex / GitHub Copilot
 For GitHub Copilot CLI or custom agents, we recommend using repository-level instruction files.
@@ -322,5 +380,7 @@ Some of the built-in AI agent skills in this repository are adapted from the fol
 -   **`skill-creator`**, **`pptx`**: Adapted from [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills).
 -   **`obsidian-markdown`**: Adapted from [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills).
 -   **`paper-finder`**: Adapted from [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist).
+-   **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`exa-search`**, **`tech-doc-writing`**: Adapted from [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code).
+-   **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: Adapted from [obra/superpowers](https://github.com/obra/superpowers).
 
 All credit goes to the original authors for these foundational capabilities.

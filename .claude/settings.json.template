@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "@bitbonsai/mcpvault@latest",
+        "path_to_your_obsidian_vault"
+      ]
+    }
+  },
+  "permissions": {
+    "additionalDirectories": [
+    ]
+  }
+}
