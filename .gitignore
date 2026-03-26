@@ -207,8 +207,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
-GEMINI.md
-CLAUDE.md
 config/zotero.json
 config/api_keys.json
 .gemini/commands/
@@ -220,6 +218,12 @@ config/api_keys.json
 .claude/commands/
 .claude/agents/
 .claude/skills/
+.state/
+
+# Ignore personalized instruction files
+GEMINI.md
+AGENTS.md
+CLAUDE.md
 .gemini/settings.json
 .claude/settings.json
-.state/
+.codex/config.toml

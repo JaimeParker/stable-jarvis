@@ -1,0 +1,9 @@
+# .codexignore
+# This file tells Codex which files to ignore or, in this case, NOT ignore.
+
+# The '!' character negates a pattern from .gitignore.
+# This line instructs Codex to ALWAYS read AGENTS.md (or CODEX.md),
+# even though it is listed in .gitignore.
+!AGENTS.md
+!CODEX.md
+!.codex/config.toml

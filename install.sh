@@ -95,17 +95,17 @@ display_categories() {
     echo -e "${C_WHITE_BOLD}Available Asset Categories (可用资产类别)${C_RESET}"
     echo -e "${C_WHITE_BOLD}----------------------------------${C_RESET}"
 
-    local categories=("RESEARCH" "CODING" "DAILY" "LAB_SKILLS")
-    local category_cn=("科研" "编程" "日常" "实验室专用")
-    
-    for i in "${!categories[@]}"; do
-        local cat="${categories[$i]}"
-        local cat_cn="${category_cn[$i]}"
-        local skills_ref="${cat}_SKILLS[@]"
+    local category_names=("RESEARCH" "CODING" "DAILY" "LAB_SKILLS")
+    local category_cns=("科研" "编程" "日常" "实验室专用")
+    local skill_arrays=("RESEARCH_SKILLS" "CODING_SKILLS" "DAILY_SKILLS" "LAB_SKILLS")
+
+    for i in "${!category_names[@]}"; do
+        local cat_name="${category_names[$i]}"
+        local cat_cn="${category_cns[$i]}"
+        local skills_ref="${skill_arrays[$i]}[@]"
         local skills=("${!skills_ref}")
-        
-        echo -e "
-${C_BOLD}${C_BLUE}[$cat] ($cat_cn)${C_RESET}"
+
+        echo -e "\n${C_BOLD}${C_BLUE}[$cat_name] ($cat_cn)${C_RESET}"
         for skill in "${skills[@]}"; do
             echo -e "  - ${C_BOLD}$skill${C_RESET}"
             echo -e "    - ${C_CYAN}EN:${C_RESET} ${DESC_EN[$skill]}"
