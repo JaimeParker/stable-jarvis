@@ -56,106 +56,34 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 
 > 💡 **即将到来**：敬请关注我们即将推出的 **Feishu (飞书) MCP** 集成！
 
-## 💻 客户端安装与集成 (Client Installation & Integration)
+## 💻 安装
 
-Stable-JARVIS 支持多种 AI 客户端。为了获得最佳体验，我们建议使用 **符号链接 (Symlink)** 来注册提供的智能体和技能，这样仓库中的更新将自动反映在您的客户端中。
+本项目提供了交互式脚本，可以帮助您为指定的客户端安装技能、智能体和命令。请根据您的操作系统使用对应的脚本。
 
-### 1. Gemini CLI
-Gemini CLI 自动识别 `.gemini/commands/` 下的 `.toml` 文件，通过 `skills` 命令管理技能，并支持通过 Markdown 文件定义的子智能体。
+### Windows 用户
 
-- **配置 Exa Search (MCP)**:
-  在 `~/.gemini/settings.json` 中添加以下配置以启用远程 Exa MCP 服务：
-  ```json
-  {
-    "mcpServers": {
-      "exa": {
-        "httpUrl": "https://mcp.exa.ai/mcp"
-      }
-    }
-  }
-  ```
-- **安装子智能体 (Subagents)**:
-  ```bash
-  # 全局安装 (推荐)
-  mkdir -p ~/.gemini/agents
-  ln -s $(pwd)/agents/*.md ~/.gemini/agents/
+1.  以 **管理员身份** 打开一个新的 PowerShell 终端。
+2.  进入到仓库的根目录。
+3.  如果这是您第一次运行脚本，您可能需要允许脚本执行，请运行：
+    ```powershell
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+4.  运行安装脚本：
+    ```powershell
+    .\install.windows.ps1
+    ```
 
-  # 项目局部安装 (可选)
-  mkdir -p .gemini/agents
-  ln -s $(pwd)/agents/*.md .gemini/agents/
-  ```
-- **安装命令 (Commands)**:
-  ```bash
-  # 将本项目命令链接到项目局部配置
-  mkdir -p .gemini/commands
-  ln -s $(pwd)/commands/daily/plan.toml .gemini/commands/daily:plan.toml
-  ln -s $(pwd)/commands/paper/analyze.toml .gemini/commands/paper:analyze.toml
-  # 在 Gemini CLI 中刷新命令: /commands reload
-  ```
-- **安装技能 (Skills)**:
-  ```bash
-  # 链接技能到全局作用域 (推荐)
-  gemini skills link ./skills
+### macOS / Linux 用户
 
-  # 链接到项目局部作用域 (可选)
-  gemini skills link ./skills --scope workspace
-  ```
+1.  打开一个终端。
+2.  进入到仓库的根目录。
+3.  运行安装脚本：
+    ```bash
+    bash install.sh
+    ```
+    *（macOS 用户也可以使用 `bash install_mac.sh`）*
 
-### 2. Claude Code
-Claude Code 在 `.claude/` 目录下查找智能体定义和技能。
-
-- **安装智能体 (Agents)**:
-  ```bash
-  # 全局注册 (推荐)
-  mkdir -p ~/.claude/agents
-  ln -s $(pwd)/agents/*.md ~/.claude/agents/
-
-  # 项目内注册 (可选)
-  mkdir -p .claude/agents
-  ln -s $(pwd)/agents/*.md .claude/agents/
-  ```
-- **集成技能 (Skills)**:
-  ```bash
-  # 全局链接技能目录 (推荐)
-  mkdir -p ~/.claude/skills
-  ln -s $(pwd)/skills/* ~/.claude/skills/
-
-  # 项目内局部链接 (可选)
-  mkdir -p .claude/skills
-  ln -s $(pwd)/skills/* .claude/skills/
-  ```
-- **配置 Exa Search (MCP)**:
-  ```bash
-  # 运行以下命令添加 Exa MCP 服务器，将 YOUR_API_KEY 替换为您的真实 Key
-  claude mcp add --transport http exa "https://mcp.exa.ai/mcp?exaApiKey=YOUR_API_KEY&tools=web_search_exa,get_code_context_exa"
-  ```
-
-### 3. Codex / GitHub Copilot
-对于 Codex，请使用 `AGENTS.md` 作为仓库级指令文件。对于 GitHub Copilot 扩展或自定义智能体，可以通过以下方式链接指令和技能：
-
-- **安装指令文件**:
-  ```bash
-  # Codex 仓库内指令 (推荐新手使用)
-  cp AGENTS.md.template AGENTS.md
-
-  # GitHub Copilot 全局指令链接 (可选)
-  mkdir -p ~/.copilot/instructions
-  ln -s $(pwd)/AGENTS.md ~/.copilot/instructions/stable-jarvis.md
-
-  # 项目局部链接 (可选)
-  mkdir -p .github/instructions
-  ln -s $(pwd)/AGENTS.md .github/instructions/stable-jarvis.md
-  ```
-- **安装技能 (Skills)**:
-  ```bash
-  # 全局链接技能目录 (推荐)
-  mkdir -p ~/.copilot/skills
-  ln -s $(pwd)/skills/* ~/.copilot/skills/
-
-  # 项目局部链接 (可选)
-  mkdir -p .github/skills
-  ln -s $(pwd)/skills/* .github/skills/
-  ```
+脚本将引导您选择客户端并选择要安装的资产类别。
 
 ---
 

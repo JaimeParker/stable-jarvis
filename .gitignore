@@ -212,6 +212,14 @@ CLAUDE.md
 config/zotero.json
 config/api_keys.json
 .gemini/commands/
+.gemini/agents/
+.gemini/skills/
+.codex/commands/
+.codex/agents/
+.codex/skills/
+.claude/commands/
+.claude/agents/
+.claude/skills/
 .gemini/settings.json
 .claude/settings.json
 .state/

@@ -54,106 +54,34 @@ To unlock the full power of Stable-JARVIS, you must have the following MCP serve
 
 > 💡 **Coming Soon**: Keep an eye out for our upcoming **Feishu MCP** integration!
 
-## 💻 Client Installation & Integration
+## 💻 Installation
 
-Stable-JARVIS supports multiple AI clients. For the best experience, we recommend **symlinking** the provided agents and skills so that updates in this repository are automatically reflected in your client.
+This project provides interactive scripts to help you install the skills, agents, and commands. Please use the script appropriate for your operating system.
 
-### 1. Gemini CLI
-Gemini CLI automatically registers `.toml` files in `.gemini/commands/` and manages skills via the `skills` command. It also supports sub-agents defined in Markdown files.
+### Windows
 
-- **Configure Exa Search (MCP)**:
-  Add the following to `~/.gemini/settings.json` to enable the remote Exa MCP service:
-  ```json
-  {
-    "mcpServers": {
-      "exa": {
-        "httpUrl": "https://mcp.exa.ai/mcp"
-      }
-    }
-  }
-  ```
-- **Installing Subagents (Recommended)**:
-  ```bash
-  # Global Installation (Recommended)
-  mkdir -p ~/.gemini/agents
-  ln -s $(pwd)/agents/*.md ~/.gemini/agents/
+1.  Open a new PowerShell terminal **as an Administrator**.
+2.  Navigate to the repository root directory.
+3.  If you haven't already, you may need to allow script execution by running:
+    ```powershell
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+4.  Run the installation script:
+    ```powershell
+    .\install.windows.ps1
+    ```
 
-  # Workspace-local (Optional)
-  mkdir -p .gemini/agents
-  ln -s $(pwd)/agents/*.md .gemini/agents/
-  ```
-- **Installing Commands**:
-  ```bash
-  # Symlink commands to the project-local configuration
-  mkdir -p .gemini/commands
-  ln -s $(pwd)/commands/daily/plan.toml .gemini/commands/daily:plan.toml
-  ln -s $(pwd)/commands/paper/analyze.toml .gemini/commands/paper:analyze.toml
-  # Reload in Gemini CLI: /commands reload
-  ```
-- **Installing Skills**:
-  ```bash
-  # Link skills to global scope (Recommended)
-  gemini skills link ./skills
+### macOS / Linux
 
-  # Workspace-local (Optional)
-  gemini skills link ./skills --scope workspace
-  ```
+1.  Open a terminal.
+2.  Navigate to the repository root directory.
+3.  Run the installation script:
+    ```bash
+    bash install.sh
+    ```
+    *(macOS users can also use `bash install_mac.sh`)*
 
-### 2. Claude Code
-Claude Code looks for agent definitions and skills in `.claude/` directories.
-
-- **Installing Agents (Recommended)**:
-  ```bash
-  # Global Registration (Recommended)
-  mkdir -p ~/.claude/agents
-  ln -s $(pwd)/agents/*.md ~/.claude/agents/
-
-  # Project-Level Registration (Optional)
-  mkdir -p .claude/agents
-  ln -s $(pwd)/agents/*.md .claude/agents/
-  ```
-- **Integrating Skills**:
-  ```bash
-  # Link skill directories globally (Recommended)
-  mkdir -p ~/.claude/skills
-  ln -s $(pwd)/skills/* ~/.claude/skills/
-
-  # Project-Level (Optional)
-  mkdir -p .claude/skills
-  ln -s $(pwd)/skills/* .claude/skills/
-  ```
-- **Configure Exa Search (MCP)**:
-  ```bash
-  # Run the following to add the Exa MCP server. Replace YOUR_API_KEY with your actual key.
-  claude mcp add --transport http exa "https://mcp.exa.ai/mcp?exaApiKey=YOUR_API_KEY&tools=web_search_exa,get_code_context_exa"
-  ```
-
-### 3. Codex / GitHub Copilot
-For Codex, use `AGENTS.md` as the repository instruction file. For GitHub Copilot or custom agents, instructions and skills can be linked as follows:
-
-- **Installing Instructions**:
-  ```bash
-  # Codex repo-local instructions (Recommended for beginners)
-  cp AGENTS.md.template AGENTS.md
-
-  # GitHub Copilot global instructions (Optional)
-  mkdir -p ~/.copilot/instructions
-  ln -s $(pwd)/AGENTS.md ~/.copilot/instructions/stable-jarvis.md
-
-  # GitHub Copilot workspace-local (Optional)
-  mkdir -p .github/instructions
-  ln -s $(pwd)/AGENTS.md .github/instructions/stable-jarvis.md
-  ```
-- **Installing Skills**:
-  ```bash
-  # Link skill directories globally (Recommended)
-  mkdir -p ~/.copilot/skills
-  ln -s $(pwd)/skills/* ~/.copilot/skills/
-
-  # Workspace-local (Optional)
-  mkdir -p .github/skills
-  ln -s $(pwd)/skills/* .github/skills/
-  ```
+The script will guide you through selecting your client and the asset categories to install.
 
 ---
 
