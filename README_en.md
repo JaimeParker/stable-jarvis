@@ -54,100 +54,34 @@ To unlock the full power of Stable-JARVIS, you must have the following MCP serve
 
 > 💡 **Coming Soon**: Keep an eye out for our upcoming **Feishu MCP** integration!
 
-## 🖥️ Client Configuration
+## 💻 Installation
 
-Stable-JARVIS relies on a core context file to guide the AI agent's personality and logic. Depending on your chosen client, you should ensure the appropriate file exists in your project root:
+This project provides interactive scripts to help you install the skills, agents, and commands. Please use the script appropriate for your operating system.
 
--   **Gemini CLI**: Uses `GEMINI.md`
--   **Claude Code**: Uses `CLAUDE.md` (You can simply copy `GEMINI.md` to `CLAUDE.md`)
--   **Other Clients**: Refer to your client's documentation for its specific context file naming convention.
+### Windows
 
-### 1. Claude Code Agent Registration
+1.  Open a new PowerShell terminal **as an Administrator**.
+2.  Navigate to the repository root directory.
+3.  If you haven't already, you may need to allow script execution by running:
+    ```powershell
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+4.  Run the installation script:
+    ```powershell
+    .\install.windows.ps1
+    ```
 
-Claude Code allows defining specialized sub-agents via Markdown files. To enable the agents in this project:
+### macOS / Linux
 
-- **Project-Level Registration**: Copy `agents/*.md` to the `.claude/agents/` directory.
-- **Global Registration**: Copy `agents/*.md` to the `~/.claude/agents/` directory.
-- **Usage**: You can invoke them using slash commands in the Claude Code CLI, e.g., `/planner` or `/python-reviewer`.
+1.  Open a terminal.
+2.  Navigate to the repository root directory.
+3.  Run the installation script:
+    ```bash
+    bash install.sh
+    ```
+    *(macOS users can also use `bash install_mac.sh`)*
 
-### 2. Gemini CLI Agent Support (Persona Adoption)
-
-Gemini CLI **does not natively support** registering static Markdown files as slash-command agents via a `/agent` command.
-
-**Solution**:
-You can leverage Gemini's powerful long-context window by instructing it to adopt the personas defined in the `agents/` directory:
-- **Manual Adoption**: Send a prompt like: "Please read `agents/architect.md` and adopt the Architect persona to review my design."
-- **Dynamic Orchestration**: As your Cyber Brain Custodian, I will automatically consult these files and execute the SOPs (Standard Operating Procedures) defined within them when the task demands specialized expertise.
-
-## 🌟 Key Features
-
-- **Non-Destructive PDF Annotation**: Extracts text coordinates using `PyMuPDF` and injects highlights, comments, and notes directly via the Zotero Web API. The original PDF file hash remains completely unchanged.
-- **High-Fidelity PDF to Markdown**: Converts complex academic papers (including math formulas) into LLM-friendly Markdown using `pymupdf4llm` and LaTeX source retrieval.
-- **Semantic Image Extraction**: Automatically pulls figures and diagrams from PDFs, saving them locally with structural metadata manifests.
-- **Zotero MCP Integration**: Seamlessly interfaces with the Zotero library to retrieve paper metadata, Item IDs, and local attachment keys based on natural language prompts.
-- **Agentic Workflow Ready**: Designed to be driven by AI agents (like Gemini-CLI) executing multi-step research tasks autonomously.
-
-## 🏗️ Architecture & Workflow
-
-The system is built on a composite architecture that executes the following automated workflow when analyzing a paper:
-
-1. **Dimensionality Reduction & Extraction**
-   - **Retrieval**: Uses Zotero-MCP to find the target paper and its local PDF attachment key.
-   - **Parsing**: Converts the PDF into Markdown text (preserving equations) and extracts local structural images for multimodal analysis.
-
-2. **Smart Anchoring**
-   - The AI Agent reads the parsed text and generates a structured research report.
-   - Simultaneously, it outputs an "annotation action list" in JSON format, capturing exact quotes from the text, assigned colors, and analytical commentary.
-
-3. **Non-Destructive Annotation Engine**
-   - **Locate**: Scans the PDF to find the absolute page coordinates (bounding boxes) for the exact quotes returned by the LLM.
-   - **Inject**: Transforms these coordinates into Zotero's native `annotationPosition` format and pushes them via the Zotero API, making the highlights and notes natively accessible and editable within Zotero's built-in PDF reader.
-
-## 💻 Client Installation & Integration
-
-The functionalities of Stable-JARVIS are extended through **Commands** and **Skills**. To enable your AI client to recognize these features, follow the integration steps for your specific platform:
-
-### 1. Gemini CLI
-Gemini CLI automatically registers `.toml` files located in `.gemini/commands/` and manages skills via the `skills` command.
-
-- **Configure Exa Search (MCP)**:
-  Add the following to `~/.gemini/settings.json` to enable the remote Exa MCP service:
-  ```json
-  {
-    "mcpServers": {
-      "exa": {
-        "httpUrl": "https://mcp.exa.ai/mcp"
-      }
-    }
-  }
-  ```
-- **Installing Commands**:
-  ```bash
-  # Symlink commands to the project-local configuration (Recommended)
-  mkdir -p .gemini/commands
-  ln -s $(pwd)/commands/daily/plan.toml .gemini/commands/daily:plan.toml
-  ln -s $(pwd)/commands/paper/analyze.toml .gemini/commands/paper:analyze.toml
-  # To reload commands in Gemini CLI: /commands reload
-  ```
-- **Installing Skills**:
-  ```bash
-  gemini skills install ./skills
-  ```
-
-### 2. Claude Code
-Claude Code and other modern agents typically look for Markdown-based instructions or skill definitions in `.claude/skills/`. Integrating Exa Search requires an MCP server configuration.
-
-- **Integrating Skills**:
-  ```bash
-  mkdir -p .claude/skills
-  # Link skill directories (Claude will recognize the SKILL.md within)
-  ln -s $(pwd)/skills/paper-analyzer .claude/skills/paper-analyzer
-  ```
-- **Configure Exa Search (MCP)**:
-  ```bash
-  # Run the following to add the Exa MCP server. Replace YOUR_API_KEY with your actual key.
-  claude mcp add --transport http exa "https://mcp.exa.ai/mcp?exaApiKey=YOUR_API_KEY&tools=web_search_exa,get_code_context_exa"
-  ```
+The script will guide you through selecting your client and the asset categories to install.
 
 ---
 
@@ -172,15 +106,6 @@ export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
 ```
 
 > 💡 **Note**: If environment variables are set, Stable-JARVIS will **prioritize** them and ignore the corresponding fields in `config/api_keys.json` or `config/zotero.json`. This prevents accidental commits of sensitive keys to the repository.
-
-### 3. Codex / GitHub Copilot
-For GitHub Copilot CLI or custom agents, we recommend using repository-level instruction files.
-
-### 3. Codex / GitHub Copilot
-For GitHub Copilot CLI or custom agents, we recommend using repository-level instruction files.
-
-- **Global Instructions**: Link or copy the content of `GEMINI.md` to `.github/copilot-instructions.md`.
-- **Specific Agents**: Create symlinks in `.github/instructions/` pointing to the skill definitions in this repository.
 
 ---
 
@@ -207,7 +132,7 @@ Configure Zotero credentials using one of these methods (in priority order):
 
 Before using the assistant, you **must** initialize your research identity by renaming the following template files and filling in your details:
 
-1.  **System Prompt**: Rename `GEMINI.md.template` to `GEMINI.md`. Replace the placeholders with your research area and name. This file defines the agent's logic.
+1.  **Instruction Files**: Choose the file that matches your client. For Gemini, rename `GEMINI.md.template` to `GEMINI.md`. For Codex, copy `AGENTS.md.template` to `AGENTS.md`. Replace the placeholders with your research area and name. These files define the agent's core behavior.
 2.  **Daily Plan Command**: The `daily plan` command must be configured by yourself. We provide a template at `commands/daily/plan.toml.template`; copy it to `commands/daily/plan.toml` and customize it for your active projects.
 3.  **Zotero Credentials**: Rename `config/zotero.json.template` to `config/zotero.json` and enter your API keys. (Alternatively, use environment variables below).
 4.  **Semantic Search Credentials (Optional)**: If you want to use `paper-finder --semantic`, create `config/api_keys.json` from `config/api_keys.json.template` and fill in `semantic_model.api_base_url`, `semantic_model.api_key`, and `semantic_model.model` (or use environment variables instead).

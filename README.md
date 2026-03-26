@@ -56,101 +56,34 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 
 > 💡 **即将到来**：敬请关注我们即将推出的 **Feishu (飞书) MCP** 集成！
 
-## 🖥️ 客户端配置
+## 💻 安装
 
-Stable-JARVIS 依赖核心上下文文件来指导 AI 智能体的人设和逻辑。根据您选择的客户端，请确保项目根目录中存在相应的文件：
+本项目提供了交互式脚本，可以帮助您为指定的客户端安装技能、智能体和命令。请根据您的操作系统使用对应的脚本。
 
--   **Gemini CLI**: 使用 `GEMINI.md`
--   **Claude Code**: 使用 `CLAUDE.md` (您可以直接将 `GEMINI.md` 复制为 `CLAUDE.md`)
--   **其他客户端**: 请参考您所用客户端的文档，了解其特定的上下文文件命名规范。
+### Windows 用户
 
-### 1. Claude Code 智能体 (Agents) 注册
+1.  以 **管理员身份** 打开一个新的 PowerShell 终端。
+2.  进入到仓库的根目录。
+3.  如果这是您第一次运行脚本，您可能需要允许脚本执行，请运行：
+    ```powershell
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+4.  运行安装脚本：
+    ```powershell
+    .\install.windows.ps1
+    ```
 
-Claude Code 允许通过 Markdown 定义专门的子智能体。要使本项目中的智能体生效：
+### macOS / Linux 用户
 
-- **项目内注册**：将 `agents/*.md` 复制到 `.claude/agents/` 目录下。
-- **全局注册**：将 `agents/*.md` 复制到 `~/.claude/agents/` 目录下。
-- **使用方法**：在 Claude Code CLI 中直接输入斜杠命令，例如 `/planner` 或 `/python-reviewer`。
+1.  打开一个终端。
+2.  进入到仓库的根目录。
+3.  运行安装脚本：
+    ```bash
+    bash install.sh
+    ```
+    *（macOS 用户也可以使用 `bash install_mac.sh`）*
 
-### 2. Gemini CLI 智能体支持 (Persona Adoption)
-
-Gemini CLI 目前**不原生支持**通过 `/agent` 命令注册静态 Markdown 文件作为智能体。
-
-**解决方案 (Solution)**:
-您可以利用其强大的长上下文能力，通过指令要求 Gemini 采用 `agents/` 目录下的特定人设：
-- **手动启用**：在对话开始时发送：“请读取 `agents/architect.md` 并作为架构师人设为我的设计提供建议。”
-- **动态调用**：作为您的 Cyber Brain 托管者，我会在任务需要时主动读取这些文件并执行其定义的 SOP（标准作业程序）。
-
-## 🌟 核心功能
-
-- **无损 PDF 批注**：使用 `PyMuPDF` 提取文本坐标，并通过 Zotero Web API 直接注入高亮、评论和笔记。原始 PDF 文件的哈希值保持完全不变。
-- **高保真 PDF 转 Markdown**：利用 `pymupdf4llm` 和 LaTeX 源码检索技术，将复杂的学术论文（包括数学公式）转换为对大模型友好的 Markdown 格式。
-- **语义图像提取**：自动从 PDF 中提取图表，并在本地保存时附带结构化的元数据清单。
-- **Zotero MCP 集成**：与 Zotero 库无缝对接，根据自然语言提示检索论文元数据、条目 ID 以及本地附件 Key。
-- **Agentic 工作流就绪**：专为由 AI 智能体（如 Gemini-CLI）驱动的多步自动化科研任务而设计。
-
-## 🏗️ 架构与工作流
-
-该系统基于组合式架构构建。在分析论文时，系统会执行以下自动化工作流：
-
-1. **降维与提取 (Dimensionality Reduction & Extraction)**
-   - **检索**：使用 Zotero-MCP 查找目标论文及其本地 PDF 附件 Key。
-   - **解析**：将 PDF 转换为 Markdown 文本（保留公式），并提取本地的结构化图像以供多模态分析。
-
-2. **智能锚点 (Smart Anchoring)**
-   - AI 智能体读取解析后的文本并生成结构化的研究报告。
-   - 同时，它会输出一个 JSON 格式的“批注动作列表”，记录文本中的精确引用、指定的颜色以及分析评论。
-
-3. **无损批注映射引擎 (Non-Destructive Annotation Engine)**
-   - **定位**：扫描 PDF，查找 LLM 返回的精确引文在页面上的绝对坐标（边界框 bounding boxes）。
-   - **注入**：将这些坐标转换为 Zotero 的原生 `annotationPosition` 格式，并通过 Zotero API 推送。如此一来，高亮和笔记就可以在 Zotero 内置的 PDF 阅读器中原生访问并进行二次编辑。
-
-## 💻 客户端安装与集成 (Client Installation & Integration)
-
-Stable-JARVIS 的功能通过 **Commands (命令)** 和 **Skills (技能)** 扩展。为了让您的 AI 客户端识别这些功能，请根据所用平台执行以下集成操作：
-
-### 1. Gemini CLI
-Gemini CLI 自动识别 `.gemini/commands/` 下的 `.toml` 文件，并通过 `skills` 指令管理技能。
-
-- **配置 Exa Search (MCP)**:
-  在 `~/.gemini/settings.json` 中添加以下配置以启用远程 Exa MCP 服务：
-  ```json
-  {
-    "mcpServers": {
-      "exa": {
-        "httpUrl": "https://mcp.exa.ai/mcp"
-      }
-    }
-  }
-  ```
-- **安装命令 (Commands)**:
-  ```bash
-  # 将本项目命令链接到项目局部配置（推荐）
-  mkdir -p .gemini/commands
-  ln -s $(pwd)/commands/daily/plan.toml .gemini/commands/daily:plan.toml
-  ln -s $(pwd)/commands/paper/analyze.toml .gemini/commands/paper:analyze.toml
-  # 刷新命令
-  # 在 Gemini CLI 中输入: /commands reload
-  ```
-- **安装技能 (Skills)**:
-  ```bash
-  gemini skills install ./skills
-  ```
-
-### 2. Claude Code
-Claude Code (及相关 Agent) 倾向于在 `.claude/skills/` 目录下寻找以 `.md` 结尾的指令或技能定义。同时，集成 Exa Search 需要配置 MCP 服务器。
-
-- **集成技能**:
-  ```bash
-  mkdir -p .claude/skills
-  # 链接技能目录（Claude 会识别其中的 SKILL.md）
-  ln -s $(pwd)/skills/paper-analyzer .claude/skills/paper-analyzer
-  ```
-- **配置 Exa Search (MCP)**:
-  ```bash
-  # 运行以下命令添加 Exa MCP 服务器，将 YOUR_API_KEY 替换为您的真实 Key
-  claude mcp add --transport http exa "https://mcp.exa.ai/mcp?exaApiKey=YOUR_API_KEY&tools=web_search_exa,get_code_context_exa"
-  ```
+脚本将引导您选择客户端并选择要安装的资产类别。
 
 ---
 
@@ -175,12 +108,6 @@ export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
 ```
 
 > 💡 **注意**：如果您已经设置了环境变量，Stable-JARVIS 将**优先**使用它们，而忽略 `config/api_keys.json` 或 `config/zotero.json` 中的相应字段。这能有效防止 API Key 被误提交到版本库中。
-
-### 3. Codex / GitHub Copilot
-对于 GitHub Copilot CLI 或自定义 Agent，建议使用项目级指令文件。
-
-- **全局指令**: 将 `GEMINI.md` 的内容引用或复制到 `.github/copilot-instructions.md`。
-- **特定 Agent**: 在 `.github/instructions/` 目录下创建符号链接，指向本项目的技能文档。
 
 ---
 
@@ -207,7 +134,7 @@ pip install -e '.[semantic]'
 
 在开始使用之前，您**必须**通过重命名以下模板文件并填写您的个人信息来初始化您的科研身份：
 
-1.  **系统提示词**: 将 `GEMINI.md.template` 重命名为 `GEMINI.md`。将占位符替换为您具体的研究领域和姓名。该文件定义了智能体的核心逻辑。
+1.  **指令文件**: 根据您使用的客户端选择对应文件。Gemini 用户请将 `GEMINI.md.template` 重命名为 `GEMINI.md`；Codex 用户请将 `AGENTS.md.template` 复制为 `AGENTS.md`。将占位符替换为您具体的研究领域和姓名。这些文件定义了智能体的核心行为。
 2.  **每日计划命令**: `daily plan` 需要您自行配置；项目已提供模板 `commands/daily/plan.toml.template`，请复制为 `commands/daily/plan.toml` 后按您的项目实际情况修改。
 3.  **Zotero 凭证**: 将 `config/zotero.json.template` 重命名为 `config/zotero.json` 并填入您的 API 密钥（或者使用下方的环境变量方式）。
 4.  **语义搜索凭证（可选）**: 如果您要使用 `paper-finder --semantic`，请基于 `config/api_keys.json.template` 创建 `config/api_keys.json`，并填写 `semantic_model.api_base_url`、`semantic_model.api_key` 与 `semantic_model.model`（或改用环境变量方式）。
@@ -305,7 +232,7 @@ metadata = converter.extract_images_with_metadata(
     "paper.pdf",
     output_dir="./figures",
     quality="high",  # 选项: low, medium, high, epic
-    name_prefix="ABC12345",
+    name_prefix="ABC12345"
 )
 
 # 保存清单 JSON 以供 LLM 引用
