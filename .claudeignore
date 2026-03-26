@@ -1,0 +1,9 @@
+# .claudeignore
+# This file tells Claude Code which files to ignore or, in this case, NOT ignore.
+
+# The '!' character negates a pattern from .gitignore.
+# This line instructs Claude to ALWAYS read AGENTS.md (or CLAUDE.md),
+# even though it is listed in .gitignore.
+!AGENTS.md
+!CLAUDE.md
+!.claude/settings.json

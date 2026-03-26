@@ -1,0 +1,8 @@
+# .geminiignore
+# This file tells the Gemini CLI which files to ignore or, in this case, NOT ignore.
+
+# The '!' character negates a pattern from .gitignore.
+# This line instructs the Gemini CLI to ALWAYS read GEMINI.md,
+# even though it is listed in .gitignore.
+!GEMINI.md
+!.gemini/settings.json
