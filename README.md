@@ -293,6 +293,8 @@ stable-jarvis/
 
 **非常欢迎提交 PR！** 无论您是添加新的科研技能、改进 PDF 解析引擎，还是优化“数字大脑”逻辑，您的贡献都是本项目前进的动力。
 
+如果您贡献新的技能 (skills)、智能体 (agents) 或命令 (commands)，请确保您同时在所有三个安装脚本 (`install.sh`, `install_mac.sh`, `install.windows.ps1`) 中相应类别的数组里声明它们，以便用户可以使用。
+
 欢迎访问 [issues 页面](https://github.com/JaimeParker/JARVIS-Dev/issues) 开始贡献。
 
 ## 📄 许可证
