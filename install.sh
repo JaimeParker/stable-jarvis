@@ -156,10 +156,10 @@ install_assets() {
     fi
     
     if [ "$client_name" = "Gemini CLI" ]; then
-        if [ "$INSTALL_RESEARCH_GLOBAL" = true ]; then mkdir -p "$base_dir/commands/paper"; ln -sf "$(pwd)/commands/paper/analyze.toml" "$base_dir/commands/paper:analyze.toml"; fi
-        if [ "$INSTALL_DAILY_GLOBAL" = true ]; then mkdir -p "$base_dir/commands/daily"; ln -sf "$(pwd)/commands/daily/plan.toml" "$base_dir/commands/daily:plan.toml"; fi
-        if [ "$INSTALL_RESEARCH_LOCAL" = true ]; then mkdir -p "$workspace_dir/commands/paper"; ln -sf "$(pwd)/commands/paper/analyze.toml" "$workspace_dir/commands/paper:analyze.toml"; fi
-        if [ "$INSTALL_DAILY_LOCAL" = true ]; then mkdir -p "$workspace_dir/commands/daily"; ln -sf "$(pwd)/commands/daily/plan.toml" "$workspace_dir/commands/daily:plan.toml"; fi
+        if [ "$INSTALL_RESEARCH_GLOBAL" = true ]; then mkdir -p "$base_dir/commands/paper"; ln -sf "$(pwd)/commands/paper/analyze.toml" "$base_dir/commands/paper/analyze.toml"; fi
+        if [ "$INSTALL_DAILY_GLOBAL" = true ]; then mkdir -p "$base_dir/commands/daily"; ln -sf "$(pwd)/commands/daily/plan.toml" "$base_dir/commands/daily/plan.toml"; fi
+        if [ "$INSTALL_RESEARCH_LOCAL" = true ]; then mkdir -p "$workspace_dir/commands/paper"; ln -sf "$(pwd)/commands/paper/analyze.toml" "$workspace_dir/commands/paper/analyze.toml"; fi
+        if [ "$INSTALL_DAILY_LOCAL" = true ]; then mkdir -p "$workspace_dir/commands/daily"; ln -sf "$(pwd)/commands/daily/plan.toml" "$workspace_dir/commands/daily/plan.toml"; fi
     fi
 }
 
