@@ -291,6 +291,8 @@ We want Stable-JARVIS to be a **community flywheel**: every new skill, bug fix, 
 
 **PRs are extremely welcome!** Whether you're adding a new research skill, improving the PDF parsing engine, or refining the "Cyber Brain" logic, your contributions are the fuel for this project.
 
+If you are contributing new skills, agents, or commands, please ensure you also declare them in the appropriate category arrays within all three installation scripts (`install.sh`, `install_mac.sh`, and `install.windows.ps1`) so they are available to all users.
+
 Feel free to check the [issues page](https://github.com/JaimeParker/JARVIS-Dev/issues) to get started.
 
 ## 📄 License

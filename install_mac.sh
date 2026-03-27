@@ -47,6 +47,7 @@ DESC_EN["tech-doc-writing"]="Write technical documentation, guides, and tutorial
 DESC_EN["writing-plans"]="A skill for creating detailed plans for complex tasks."
 DESC_EN["pptx"]="Create, read, and edit .pptx presentations, from content extraction to generation."
 DESC_EN["weekly-report-generator"]="Automatically generates a 1-page weekly progress report PPTX from Obsidian notes."
+DESC_EN["knowledge-distillation-from-discussion"]="Distills raw discussions and meeting notes into structured, permanent knowledge notes following Zettelkasten methodology."
 
 # Chinese Descriptions
 declare -A DESC_CN
@@ -76,14 +77,15 @@ DESC_CN["tech-doc-writing"]="以一致的风格编写技术文档、指南和教
 DESC_CN["writing-plans"]="一个为复杂任务创建详细计划的技能。"
 DESC_CN["pptx"]="创建、读取和编辑 .pptx 演示文稿，从内容提取到生成。"
 DESC_CN["weekly-report-generator"]="根据 Obsidian 笔记自动生成一页的每周进展报告 PPTX。"
+DESC_CN["knowledge-distillation-from-discussion"]="将原始讨论和会议记录提炼为结构化的永久知识笔记，遵循 Zettelkasten 方法论。"
 
 # --- Asset Categorization ---
-RESEARCH_SKILLS=("arxiv-search" "deep-research" "exa-search" "notion-to-markdown" "obsidian-auto-classifier" "obsidian-markdown" "paper-analyzer" "paper-finder" "web-research")
+RESEARCH_SKILLS=("arxiv-search" "exa-search" "notion-to-markdown" "obsidian-auto-classifier" "obsidian-markdown" "paper-analyzer" "paper-finder" "web-research")
 RESEARCH_AGENTS=("doc-updater.md")
 RESEARCH_COMMANDS=("paper/analyze.toml")
-CODING_SKILLS=("continuous-agent-loop" "continuous-learning" "continuous-learning-v2" "cpp-coding-standards" "docker-patterns" "iterative-retrieval" "python-patterns" "skill-creator" "verification-loop" "videodb")
+CODING_SKILLS=("continuous-agent-loop" "continuous-learning" "continuous-learning-v2" "cpp-coding-standards" "docker-patterns" "iterative-retrieval" "python-patterns" "verification-loop" "videodb" "writing-plans")
 CODING_AGENTS=("architect.md" "build-error-resolver.md" "code-reviewer.md" "python-reviewer.md" "security-reviewer.md")
-DAILY_SKILLS=("autonomous-loops" "brainstorming" "executing-plans" "tech-doc-writing" "writing-plans")
+DAILY_SKILLS=("autonomous-loops" "brainstorming" "executing-plans" "tech-doc-writing" "skill-creator" "deep-research" "knowledge-distillation-from-discussion")
 DAILY_AGENTS=("loop-operator.md" "planner.md")
 DAILY_COMMANDS=("daily/plan.toml")
 LAB_SKILLS=( "pptx" "weekly-report-generator" )

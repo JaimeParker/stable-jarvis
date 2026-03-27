@@ -47,14 +47,15 @@ $Descriptions = @{
     "writing-plans"             = @{ EN="A skill for creating detailed plans for complex tasks."; CN="一个为复杂任务创建详细计划的技能。" };
     "pptx"                      = @{ EN="Create, read, and edit .pptx presentations, from content extraction to generation."; CN="创建、读取和编辑 .pptx 演示文稿，从内容提取到生成。" };
     "weekly-report-generator"   = @{ EN="Automatically generates a 1-page weekly progress report PPTX from Obsidian notes."; CN="根据 Obsidian 笔记自动生成一页的每周进展报告 PPTX。" };
+    "knowledge-distillation-from-discussion" = @{ EN="Distills raw discussions and meeting notes into structured, permanent knowledge notes following Zettelkasten methodology."; CN="将原始讨论和会议记录提炼为结构化的永久知识笔记，遵循 Zettelkasten 方法论。" };
 }
 
 # --- Asset Categorization ---
-$RESEARCH_SKILLS = @("arxiv-search", "deep-research", "exa-search", "notion-to-markdown", "obsidian-auto-classifier", "obsidian-markdown", "paper-analyzer", "paper-finder", "web-research")
+$RESEARCH_SKILLS = @("arxiv-search", "exa-search", "notion-to-markdown", "obsidian-auto-classifier", "obsidian-markdown", "paper-analyzer", "paper-finder", "web-research")
 $RESEARCH_AGENTS = @("doc-updater.md")
-$CODING_SKILLS = @("continuous-agent-loop", "continuous-learning", "continuous-learning-v2", "cpp-coding-standards", "docker-patterns", "iterative-retrieval", "python-patterns", "skill-creator", "verification-loop", "videodb")
+$CODING_SKILLS = @("continuous-agent-loop", "continuous-learning", "continuous-learning-v2", "cpp-coding-standards", "docker-patterns", "iterative-retrieval", "python-patterns", "verification-loop", "videodb")
 $CODING_AGENTS = @("architect.md", "build-error-resolver.md", "code-reviewer.md", "python-reviewer.md", "security-reviewer.md")
-$DAILY_SKILLS = @("autonomous-loops", "brainstorming", "executing-plans", "tech-doc-writing", "writing-plans")
+$DAILY_SKILLS = @("autonomous-loops", "brainstorming", "executing-plans", "tech-doc-writing", "skill-creator", "deep-research", "knowledge-distillation-from-discussion")
 $DAILY_AGENTS = @("loop-operator.md", "planner.md")
 $LAB_SKILLS = @("pptx", "weekly-report-generator")
 
