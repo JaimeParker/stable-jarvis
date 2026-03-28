@@ -1,3 +1,8 @@
+---
+tags: [academic, writing, grant, proposal, robotics, ai]
+summary: A high-fidelity drafting agent for academic research proposals and grant applications.
+aliases: [grant-writer, academic-writing]
+---
 # Skill: Academic Grant Writer
 
 A high-fidelity drafting agent for academic research proposals and grant applications. This skill excels at converting sparse technical requirements into dense, logically rigorous, and formatted academic prose that meets specific word count and structural constraints.
