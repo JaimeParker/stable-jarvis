@@ -27,6 +27,7 @@ $Descriptions = @{
     "notion-to-markdown"        = @{ EN="Directly convert Notion pages to Obsidian-friendly Markdown."; CN="将 Notion 页面直接转换为 Obsidian 友好的 Markdown。" };
     "obsidian-auto-classifier"  = @{ EN="Intelligently organize and categorize Markdown notes within an Obsidian vault."; CN="在 Obsidian 保险库中智能地组织和分类 Markdown 笔记。" };
     "obsidian-markdown"         = @{ EN="Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, etc."; CN="创建和编辑带有 wikilinks、嵌入、callouts 等功能的 Obsidian 风格 Markdown。" };
+    "obsidian-batch-yaml"       = @{ EN="Autonomously batch process Obsidian notes to add structured YAML frontmatter with tags, summaries, and aliases."; CN="自主批量处理 Obsidian 笔记，添加带有标签、摘要和别名的结构化 YAML 前置数据。" };
     "paper-analyzer"            = @{ EN="Analyze literature in Zotero, generate Markdown reports with LaTeX, and upload as Zotero Notes."; CN="分析 Zotero 中的文献，生成带 LaTeX 的 Markdown 报告，并上传为 Zotero 笔记。" };
     "paper-finder"              = @{ EN="Discover recent arXiv papers matching a research profile and generate Obsidian-compatible notes."; CN="发现符合研究兴趣的最新 arXiv 论文，并生成 Obsidian 兼容的笔记。" };
     "web-research"              = @{ EN="Provides a structured approach to conducting comprehensive web research."; CN="提供一种进行全面网络研究的结构化方法。" };
@@ -51,7 +52,7 @@ $Descriptions = @{
 }
 
 # --- Asset Categorization ---
-$RESEARCH_SKILLS = @("arxiv-search", "exa-search", "notion-to-markdown", "obsidian-auto-classifier", "obsidian-markdown", "paper-analyzer", "paper-finder", "web-research")
+$RESEARCH_SKILLS = @("arxiv-search", "exa-search", "notion-to-markdown", "obsidian-auto-classifier", "obsidian-markdown", "obsidian-batch-yaml", "paper-analyzer", "paper-finder", "web-research")
 $RESEARCH_AGENTS = @("doc-updater.md")
 $CODING_SKILLS = @("continuous-agent-loop", "continuous-learning", "continuous-learning-v2", "cpp-coding-standards", "docker-patterns", "iterative-retrieval", "python-patterns", "verification-loop", "videodb")
 $CODING_AGENTS = @("architect.md", "build-error-resolver.md", "code-reviewer.md", "python-reviewer.md", "security-reviewer.md")
