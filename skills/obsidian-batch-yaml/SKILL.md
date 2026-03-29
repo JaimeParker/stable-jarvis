@@ -108,6 +108,7 @@ If a user provides more than 5 items (folders or notes), they will automatically
 
 ## Technical Constraints
 
+- **CRITICAL: NO CONTENT MODIFICATION:** You **MUST NOT** under any circumstances modify, reformat, or delete the original body content of the note (everything below the second `---` delimiter). This skill is strictly for YAML frontmatter enhancement.
 - **Atomicity:** Ensure the note content below the YAML block remains completely unchanged.
 - **Safety:** If a note read fails or content is ambiguous, skip that note and move to the next to prevent stalling the loop.
 - **Formatting:** Always use valid YAML syntax (e.g., spaces after colons, correct list formatting).
