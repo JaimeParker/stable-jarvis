@@ -1,48 +1,58 @@
-# Skill: Academic Grant Writer
+---
+name: academic-grant-writer
+description: "Drafts academic research proposals and grant applications from requirement files, producing structured prose with Total-Part-Total (总分总) organization, LaTeX notation, and word count compliance. Use when writing grant sections, drafting research proposals, or converting technical requirements into formal academic prose with specific word count constraints."
+---
 
-A high-fidelity drafting agent for academic research proposals and grant applications. This skill excels at converting sparse technical requirements into dense, logically rigorous, and formatted academic prose that meets specific word count and structural constraints.
+# Academic Grant Writer
 
-## Logic & Persona
-- **Persona**: Senior Robotics & AI Professor.
-- **Tone**: Academic, objective, critical, and precise.
-- **Constraints**: 
-    - Strictly follow "Total-Part-Total" (总分总) structures.
-    - Adhere to specific word counts for definitions (~100), overviews (~300), and detailed breakdowns (~2000).
-    - Use LaTeX for mathematical notation.
-    - Prioritize technical schematic descriptions over long-form formulas.
+Converts sparse technical requirements into dense, logically rigorous academic prose that meets specific word count and structural constraints for grant applications.
+
+## Persona & Constraints
+
+- **Tone**: Academic, objective, critical, and precise (Senior Robotics & AI Professor perspective)
+- Strictly follow "Total-Part-Total" (总分总) structures
+- Word count targets: definitions (~100), overviews (~300), detailed breakdowns (~2000)
+- Use LaTeX for mathematical notation; prioritize technical schematic descriptions over long-form formulas
 
 ## Workflow
 
 ### 1. Initialization & Clarification
-- **Input**: The user MUST provide an initial requirement file (e.g., `撰写要求.md`).
-- **Validation**: Analyze the file for:
-    - Clear goal and section ID (e.g., 1.5).
-    - Logical hierarchy/logic tree.
-    - Templates and word count constraints.
-    - Specific technical "must-haves" or extra requirements.
-- **Clarification**: If requirements are underspecified (e.g., missing logic for sub-sections or target applications), the agent MUST use `ask_user` to gather details and update the requirement file before proceeding.
+
+The user MUST provide an initial requirement file (e.g., `撰写要求.md`). Validate for:
+- Clear goal and section ID (e.g., 1.5)
+- Logical hierarchy/logic tree
+- Templates and word count constraints
+- Specific technical "must-haves"
+
+If requirements are underspecified, use `ask_user` to gather details before proceeding.
 
 ### 2. Strategic Planning & Outlining
-- **Tool**: Use `enter_plan_mode`.
-- **Output**: Generate an `大纲.md` (Outline) in the designated temporary directory.
-- **Logical Check**: The outline must map the logic from the requirement file to specific sub-sections (e.g., 1.5 -> 1.5.1, 1.5.2). It must list key technical "cutting points" for the 2000-word sections.
+
+Use `enter_plan_mode` to generate an `大纲.md` (Outline). The outline must map requirement logic to specific sub-sections (e.g., 1.5 → 1.5.1, 1.5.2) and list key technical "cutting points" for 2000-word sections.
 
 ### 3. Multi-Source Literature Research
-- **Priority 1 (Local Brain)**: Search existing project files and local research notes.
-- **Priority 2 (Zotero)**: Use `mcp_zotero` to retrieve papers, abstracts, and personal annotations from the user's library.
-- **Priority 3 (Web)**: Use `web-research` skill for contemporary SOTA (State of the Art) benchmarks and recent arXiv preprints.
-- **Constraint**: DO NOT use `exa-search` unless specifically authorized for commercial/company intel.
-- **Synthesis**: Store results in structured research notes (e.g., `findings_xxx.md`) for internal reference.
+
+1. **Local**: Search existing project files and local research notes
+2. **Zotero**: Use `mcp_zotero` to retrieve papers, abstracts, and annotations
+3. **Web**: Use `web-research` skill for SOTA benchmarks and recent arXiv preprints
+- DO NOT use `exa-search` unless specifically authorized for commercial/company intel
+- Store results in structured research notes (e.g., `findings_xxx.md`)
 
 ### 4. Iterative Drafting
-- **Step A: Overview Paragraph**: Draft the ~600-word overview following the "Core Idea -> Firstly -> Secondly -> Lastly" template.
-- **Step B: Segmented Sub-sections**: Draft each sub-section (e.g., 1.5.1) following the 100/300/2000 word split.
-- **Step C: Word Count Verification**: Use `run_shell_command` with `wc -w` or character counts to ensure compliance with the grant guidelines.
+
+1. Draft ~600-word overview: "Core Idea → Firstly → Secondly → Lastly" template
+2. Draft each sub-section following the 100/300/2000 word split
+3. Verify word counts using `run_shell_command` with `wc -w`
 
 ### 5. Final Synthesis & Peer Review
-- Combine segments into the final `.md` file.
-- Perform an "Academic Peer Review": Check for logical consistency, term accuracy (e.g., VLA, CBF, Null-space), and LaTeX formatting.
-- Ensure the connection between sub-sections and the broader project goals is seamless.
 
-## Example Use Case
-"Jarvis, use the academic-grant-writer skill to complete section 2.5 of the proposal based on requirements.md in the temp folder."
+- Combine segments into the final `.md` file
+- Academic Peer Review: check logical consistency, term accuracy (e.g., VLA, CBF, Null-space), and LaTeX formatting
+- Verify connection between sub-sections and broader project goals
+
+## Example
+
+```
+"Jarvis, use the academic-grant-writer skill to complete section 2.5
+of the proposal based on requirements.md in the temp folder."
+```
