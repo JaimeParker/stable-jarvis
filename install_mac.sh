@@ -136,32 +136,36 @@ link_items() {
 }
 
 install_assets() {
-    local client_name="$1"; local base_dir="$2"; local workspace_dir="$3"; local agent_dir_name="$4"
+    local client_name="$1"; local global_skills_dir="$2"; local global_agents_dir="$3"; local local_skills_dir="$4"; local local_agents_dir="$5"
 
     echo -e "
 --- ${C_GREEN_BOLD}Installing for $client_name (正在为 $client_name 安装)${C_RESET} ---"
 
     if [ "$INSTALL_RESEARCH_GLOBAL" = true ] || [ "$INSTALL_CODING_GLOBAL" = true ] || [ "$INSTALL_DAILY_GLOBAL" = true ] || [ "$INSTALL_LAB_GLOBAL" = true ]; then
-        echo -e "${C_BOLD}Linking global assets to '${C_MAGENTA}$base_dir${C_RESET}'...${C_RESET}"
-        [ "$INSTALL_RESEARCH_GLOBAL" = true ] && link_items "$base_dir/skills" "${RESEARCH_SKILLS[@]/#/skills/}" && link_items "$base_dir/$agent_dir_name" "${RESEARCH_AGENTS[@]/#/agents/}"
-        [ "$INSTALL_CODING_GLOBAL" = true ] && link_items "$base_dir/skills" "${CODING_SKILLS[@]/#/skills/}" && link_items "$base_dir/$agent_dir_name" "${CODING_AGENTS[@]/#/agents/}"
-        [ "$INSTALL_DAILY_GLOBAL" = true ] && link_items "$base_dir/skills" "${DAILY_SKILLS[@]/#/skills/}" && link_items "$base_dir/$agent_dir_name" "${DAILY_AGENTS[@]/#/agents/}"
-        [ "$INSTALL_LAB_GLOBAL" = true ] && link_items "$base_dir/skills" "${LAB_SKILLS[@]/#/skills/}"
+        echo -e "${C_BOLD}Linking global assets to '${C_MAGENTA}$global_skills_dir${C_RESET}' and '${C_MAGENTA}$global_agents_dir${C_RESET}'...${C_RESET}"
+        [ "$INSTALL_RESEARCH_GLOBAL" = true ] && link_items "$global_skills_dir" "${RESEARCH_SKILLS[@]/#/skills/}" && link_items "$global_agents_dir" "${RESEARCH_AGENTS[@]/#/agents/}"
+        [ "$INSTALL_CODING_GLOBAL" = true ] && link_items "$global_skills_dir" "${CODING_SKILLS[@]/#/skills/}" && link_items "$global_agents_dir" "${CODING_AGENTS[@]/#/agents/}"
+        [ "$INSTALL_DAILY_GLOBAL" = true ] && link_items "$global_skills_dir" "${DAILY_SKILLS[@]/#/skills/}" && link_items "$global_agents_dir" "${DAILY_AGENTS[@]/#/agents/}"
+        [ "$INSTALL_LAB_GLOBAL" = true ] && link_items "$global_skills_dir" "${LAB_SKILLS[@]/#/skills/}"
     fi
 
     if [ "$INSTALL_RESEARCH_LOCAL" = true ] || [ "$INSTALL_CODING_LOCAL" = true ] || [ "$INSTALL_DAILY_LOCAL" = true ] || [ "$INSTALL_LAB_LOCAL" = true ]; then
-        echo -e "${C_BOLD}Linking local assets to '${C_MAGENTA}$workspace_dir${C_RESET}'...${C_RESET}"
-        [ "$INSTALL_RESEARCH_LOCAL" = true ] && link_items "$workspace_dir/skills" "${RESEARCH_SKILLS[@]/#/skills/}" && link_items "$workspace_dir/$agent_dir_name" "${RESEARCH_AGENTS[@]/#/agents/}"
-        [ "$INSTALL_CODING_LOCAL" = true ] && link_items "$workspace_dir/skills" "${CODING_SKILLS[@]/#/skills/}" && link_items "$workspace_dir/$agent_dir_name" "${CODING_AGENTS[@]/#/agents/}"
-        [ "$INSTALL_DAILY_LOCAL" = true ] && link_items "$workspace_dir/skills" "${DAILY_SKILLS[@]/#/skills/}" && link_items "$workspace_dir/$agent_dir_name" "${DAILY_AGENTS[@]/#/agents/}"
-        [ "$INSTALL_LAB_LOCAL" = true ] && link_items "$workspace_dir/skills" "${LAB_SKILLS[@]/#/skills/}"
+        echo -e "${C_BOLD}Linking local assets to '${C_MAGENTA}$local_skills_dir${C_RESET}' and '${C_MAGENTA}$local_agents_dir${C_RESET}'...${C_RESET}"
+        [ "$INSTALL_RESEARCH_LOCAL" = true ] && link_items "$local_skills_dir" "${RESEARCH_SKILLS[@]/#/skills/}" && link_items "$local_agents_dir" "${RESEARCH_AGENTS[@]/#/agents/}"
+        [ "$INSTALL_CODING_LOCAL" = true ] && link_items "$local_skills_dir" "${CODING_SKILLS[@]/#/skills/}" && link_items "$local_agents_dir" "${CODING_AGENTS[@]/#/agents/}"
+        [ "$INSTALL_DAILY_LOCAL" = true ] && link_items "$local_skills_dir" "${DAILY_SKILLS[@]/#/skills/}" && link_items "$local_agents_dir" "${DAILY_AGENTS[@]/#/agents/}"
+        [ "$INSTALL_LAB_LOCAL" = true ] && link_items "$local_skills_dir" "${LAB_SKILLS[@]/#/skills/}"
     fi
     
     if [ "$client_name" = "Gemini CLI" ]; then
-        if [ "$INSTALL_RESEARCH_GLOBAL" = true ]; then mkdir -p "$base_dir/commands/paper"; ln -sf "$(pwd)/commands/paper/analyze.toml" "$base_dir/commands/paper:analyze.toml"; fi
-        if [ "$INSTALL_DAILY_GLOBAL" = true ]; then mkdir -p "$base_dir/commands/daily"; ln -sf "$(pwd)/commands/daily/plan.toml" "$base_dir/commands/daily:plan.toml"; fi
-        if [ "$INSTALL_RESEARCH_LOCAL" = true ]; then mkdir -p "$workspace_dir/commands/paper"; ln -sf "$(pwd)/commands/paper/analyze.toml" "$workspace_dir/commands/paper:analyze.toml"; fi
-        if [ "$INSTALL_DAILY_LOCAL" = true ]; then mkdir -p "$workspace_dir/commands/daily"; ln -sf "$(pwd)/commands/daily/plan.toml" "$workspace_dir/commands/daily:plan.toml"; fi
+        local global_root
+        local local_root
+        global_root="$(dirname "$global_skills_dir")"
+        local_root="$(dirname "$local_skills_dir")"
+        if [ "$INSTALL_RESEARCH_GLOBAL" = true ]; then mkdir -p "$global_root/commands/paper"; ln -sf "$(pwd)/commands/paper/analyze.toml" "$global_root/commands/paper/analyze.toml"; fi
+        if [ "$INSTALL_DAILY_GLOBAL" = true ]; then mkdir -p "$global_root/commands/daily"; ln -sf "$(pwd)/commands/daily/plan.toml" "$global_root/commands/daily/plan.toml"; fi
+        if [ "$INSTALL_RESEARCH_LOCAL" = true ]; then mkdir -p "$local_root/commands/paper"; ln -sf "$(pwd)/commands/paper/analyze.toml" "$local_root/commands/paper/analyze.toml"; fi
+        if [ "$INSTALL_DAILY_LOCAL" = true ]; then mkdir -p "$local_root/commands/daily"; ln -sf "$(pwd)/commands/daily/plan.toml" "$local_root/commands/daily/plan.toml"; fi
     fi
 }
 
@@ -180,7 +184,7 @@ ${C_YELLOW_BOLD}Step 1: Choose your AI client (第一步: 选择您的 AI 客户
 echo -e "${C_WHITE_BOLD}--------------------------------${C_RESET}"
 echo "  1) Gemini CLI"
 echo "  2) Claude Code"
-echo "  3) Codex / GitHub Copilot"
+echo "  3) Codex"
 read -p "Enter the number of your client (请输入客户端对应的数字): " client_choice
 
 INSTALL_RESEARCH_GLOBAL=false; INSTALL_CODING_GLOBAL=false; INSTALL_DAILY_GLOBAL=false; INSTALL_LAB_GLOBAL=false
@@ -220,9 +224,9 @@ ${C_YELLOW_BOLD}Step 4: Performing installation (第四步: 执行安装)${C_RES
 echo -e "${C_WHITE_BOLD}---------------------------------${C_RESET}"
 
 case $client_choice in
-    1) install_assets "Gemini CLI" "$HOME/.gemini" ".gemini" "agents";;
-    2) install_assets "Claude Code" "$HOME/.claude" ".claude" "agents";;
-    3) install_assets "Codex / GitHub Copilot" "$HOME/.copilot" ".github" "instructions";;
+    1) install_assets "Gemini CLI" "$HOME/.gemini/skills" "$HOME/.gemini/agents" ".gemini/skills" ".gemini/agents";;
+    2) install_assets "Claude Code" "$HOME/.claude/skills" "$HOME/.claude/agents" ".claude/skills" ".claude/agents";;
+    3) install_assets "Codex" "$HOME/.codex/skills" "$HOME/.codex/agents" ".agents/skills" ".codex/agents";;
     *) echo -e "${C_YELLOW_BOLD}Invalid choice. Exiting. (无效选择，正在退出。)${C_RESET}"; exit 1;;
 esac
 
