@@ -10,3 +10,7 @@ allow_login_shell = true
 
 # Keep Plan mode aligned with normal turns unless you need a different tradeoff.
 plan_mode_reasoning_effort = "medium"
+
+[mcp_servers.obsidian]
+command = "npx"
+args = ["-y", "@bitbonsai/mcpvault@latest", "/path/to/your/vault"]

@@ -111,29 +111,30 @@ function New-Symlink {
 function Invoke-AssetInstallation {
     param(
         [string]$ClientName,
-        [string]$BaseDir,
-        [string]$WorkspaceDir,
-        [string]$AgentDirName
+        [string]$GlobalSkillsDir,
+        [string]$GlobalAgentsDir,
+        [string]$LocalSkillsDir,
+        [string]$LocalAgentsDir
     )
 
     Write-Host "`n--- Installing for $ClientName (正在为 $ClientName 安装) ---" -ForegroundColor Green
 
     # Global Installation
     if ($INSTALL_RESEARCH_GLOBAL -or $INSTALL_CODING_GLOBAL -or $INSTALL_DAILY_GLOBAL -or $INSTALL_LAB_GLOBAL) {
-        Write-Host "Linking global assets to '$BaseDir'..."
-        if ($INSTALL_RESEARCH_GLOBAL) { New-Symlink "$BaseDir\skills" $RESEARCH_SKILLS; New-Symlink "$BaseDir\$AgentDirName" $RESEARCH_AGENTS }
-        if ($INSTALL_CODING_GLOBAL)   { New-Symlink "$BaseDir\skills" $CODING_SKILLS;   New-Symlink "$BaseDir\$AgentDirName" $CODING_AGENTS }
-        if ($INSTALL_DAILY_GLOBAL)    { New-Symlink "$BaseDir\skills" $DAILY_SKILLS;    New-Symlink "$BaseDir\$AgentDirName" $DAILY_AGENTS }
-        if ($INSTALL_LAB_GLOBAL)      { New-Symlink "$BaseDir\skills" $LAB_SKILLS }
+        Write-Host "Linking global assets to '$GlobalSkillsDir' and '$GlobalAgentsDir'..."
+        if ($INSTALL_RESEARCH_GLOBAL) { New-Symlink $GlobalSkillsDir ($RESEARCH_SKILLS | ForEach-Object { "skills/$_" }); New-Symlink $GlobalAgentsDir ($RESEARCH_AGENTS | ForEach-Object { "agents/$_" }) }
+        if ($INSTALL_CODING_GLOBAL)   { New-Symlink $GlobalSkillsDir ($CODING_SKILLS | ForEach-Object { "skills/$_" });   New-Symlink $GlobalAgentsDir ($CODING_AGENTS | ForEach-Object { "agents/$_" }) }
+        if ($INSTALL_DAILY_GLOBAL)    { New-Symlink $GlobalSkillsDir ($DAILY_SKILLS | ForEach-Object { "skills/$_" });    New-Symlink $GlobalAgentsDir ($DAILY_AGENTS | ForEach-Object { "agents/$_" }) }
+        if ($INSTALL_LAB_GLOBAL)      { New-Symlink $GlobalSkillsDir ($LAB_SKILLS | ForEach-Object { "skills/$_" }) }
     }
 
     # Local Installation
     if ($INSTALL_RESEARCH_LOCAL -or $INSTALL_CODING_LOCAL -or $INSTALL_DAILY_LOCAL -or $INSTALL_LAB_LOCAL) {
-        Write-Host "Linking local assets to '$WorkspaceDir'..."
-        if ($INSTALL_RESEARCH_LOCAL) { New-Symlink "$WorkspaceDir\skills" $RESEARCH_SKILLS; New-Symlink "$WorkspaceDir\$AgentDirName" $RESEARCH_AGENTS }
-        if ($INSTALL_CODING_LOCAL)   { New-Symlink "$WorkspaceDir\skills" $CODING_SKILLS;   New-Symlink "$WorkspaceDir\$AgentDirName" $CODING_AGENTS }
-        if ($INSTALL_DAILY_LOCAL)    { New-Symlink "$WorkspaceDir\skills" $DAILY_SKILLS;    New-Symlink "$WorkspaceDir\$AgentDirName" $DAILY_AGENTS }
-        if ($INSTALL_LAB_LOCAL)      { New-Symlink "$WorkspaceDir\skills" $LAB_SKILLS }
+        Write-Host "Linking local assets to '$LocalSkillsDir' and '$LocalAgentsDir'..."
+        if ($INSTALL_RESEARCH_LOCAL) { New-Symlink $LocalSkillsDir ($RESEARCH_SKILLS | ForEach-Object { "skills/$_" }); New-Symlink $LocalAgentsDir ($RESEARCH_AGENTS | ForEach-Object { "agents/$_" }) }
+        if ($INSTALL_CODING_LOCAL)   { New-Symlink $LocalSkillsDir ($CODING_SKILLS | ForEach-Object { "skills/$_" });   New-Symlink $LocalAgentsDir ($CODING_AGENTS | ForEach-Object { "agents/$_" }) }
+        if ($INSTALL_DAILY_LOCAL)    { New-Symlink $LocalSkillsDir ($DAILY_SKILLS | ForEach-Object { "skills/$_" });    New-Symlink $LocalAgentsDir ($DAILY_AGENTS | ForEach-Object { "agents/$_" }) }
+        if ($INSTALL_LAB_LOCAL)      { New-Symlink $LocalSkillsDir ($LAB_SKILLS | ForEach-Object { "skills/$_" }) }
     }
 }
 
@@ -150,7 +151,7 @@ Write-Host "`nStep 1: Choose your AI client (第一步: 选择您的 AI 客户�
 Write-Host "--------------------------------" -ForegroundColor White
 Write-Host "  1) Gemini CLI"
 Write-Host "  2) Claude Code"
-Write-Host "  3) Codex / GitHub Copilot"
+Write-Host "  3) Codex"
 $client_choice = Read-Host "Enter the number of your client (请输入客户端对应的数字)"
 
 # --- Global First ---
@@ -199,9 +200,9 @@ Write-Host "`nStep 4: Performing installation (第四步: 执行安装)" -Foregr
 Write-Host "---------------------------------" -ForegroundColor White
 
 switch ($client_choice) {
-    "1" { Invoke-AssetInstallation "Gemini CLI" (Join-Path $env:USERPROFILE ".gemini") ".gemini" "agents" }
-    "2" { Invoke-AssetInstallation "Claude Code" (Join-Path $env:USERPROFILE ".claude") ".claude" "agents" }
-    "3" { Invoke-AssetInstallation "Codex / GitHub Copilot" (Join-Path $env:USERPROFILE ".copilot") ".github" "instructions" }
+    "1" { Invoke-AssetInstallation "Gemini CLI" (Join-Path $env:USERPROFILE ".gemini\skills") (Join-Path $env:USERPROFILE ".gemini\agents") ".gemini\skills" ".gemini\agents" }
+    "2" { Invoke-AssetInstallation "Claude Code" (Join-Path $env:USERPROFILE ".claude\skills") (Join-Path $env:USERPROFILE ".claude\agents") ".claude\skills" ".claude\agents" }
+    "3" { Invoke-AssetInstallation "Codex" (Join-Path $env:USERPROFILE ".codex\skills") (Join-Path $env:USERPROFILE ".codex\agents") ".agents\skills" ".codex\agents" }
     default { Write-Warning "Invalid choice. Exiting. (无效选择，正在退出。)"; exit 1 }
 }
 
