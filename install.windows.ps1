@@ -37,6 +37,9 @@ $Descriptions = @{
     "cpp-coding-standards"      = @{ EN="C++ coding standards based on the C++ Core Guidelines for modern, safe code."; CN="基于 C++ 核心指南的 C++ 编码标准，用于现代、安全的代码。" };
     "docker-patterns"           = @{ EN="Docker and Docker Compose patterns for local development and container orchestration."; CN="用于本地开发和容器编排的 Docker 和 Docker Compose 模式。" };
     "iterative-retrieval"       = @{ EN="Pattern for progressively refining context retrieval to solve subagent context problems."; CN="用于逐步优化上下文检索以解决子智能体上下文问题的模式。" };
+    "markdown-to-html"          = @{ EN="Convert Markdown files to HTML using marked.js, pandoc, or custom scripts with GFM and CommonMark support."; CN="将 Markdown 文件转换为 HTML，支持 marked.js、pandoc 或自定义脚本，兼容 GFM 和 CommonMark。" };
+    "premium-frontend-ui"       = @{ EN="A comprehensive guide for crafting immersive, high-performance web experiences with advanced motion and typography."; CN="打造沉浸式高性能 Web 体验的综合指南，涵盖高级动效、排版和架构工艺。" };
+    "web-coder"                 = @{ EN="Expert web development engineer with comprehensive knowledge of HTML, CSS, JavaScript, web APIs, HTTP, and web standards."; CN="专家级 Web 开发工程师，全面掌握 HTML、CSS、JavaScript、Web API、HTTP 和 Web 标准。" };
     "python-patterns"           = @{ EN="Pythonic idioms, PEP 8 standards, and best practices for robust Python apps."; CN="用于构建健壮 Python 应用程序的 Pythonic 惯用法、PEP 8 标准和最佳实践。" };
     "skill-creator"             = @{ EN="Create new skills, modify existing skills, and measure their performance."; CN="创建新技能、修改现有技能并衡量其性能。" };
     "verification-loop"         = @{ EN="A comprehensive verification system for Claude Code sessions."; CN="一个用于 Claude Code 会话的综合验证系统。" };
@@ -54,7 +57,7 @@ $Descriptions = @{
 # --- Asset Categorization ---
 $RESEARCH_SKILLS = @("arxiv-search", "exa-search", "notion-to-markdown", "obsidian-auto-classifier", "obsidian-markdown", "obsidian-batch-yaml", "paper-analyzer", "paper-finder", "web-research")
 $RESEARCH_AGENTS = @("doc-updater.md")
-$CODING_SKILLS = @("continuous-agent-loop", "continuous-learning", "continuous-learning-v2", "cpp-coding-standards", "docker-patterns", "iterative-retrieval", "python-patterns", "verification-loop", "videodb")
+$CODING_SKILLS = @("continuous-agent-loop", "continuous-learning", "continuous-learning-v2", "cpp-coding-standards", "docker-patterns", "iterative-retrieval", "markdown-to-html", "premium-frontend-ui", "python-patterns", "verification-loop", "videodb", "web-coder")
 $CODING_AGENTS = @("architect.md", "build-error-resolver.md", "code-reviewer.md", "python-reviewer.md", "security-reviewer.md")
 $DAILY_SKILLS = @("autonomous-loops", "brainstorming", "executing-plans", "tech-doc-writing", "skill-creator", "deep-research", "knowledge-distillation-from-discussion")
 $DAILY_AGENTS = @("loop-operator.md", "planner.md")

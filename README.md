@@ -5,7 +5,7 @@
 
 [English](README_en.md) | 简体中文
 
-**Stable-JARVIS** 是专为学术研究人员设计的 AI 助手框架。它利用模型上下文协议 (MCP) 架构、LLM 智能体和一系列专用的编程技能，实现了科研全生命周期的自动化：从 arXiv 检索和多维网页调研，到深度文献解析、生成结构化 Markdown 报告、管理 Obsidian “数字大脑”，以及将原生批注无损写回 Zotero 中。
+**Stable-JARVIS** 是专为学术研究人员设计的 AI 助手框架。它利用模型上下文协议 (MCP) 架构、LLM 智能体和一系列专用的编程技能，实现了科研全生命周期的自动化：从 arXiv 检索和多维网页调研，到深度文献解析、生成结构化 Markdown 报告、管理 Obsidian “数字大脑”，以及将分析报告上传至 Zotero 中。
 
 Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude Code**, **Codex**, **OpenCode** 以及其他兼容 MCP 的智能体。
 
@@ -13,7 +13,7 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 
 本框架基于特定的知识管理层级构建，以确保用户及其 AI 智能体拥有最高的执行效率：
 
--   **Zotero (实验室)**：深度、仔细阅读文献的核心工作区。这是原始数据 (PDF) 被处理并通过无损引擎进行初始批注的地方。
+-   **Zotero (实验室)**：深度、仔细阅读文献的核心工作区。这是原始数据 (PDF) 被深度处理和分析的地方。
 -   **Obsidian (本地数字大脑)**：经过精选的本地知识库。它是一个“无尘室”，仅包含经过总结、用户验证和高信号的信息。它充当编程智能体读取和引用的外部逻辑引擎，构成了您的“数字大脑”。在这个生态系统中，Obsidian 严格用于**知识摄取与合成**——它是事实的来源，而非信息分发渠道。
 -   **Notion (交换站与输入框)**：用于协作、快速记录、数据库管理和跨团队讨论的动态平台。它充当原始信息的“收件箱”以及共享结果和发布的“输出口”。
 
@@ -39,7 +39,7 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 
 框架包含多个可供智能体调用的专用技能：
 
--   **`paper-analyzer`**: 核心科研技能。编排 Zotero-MCP、多模态 PDF 阅读和 Zotero Web API，生成深度技术报告和原生批注。
+-   **`paper-analyzer`**: 核心科研技能。编排 Zotero-MCP、多模态 PDF 阅读和 Zotero Web API，生成深度技术报告并上传为 Zotero Note。
 -   **`paper-finder`**: 基于研究兴趣画像的论文发现技能。按 profile 检索 arXiv，执行词法+可选语义排序，并输出 Obsidian 可直接摄取的 Markdown 笔记。
 -   **`weekly-report-generator`**: 自动将 Obsidian 每日笔记中的进度合成到专业的单页 PPTX 幻灯片中。
 -   **`notion-to-markdown`**: 将 Notion 页面无缝迁移到本地 Obsidian 库中，并实现完美的 LaTeX 公式和图像本地化。
@@ -187,26 +187,7 @@ export STABLE_JARVIS_SEMANTIC_MODEL="your-embedding-model"
 
 ## 📖 快速开始
 
-### 1. 自动批注
-
-通过代码向 Zotero 的 PDF 附件注入高亮和评论。
-
-```python
-from stable_jarvis import annotate
-
-result = annotate(
-    pdf_path="/path/to/local/paper.pdf",
-    attachment_key="ABC12345", # PDF 的 Zotero Attachment Key
-    target_text="We formulate the search-to-control problem as a Markov Decision Process",
-    comment="这里定义了 MDP 的状态空间，是一个重要的区别。",
-    color="#ff6666" 
-)
-
-if result.success:
-    print(f"成功创建批注！Zotero Key: {result.annotation_key}")
-```
-
-### 2. PDF 转 Markdown
+### 1. PDF 转 Markdown
 
 ```python
 from stable_jarvis import PDFConverter
@@ -218,7 +199,7 @@ if result.success:
     print(result.markdown) # 可供 LLM 阅读的 Markdown 内容
 ```
 
-### 3. 提取图像与元数据
+### 2. 提取图像与元数据
 
 从论文中提取图表并生成结构化清单。
 
@@ -240,7 +221,7 @@ converter.save_image_manifest(metadata, "./figures/manifest.json")
 # 输出示例: [{"filename": "ABC12345_fig1.png", "page": 1, "description": "Figure at the top of page 1"}]
 ```
 
-### 4. 画像驱动的论文发现（输出 Obsidian 笔记）
+### 3. 画像驱动的论文发现（输出 Obsidian 笔记）
 
 ```bash
 # 运行基于 profile 的检索与排序，输出 Markdown 笔记
