@@ -57,9 +57,9 @@ $Descriptions = @{
 # --- Asset Categorization ---
 $RESEARCH_SKILLS = @("arxiv-search", "exa-search", "notion-to-markdown", "obsidian-auto-classifier", "obsidian-markdown", "obsidian-batch-yaml", "paper-analyzer", "paper-finder", "web-research")
 $RESEARCH_AGENTS = @("doc-updater.md")
-$CODING_SKILLS = @("continuous-agent-loop", "continuous-learning", "continuous-learning-v2", "cpp-coding-standards", "docker-patterns", "iterative-retrieval", "markdown-to-html", "premium-frontend-ui", "python-patterns", "verification-loop", "videodb", "web-coder")
+$CODING_SKILLS = @("brainstorming", "continuous-agent-loop", "continuous-learning", "continuous-learning-v2", "cpp-coding-standards", "docker-patterns", "executing-plans", "iterative-retrieval", "markdown-to-html", "premium-frontend-ui", "python-patterns", "verification-loop", "videodb", "web-coder")
 $CODING_AGENTS = @("architect.md", "build-error-resolver.md", "code-reviewer.md", "python-reviewer.md", "security-reviewer.md")
-$DAILY_SKILLS = @("autonomous-loops", "brainstorming", "executing-plans", "tech-doc-writing", "skill-creator", "deep-research", "knowledge-distillation-from-discussion")
+$DAILY_SKILLS = @("autonomous-loops", "tech-doc-writing", "skill-creator", "deep-research", "knowledge-distillation-from-discussion")
 $DAILY_AGENTS = @("loop-operator.md", "planner.md")
 $LAB_SKILLS = @("pptx", "weekly-report-generator")
 
