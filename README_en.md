@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-**Stable-JARVIS** is an AI-powered assistant framework designed for academic researchers. It leverages Model Context Protocol (MCP) architecture, LLM agents, and a suite of specialized programmatic skills to automate the entire research lifecycle—from searching arXiv and conducting structured web-based literature reviews to generating high-fidelity Markdown reports, managing a personal "Cyber Brain" in Obsidian, and injecting native annotations back into Zotero.
+**Stable-JARVIS** is an AI-powered assistant framework designed for academic researchers. It leverages Model Context Protocol (MCP) architecture, LLM agents, and a suite of specialized programmatic skills to automate the entire research lifecycle—from searching arXiv and conducting structured web-based literature reviews to generating high-fidelity Markdown reports, managing a personal "Cyber Brain" in Obsidian, and uploading analysis reports to Zotero.
 
 Stable-JARVIS is designed to be driven by modern AI interfaces including **Gemini CLI**, **Claude Code**, **Codex**, **OpenCode**, and other MCP-compatible agents.
 
@@ -11,7 +11,7 @@ Stable-JARVIS is designed to be driven by modern AI interfaces including **Gemin
 
 This framework is built upon a specific hierarchy of knowledge management to ensure peak efficiency for both the user and their AI agents:
 
--   **Zotero (The Laboratory)**: The primary workspace for deep, careful literature reading. This is where raw data (PDFs) is processed and initially annotated using the non-destructive engine.
+-   **Zotero (The Laboratory)**: The primary workspace for deep, careful literature reading. This is where raw data (PDFs) is processed and deeply analyzed.
 -   **Obsidian (The Local Cyber Brain)**: A curated, local knowledge base. It is a "clean room" containing only summarized, user-verified, and high-signal information. It functions as an external logical engine for coding agents to read and reference, effectively forming your "Cyber Brain." In this ecosystem, Obsidian is strictly for **ingestion and synthesis**—it is the source of truth, not a broad distribution channel.
 -   **Notion (The Exchange & Input Box)**: A dynamic platform for collaboration, quick notes, database management, and cross-team discussion. It acts as the "Inbox" for raw information and the "Output" for shared results and sharing.
 
@@ -37,7 +37,7 @@ To maximize the efficiency of Stable-JARVIS skills (like `paper-finder` and `dai
 
 The framework includes several specialized skills that can be activated by the agent:
 
--   **`paper-analyzer`**: The core research skill. Orchestrates Zotero-MCP, multi-modal PDF reading, and Zotero Web API to generate deep technical reports and native annotations.
+-   **`paper-analyzer`**: The core research skill. Orchestrates Zotero-MCP, multi-modal PDF reading, and Zotero Web API to generate deep technical reports and upload them as Zotero Notes.
 -   **`paper-finder`**: A profile-driven paper discovery skill. It queries arXiv with your research-interest profile, ranks candidates (lexical + optional semantic), and writes Obsidian-ready Markdown notes.
 -   **`weekly-report-generator`**: Automatically synthesizes your progress from Obsidian daily notes into a professional one-page PPTX slide.
 -   **`notion-to-markdown`**: Seamlessly migrates Notion pages into your local Obsidian vault with perfect LaTeX and image localization.
@@ -185,26 +185,7 @@ If you are using SiliconFlow's embedding service, a good starting choice is `Qwe
 
 ## 📖 Quick Start
 
-### 1. Auto-Annotation
-
-Inject a highlight and comment into a Zotero PDF attachment programmatically.
-
-```python
-from stable_jarvis import annotate
-
-result = annotate(
-    pdf_path="/path/to/local/paper.pdf",
-    attachment_key="ABC12345", # The Zotero Attachment Key for the PDF
-    target_text="We formulate the search-to-control problem as a Markov Decision Process",
-    comment="This defines the MDP state space. Important distinction.",
-    color="#ff6666" 
-)
-
-if result.success:
-    print(f"Successfully created annotation! Zotero Key: {result.annotation_key}")
-```
-
-### 2. PDF to Markdown Conversion
+### 1. PDF to Markdown Conversion
 
 ```python
 from stable_jarvis import PDFConverter
@@ -216,7 +197,7 @@ if result.success:
     print(result.markdown) # LLM-ready markdown content
 ```
 
-### 3. Image Extraction with Metadata
+### 2. Image Extraction with Metadata
 
 Extract figures from a paper and generate a structural manifest.
 
@@ -238,7 +219,7 @@ converter.save_image_manifest(metadata, "./figures/manifest.json")
 # Output example: [{"filename": "ABC12345_fig1.png", "page": 1, "description": "Figure at the top of page 1"}]
 ```
 
-### 4. Profile-driven Paper Finder (Obsidian notes)
+### 3. Profile-driven Paper Finder (Obsidian notes)
 
 ```bash
 # Run profile-based retrieval and write markdown notes
