@@ -28,32 +28,15 @@ def load_semantic_model_settings_from_env() -> dict[str, str]:
     """
     Load semantic model settings from environment variables.
 
-    Supported vars (preferred):
-    - STABLE_JARVIS_SEMANTIC_API_BASE_URL
-    - STABLE_JARVIS_SEMANTIC_API_KEY
-    - STABLE_JARVIS_SEMANTIC_MODEL
-
-    Compatibility fallbacks:
-    - OPENAI_BASE_URL
-    - OPENAI_API_KEY
-    - OPENAI_EMBEDDING_MODEL
+    Reads from the unified EMBEDDING_* variables (set via .env or direct env vars):
+    - EMBEDDING_BASE_URL
+    - EMBEDDING_API_KEY
+    - EMBEDDING_MODEL
     """
     return {
-        "api_base_url": _coalesce_non_empty(
-            os.getenv("STABLE_JARVIS_SEMANTIC_API_BASE_URL"),
-            os.getenv("OPENAI_BASE_URL"),
-        )
-        or "",
-        "api_key": _coalesce_non_empty(
-            os.getenv("STABLE_JARVIS_SEMANTIC_API_KEY"),
-            os.getenv("OPENAI_API_KEY"),
-        )
-        or "",
-        "model": _coalesce_non_empty(
-            os.getenv("STABLE_JARVIS_SEMANTIC_MODEL"),
-            os.getenv("OPENAI_EMBEDDING_MODEL"),
-        )
-        or "",
+        "api_base_url": os.getenv("EMBEDDING_BASE_URL") or "",
+        "api_key": os.getenv("EMBEDDING_API_KEY") or "",
+        "model": os.getenv("EMBEDDING_MODEL") or "",
     }
 
 

@@ -27,7 +27,8 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 
 框架包含多个可供智能体调用的专用技能：
 
--   **`paper-analyzer`**: 核心科研技能。编排 Zotero-MCP、多模态 PDF 阅读和 Zotero Web API，生成深度技术报告并上传为 Zotero Note。
+-   **`paper-analyzer`**: 泛读技能。编排 Zotero-MCP、多模态 PDF 阅读和 Zotero Web API，单轮 LLM 生成摘要级报告并上传为 Zotero Note。
+-   **`paper-deep-reader`**: 精读技能。Zotero MCP → Obsidian 知识库 → 6-section 深度报告。支持分块摘要、KB 横向对比、多 LLM 提供商、wikilinks 输出。
 -   **`paper-finder`**: 基于研究兴趣画像的论文发现技能。按 profile 检索 arXiv，执行词法+可选语义排序，并输出 Obsidian 可直接摄取的 Markdown 笔记。
 -   **`weekly-report-generator`**: 自动将 Obsidian 每日笔记中的进度合成到专业的单页 PPTX 幻灯片中。
 -   **`notion-to-markdown`**: 将 Notion 页面无缝迁移到本地 Obsidian 库中，并实现完美的 LaTeX 公式和图像本地化。
@@ -90,27 +91,40 @@ bash scripts/sync-upstream.sh --apply
 
 ---
 
-## 🔒 安全与环境变量配置 (Security & Environment Variables)
+## 🔒 API 密钥配置
 
-为了保护您的 API 密钥不被泄露，Stable-JARVIS 建议优先使用**系统环境变量**而非本地配置文件。
-
-### 核心 API 密钥配置
-在您的 `~/.bashrc` 或 `~/.zshrc` 中添加以下行：
+所有 API 密钥统一在项目根目录的 `.env` 文件中管理：
 
 ```bash
-# Exa Search API Key (Claude Code 与 Gemini-CLI 共用)
-export EXA_API_KEY="您的_EXA_API_KEY"
-
-# Zotero 凭证
-export ZOTERO_LIBRARY_ID="您的_ID"
-export ZOTERO_API_KEY="您的_KEY"
-
-# 语义搜索 Embedding API (如果您使用 paper-finder --semantic)
-export STABLE_JARVIS_SEMANTIC_API_KEY="您的_KEY"
-export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
+# 从模板创建 .env
+cp .env.example .env
+# 编辑 .env，填入真实 key
 ```
 
-> 💡 **注意**：如果您已经设置了环境变量，Stable-JARVIS 将**优先**使用它们，而忽略 `config/api_keys.json` 或 `config/zotero.json` 中的相应字段。这能有效防止 API Key 被误提交到版本库中。
+**`.env` 中的变量一览**：
+
+```bash
+# ── LLM（paper-deep-reader 精读）────────────────────
+LLM_PROVIDER=deepseek
+LLM_MODEL=deepseek-v4-pro
+DEEPSEEK_API_KEY=sk-your-key-here
+
+# ── Embedding（paper-deep-reader + paper-finder）─────
+EMBEDDING_PROVIDER=qwen
+EMBEDDING_MODEL=Qwen/Qwen3-Embedding-8B
+EMBEDDING_API_KEY=sk-your-key-here
+EMBEDDING_BASE_URL=https://api.siliconflow.cn/v1
+
+# ── Zotero（paper-analyzer + paper-deep-reader）──────
+ZOTERO_LIBRARY_ID=your_library_id
+ZOTERO_API_KEY=your_api_key
+ZOTERO_LIBRARY_TYPE=user
+
+# ── Exa Search（exa-search skill）────────────────────
+EXA_API_KEY=your-exa-key-here
+```
+
+> 💡 `.env` 已被 `.gitignore` 排除，不会提交到 git。`stable_jarvis` 包在 import 时自动加载 `.env`。也可以直接设置同名系统环境变量（优先级高于 `.env`）。
 
 ---
 
@@ -139,58 +153,15 @@ pip install -e '.[semantic]'
 
 ### 🛠️ 个性化定制 (必读)
 
-在开始使用之前，您**必须**通过重命名以下模板文件并填写您的个人信息来初始化您的科研身份：
+在开始使用之前，您**必须**完成以下初始化：
 
-1.  **指令文件**: 根据您使用的客户端选择对应文件。Gemini 用户请将 `GEMINI.md.template` 重命名为 `GEMINI.md`；Codex 用户请将 `AGENTS.md.template` 复制为 `AGENTS.md`。将占位符替换为您具体的研究领域和姓名。这些文件定义了智能体的核心行为。
-2.  **每日计划命令**: `daily plan` 需要您自行配置；项目已提供模板 `commands/daily/plan.toml.template`，请复制为 `commands/daily/plan.toml` 后按您的项目实际情况修改。
-3.  **Zotero 凭证**: 将 `config/zotero.json.template` 重命名为 `config/zotero.json` 并填入您的 API 密钥（或者使用下方的环境变量方式）。
-4.  **语义搜索凭证（可选）**: 如果您要使用 `paper-finder --semantic`，请基于 `config/api_keys.json.template` 创建 `config/api_keys.json`，并填写 `semantic_model.api_base_url`、`semantic_model.api_key` 与 `semantic_model.model`（或改用环境变量方式）。
+1.  **API 密钥**: `cp .env.example .env`，然后编辑 `.env` 填入您的真实 API key。所有 skill 统一从此文件读取配置。
+2.  **指令文件**: 根据您使用的客户端选择对应文件。Gemini 用户请将 `GEMINI.md.template` 重命名为 `GEMINI.md`；Codex 用户请将 `AGENTS.md.template` 复制为 `AGENTS.md`。将占位符替换为您具体的研究领域和姓名。
+3.  **每日计划命令**: `daily plan` 需要您自行配置；项目已提供模板 `commands/daily/plan.toml.template`，请复制为 `commands/daily/plan.toml` 后按您的项目实际情况修改。
 
-### 选项 1：环境变量（推荐用于 CI/生产环境）
+### Embedding 推荐
 
-```bash
-export ZOTERO_LIBRARY_ID="你的_library_id"
-export ZOTERO_API_KEY="你的_api_key"
-export ZOTERO_LIBRARY_TYPE="user"  # 可选，默认为 "user"
-```
-
-### 选项 2：配置文件
-
-在以下任一位置创建一个 `zotero.json` 文件（系统按顺序搜索，找到即止）：
-1. `./zotero.json` (当前工作目录)
-2. `./config/zotero.json` (相对当前工作目录)
-3. `~/.config/stable-jarvis/zotero.json` (用户配置目录)
-
-**`zotero.json` 示例：**
-```json
-{
-    "library_id": "你的_library_id",
-    "api_key": "你的_api_key",
-    "library_type": "user"
-}
-```
-
-如需启用 `paper-finder` 的语义搜索，还需要准备 `config/api_keys.json`。可直接复制模板 `config/api_keys.json.template`，并填写如下字段：
-
-```json
-{
-    "semantic_model": {
-        "api_base_url": "https://api.your-provider.com/v1",
-        "api_key": "your_semantic_api_key",
-        "model": "your-embedding-model"
-    }
-}
-```
-
-或者也可以直接使用环境变量配置语义搜索：
-
-```bash
-export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
-export STABLE_JARVIS_SEMANTIC_API_KEY="your_semantic_api_key"
-export STABLE_JARVIS_SEMANTIC_MODEL="your-embedding-model"
-```
-
-如果您使用的是 SiliconFlow 的 embedding 服务，建议从 `Qwen/Qwen3-Embedding-8B` 开始尝试，参考[SiliconFlow Embedding Models](https://cloud.siliconflow.cn/me/models?types=embedding)。比如 `api_base_url` 可以是 `https://api.siliconflow.cn/v1`，`model` 则是 `Qwen/Qwen3-Embedding-8B`。
+如果您使用 SiliconFlow 的 embedding 服务，推荐从 `Qwen/Qwen3-Embedding-8B` 开始，`EMBEDDING_BASE_URL` 设为 `https://api.siliconflow.cn/v1`。详见 [SiliconFlow Embedding Models](https://cloud.siliconflow.cn/me/models?types=embedding)。
 
 ## 📖 快速开始
 
@@ -236,7 +207,7 @@ conda run -n jarvis python skills/paper-finder/find_papers.py \
     --profile path/to/research-interest.json \
     --output path/to/obsidian/inbox
 
-# 启用语义排序（自动读取 config/api_keys.json 中 semantic_model）
+# 启用语义排序（自动从 .env 读取 EMBEDDING_* 配置）
 conda run -n jarvis python skills/paper-finder/find_papers.py \
     --profile path/to/research-interest.json \
     --output path/to/obsidian/inbox \
@@ -253,9 +224,8 @@ stable-jarvis/
 │   ├── anthropics-skills/            # 来自 anthropics/skills
 │   ├── obsidian-skills/              # 来自 kepano/obsidian-skills
 │   └── superpowers/                  # 来自 obra/superpowers
-├── config/                          # 本地配置模板与凭证文件
-│   ├── zotero.json.template         # Zotero API 配置模板
-│   ├── api_keys.json.template       # paper-finder 语义搜索配置模板
+├── .env.example                     # 统一 API 密钥配置模板
+├── config/                          # 本地配置文件
 │   └── research-interest.example.json  # 研究兴趣画像示例
 ├── commands/                        # 面向客户端/智能体的命令模板
 │   ├── daily/                       # 每日计划命令

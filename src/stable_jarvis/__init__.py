@@ -7,7 +7,7 @@ Modules:
 
 Quick Start - Annotation:
     from stable_jarvis import annotate
-    
+
     result = annotate(
         pdf_path="path/to/paper.pdf",
         attachment_key="ABC12345",
@@ -17,13 +17,21 @@ Quick Start - Annotation:
 
 Quick Start - PDF Conversion:
     from stable_jarvis import PDFConverter
-    
+
     converter = PDFConverter()
     result = converter.convert("paper.pdf")
-    
+
     if result.success:
         print(result.markdown)
 """
+
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load stable-jarvis/.env so all submodules inherit the config
+_load_dotenv_path = Path(__file__).resolve().parents[2] / ".env"
+if _load_dotenv_path.exists():
+    load_dotenv(_load_dotenv_path)
 
 # Re-export annotation module's public API for backward compatibility
 from .annotation import (

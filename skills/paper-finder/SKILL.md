@@ -25,15 +25,12 @@ python skills/paper-finder/find_papers.py \
   --semantic
 ```
 
-Semantic settings can come from either source:
+Semantic settings are read from `stable-jarvis/.env`:
+- `EMBEDDING_BASE_URL`
+- `EMBEDDING_API_KEY`
+- `EMBEDDING_MODEL`
 
-- `config/api_keys.json` with `semantic_model.api_base_url`, `semantic_model.api_key`, `semantic_model.model`
-- Environment variables:
-  - `STABLE_JARVIS_SEMANTIC_API_BASE_URL`
-  - `STABLE_JARVIS_SEMANTIC_API_KEY`
-  - `STABLE_JARVIS_SEMANTIC_MODEL`
-
-You can still pass `--semantic-config path/to/semantic-config.json` for advanced overrides. The JSON file should match `stable_jarvis.paper_finder.semantic.SemanticConfig`.
+You can pass `--semantic-config path/to/config.json` for advanced overrides.
 
 ## Build or Refresh a Profile
 

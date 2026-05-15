@@ -158,3 +158,4 @@ python src/scripts/upload_report_note.py --report "./temp/reports/{attachment_ke
 - **Critical Thinking**: 在报告中，需保持对 Sim-to-real Gap, Real-time Performance, Sensor Latency, Generalization 等方面的学术审视。
 - **环境要求**: 所有 Python 脚本必须在 `jarvis` conda 环境中执行。
 - **MCP要求**：确保已正确安装并配置 `zotero-mcp`。
+- **Zotero API 配置**：报告上传需要 Zotero Web API key，统一在 `stable-jarvis/.env` 中配置 `ZOTERO_LIBRARY_ID`、`ZOTERO_API_KEY`、`ZOTERO_LIBRARY_TYPE`。`upload_report_note.py` 通过 `ZoteroConfig.from_default()` 自动加载。

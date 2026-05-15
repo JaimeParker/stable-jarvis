@@ -22,7 +22,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--semantic",
         action="store_true",
-        help="Enable semantic ranking; reads model settings from config/api_keys.json unless overridden",
+        help="Enable semantic ranking; reads EMBEDDING_* settings from .env",
     )
     parser.add_argument("--semantic-config", default=None, help="JSON file with semantic ranking config")
     parser.add_argument("--semantic-limit", type=int, default=3, help="Number of semantic neighbors to retain")
