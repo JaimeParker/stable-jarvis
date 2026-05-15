@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Execute 6-round deep reading analysis via external LLM API calls.
 
-Reuses paperwise's llm.client and section prompts to generate a deep-reading
+Reuses section prompts to generate a deep-reading
 report. Claude Code orchestrates Phases 1-3 and 5-6; this script handles
 Phase 4: the actual 6 independent LLM API calls.
 
@@ -31,25 +31,7 @@ import os
 import sys
 from pathlib import Path
 
-# Load .env from stable-jarvis root before anything else
-_ENV_FILE = Path(__file__).resolve().parents[4] / ".env"
-if _ENV_FILE.exists():
-    with open(_ENV_FILE, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, _, val = line.partition("=")
-            key, val = key.strip(), val.strip()
-            if key and key not in os.environ:
-                os.environ[key] = val
-
-# Ensure paperwise is on sys.path
-_PAPERWISE = Path(__file__).resolve().parents[4] / "3rd_party" / "paperwise"
-if str(_PAPERWISE) not in sys.path:
-    sys.path.insert(0, str(_PAPERWISE))
-
-# ── Section prompts (inlined from paperwise for zero-import-friction) ────────
+# ── Section prompts (inlined for zero-import-friction) ────────
 
 SYSTEM_PROMPT = """\
 你是一位资深 AI 研究员，正在为自己撰写论文精读笔记。
@@ -248,11 +230,9 @@ def main():
     ap.add_argument("--force", action="store_true", help="Regenerate even if cached")
     args = ap.parse_args()
 
-    # Resolve provider/model from CLI > env > paperwise config
-    from research_helper import config as rh_config
-
-    provider = args.provider or rh_config.LLM_PROVIDER
-    model = args.model or rh_config.LLM_MODEL
+    # Resolve provider/model from CLI > env
+    provider = args.provider or os.environ.get("LLM_PROVIDER", "anthropic")
+    model = args.model or os.environ.get("LLM_MODEL", "")
     os.environ["LLM_PROVIDER"] = provider
     os.environ["LLM_MODEL"] = model
 
@@ -283,7 +263,7 @@ def main():
         answers = []
 
     if not answers:
-        from research_helper.llm.client import complete
+        from stable_jarvis.llm import complete
 
         content = _prepare_content(title, content_text, complete)
         kb_section = _build_kb_section(kb_entries, arxiv_id)

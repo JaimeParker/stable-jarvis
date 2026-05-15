@@ -46,6 +46,11 @@ semantic = [
     "chromadb>=0.5.0",
     "openai>=1.0.0",
 ]
+paperwise = [
+    "anthropic>=0.40",
+    "openai>=1.50",
+    "sentence-transformers>=3.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/JaimeParker/JARVIS-Dev"

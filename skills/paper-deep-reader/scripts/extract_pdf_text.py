@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extract plain text from a PDF using pymupdf (fallback: pdfplumber).
+"""Extract plain text from a PDF using stable_jarvis.PDFConverter.
 
 Usage:
     python extract_pdf_text.py --pdf path/to/paper.pdf [--output path/to/output.txt]
@@ -9,48 +9,10 @@ If --output is omitted, prints to stdout.
 """
 from __future__ import annotations
 import argparse
-import re
 import sys
 from pathlib import Path
 
-
-def extract_text(pdf_path: Path) -> str:
-    try:
-        return _extract_pymupdf(pdf_path)
-    except Exception:
-        return _extract_pdfplumber(pdf_path)
-
-
-def count_pages(pdf_path: Path) -> int:
-    try:
-        import fitz
-        doc = fitz.open(str(pdf_path))
-        n = len(doc)
-        doc.close()
-        return n
-    except Exception:
-        return -1
-
-
-def _extract_pymupdf(pdf_path: Path) -> str:
-    import fitz
-    doc = fitz.open(str(pdf_path))
-    pages = [page.get_text("text") for page in doc]
-    doc.close()
-    return _clean("\n".join(pages))
-
-
-def _extract_pdfplumber(pdf_path: Path) -> str:
-    import pdfplumber
-    with pdfplumber.open(str(pdf_path)) as pdf:
-        pages = [p.extract_text() or "" for p in pdf.pages]
-    return _clean("\n".join(pages))
-
-
-def _clean(text: str) -> str:
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    text = text.replace("\f", "\n")
-    return text.strip()
+from stable_jarvis import PDFConverter
 
 
 def main():
@@ -64,11 +26,14 @@ def main():
         print(f"Error: PDF not found: {args.pdf}", file=sys.stderr)
         sys.exit(1)
 
+    converter = PDFConverter()
+
     if args.page_count:
-        print(count_pages(args.pdf))
+        metadata = converter.get_metadata(args.pdf)
+        print(metadata.get("page_count", -1))
         return
 
-    text = extract_text(args.pdf)
+    text = converter.extract_text(args.pdf)
     if args.output:
         args.output.write_text(text, encoding="utf-8")
         print(f"Extracted {len(text):,} chars → {args.output}", file=sys.stderr)

@@ -6,7 +6,7 @@ Reads two JSON files:
     --obsidian  Output from search_obsidian.py --embed or Obsidian MCP results
 
 Merges, deduplicates by arxiv_id, excludes the current paper, and writes
-a combined JSON array suitable for paperwise's --external-kb flag.
+a combined JSON array suitable for deep_read.py's --kb flag.
 
 Usage:
     python build_kb_context.py \

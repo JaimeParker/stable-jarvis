@@ -228,3 +228,6 @@ CLAUDE.md
 .gemini/settings.json
 .claude/settings.json
 .codex/config.toml
+
+# tmp
+outputs/

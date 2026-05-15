@@ -31,7 +31,7 @@ tags:
 cp .env.example .env   # 然后编辑 .env 填入真实 key
 ```
 
-`deep_read.py` 自动加载 `.env`。
+`deep_read.py` 从 `stable_jarvis` 包统一加载 `.env` 配置。
 
 | 变量 | 说明 |
 |------|------|
@@ -112,10 +112,27 @@ python scripts/extract_pdf_text.py --pdf <pdf_path> --output <output_path>.txt
 格式化为 KBEntry：`{title(from note), arxiv_id(from frontmatter), text(first 600 chars), source="obsidian"}`。
 
 **3c — Obsidian 语义搜索（可选）**
-如果配置了 embedding provider：
+需要配置 embedding provider（`.env` 中 `EMBEDDING_PROVIDER`）和 `OBSIDIAN_VAULT`（已在 `.env` 中配置）。
+
+**构建向量索引**（约 1-2 分钟，取决于 vault 大小）：
+```bash
+python scripts/search_obsidian.py --build
+```
+
+若缓存已存在，脚本会跳过并显示缓存年龄。此时应**询问用户**：
+> Obsidian 向量缓存已存在（X 条，Y 小时前）。最近 vault 是否有较大更新？是否需要 --force 重建？
+
+用户确认后用 `--force` 重建：
+```bash
+python scripts/search_obsidian.py --build --force
+```
+
+**语义搜索**：
 ```bash
 python scripts/search_obsidian.py --embed "{title}\n{abstract}" --top-k 5
 ```
+
+`--embed` 若无缓存会报错，此时需先 `--build`。
 格式化为 KBEntry：`{title, arxiv_id, text, published, source="obsidian-embed"}`。
 
 **合并去重**：

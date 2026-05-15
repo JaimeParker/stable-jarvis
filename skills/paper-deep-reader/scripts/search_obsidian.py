@@ -6,9 +6,6 @@ Modes:
     --embed Q    Embed query Q, compute cosine vs cache, print top-k results as JSON
     --content Q  No-op: just print the query (content search is done via Obsidian MCP)
 
-The script delegates embedding to research_helper.kb.embedder (qwen/openai/local).
-Set EMBEDDING_PROVIDER env var to choose the provider.
-
 Usage:
     python search_obsidian.py --build [--vault /path/to/vault] [--provider qwen]
     python search_obsidian.py --embed "offline reinforcement learning" --top-k 5
@@ -22,21 +19,24 @@ import os
 import sys
 from pathlib import Path
 
-# Locate paperwise embedder
-_PAPERWISE = Path(__file__).resolve().parents[4] / "3rd_party" / "paperwise"
-if str(_PAPERWISE) not in sys.path:
-    sys.path.insert(0, str(_PAPERWISE))
+from stable_jarvis.llm import embed, embed_one  # noqa: F401 — embed() used in cmd_build
 
 CACHE_FILE = Path("outputs/.obsidian_embeddings.json")
 CHUNK_SIZE = 2000  # characters per note to embed
 
 
 def _find_vault() -> Path:
-    """Try to locate the Obsidian vault path."""
+    """Locate the Obsidian vault path.
+
+    Priority:
+      1. OBSIDIAN_VAULT environment variable
+      2. Common default locations (~/Documents/Obsidian, ~/Obsidian, ~/vault)
+    Falls back to candidate paths. The Obsidian MCP (if configured) can provide
+    the vault root at the skill level — set OBSIDIAN_VAULT before invoking.
+    """
     env = os.environ.get("OBSIDIAN_VAULT", "")
     if env:
         return Path(env)
-    # Common default locations
     candidates = [
         Path.home() / "Documents" / "Obsidian",
         Path.home() / "Obsidian",
@@ -58,13 +58,11 @@ def _iter_notes(vault: Path):
             text = md.read_text(encoding="utf-8")
         except Exception:
             continue
-        # Extract title from first heading or filename
         title = md.stem
         for line in text.splitlines():
             if line.startswith("# "):
                 title = line[2:].strip()
                 break
-        # Extract arxiv_id from frontmatter or content
         arxiv_id = ""
         in_fm = False
         for line in text.splitlines():
@@ -81,22 +79,32 @@ def _iter_notes(vault: Path):
         yield rel, title, arxiv_id, text[:CHUNK_SIZE]
 
 
-def cmd_build(vault: Path, provider: str | None):
+def cmd_build(vault: Path, provider: str | None, force: bool = False):
     """Embed all notes and save cache."""
-    from research_helper.kb import embedder
-
     if provider:
         os.environ["EMBEDDING_PROVIDER"] = provider
+
+    if CACHE_FILE.exists() and not force:
+        cached = json.loads(CACHE_FILE.read_text(encoding="utf-8"))
+        if cached:
+            age_hours = (CACHE_FILE.stat().st_mtime - __import__("time").time()) / -3600
+            print(
+                f"Cache exists ({len(cached)} entries, {age_hours:.0f}h old): {CACHE_FILE}\n"
+                "Use --force to rebuild (recommended if vault has changed significantly).",
+                file=sys.stderr,
+            )
+            return
 
     notes = list(_iter_notes(vault))
     if not notes:
         print("No notes found in vault.", file=sys.stderr)
         sys.exit(1)
 
-    texts = [n[3] for n in notes]  # content chunks
-    print(f"Embedding {len(texts)} notes with provider={embedder.config.EMBEDDING_PROVIDER}...", file=sys.stderr)
+    texts = [n[3] for n in notes]
+    ep = os.environ.get("EMBEDDING_PROVIDER", "local")
+    print(f"Embedding {len(texts)} notes with provider={ep}...", file=sys.stderr)
 
-    embeddings = embedder.embed(texts)
+    embeddings = embed(texts)
 
     data = []
     for (rel, title, arxiv_id, text), vec in zip(notes, embeddings):
@@ -115,8 +123,6 @@ def cmd_build(vault: Path, provider: str | None):
 
 def cmd_embed(query: str, top_k: int):
     """Embed query and search cache."""
-    from research_helper.kb import embedder
-
     if not CACHE_FILE.exists():
         print("Error: Embedding cache not found. Run --build first.", file=sys.stderr)
         sys.exit(1)
@@ -126,7 +132,7 @@ def cmd_embed(query: str, top_k: int):
         print("[]")
         return
 
-    q_vec = embedder.embed_one(query[:2000])
+    q_vec = embed_one(query[:2000])
     scored = []
     for entry in data:
         sim = _cosine(q_vec, entry["embedding"])
@@ -169,12 +175,13 @@ def main():
     ap.add_argument("--top-k", type=int, default=5, help="Number of results (default: 5)")
     ap.add_argument("--vault", type=Path, default=None, help="Obsidian vault path")
     ap.add_argument("--provider", type=str, default=None, help="Embedding provider: qwen|openai|local")
+    ap.add_argument("--force", action="store_true", help="Force rebuild even if cache exists")
     args = ap.parse_args()
 
     vault = args.vault or _find_vault()
 
     if args.build:
-        cmd_build(vault, args.provider)
+        cmd_build(vault, args.provider, force=args.force)
     elif args.embed:
         cmd_embed(args.embed, args.top_k)
     elif args.content:
