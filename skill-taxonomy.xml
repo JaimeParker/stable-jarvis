@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Stable-JARVIS Skill Taxonomy
+  Centralized classification for skills, agents, and commands.
+  Read by install.sh, install_mac.sh, install.windows.ps1, and sync-upstream.sh.
+
+  To reclassify a skill, just move its <skill> element to another category.
+  To add a skill, add a <skill> element and a description in the install scripts.
+
+  upstream="repo-name"  → skill sourced from an upstream repo; sync-upstream.sh
+                           replaces it with a symlink to upstream/<repo-name>/.
+  path="sub/path"       → (optional) subdirectory within the upstream repo where
+                           the skill lives. Defaults to "skills".
+-->
+<taxonomy>
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- RESEARCH (科研): academic toolchain — papers, notes, literature -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <category id="RESEARCH" cn="科研">
+    <skills>
+      <skill upstream="deepagents" path="libs/cli/examples/skills">arxiv-search</skill>
+      <skill upstream="everything-claude-code">exa-search</skill>
+      <skill>markitdown-convert</skill>
+      <skill>notion-to-markdown</skill>
+      <skill>obsidian-auto-classifier</skill>
+      <skill>obsidian-batch-yaml</skill>
+      <skill upstream="obsidian-skills">obsidian-markdown</skill>
+      <skill>paper-analyzer</skill>
+      <skill>paper-code-audit</skill>
+      <skill>paper-deep-reader</skill>
+      <skill>paper-finder</skill>
+      <skill upstream="deepagents" path="libs/cli/examples/skills">web-research</skill>
+    </skills>
+    <agents>
+      <agent>doc-updater.md</agent>
+    </agents>
+    <commands>
+      <command>paper/analyze.toml</command>
+    </commands>
+  </category>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- CODING (编程): software construction — languages, patterns, tools -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <category id="CODING" cn="编程">
+    <skills>
+      <skill upstream="superpowers">brainstorming</skill>
+      <skill upstream="everything-claude-code">continuous-agent-loop</skill>
+      <skill upstream="everything-claude-code">continuous-learning</skill>
+      <skill upstream="everything-claude-code">continuous-learning-v2</skill>
+      <skill upstream="everything-claude-code">cpp-coding-standards</skill>
+      <skill upstream="everything-claude-code">docker-patterns</skill>
+      <skill upstream="superpowers">executing-plans</skill>
+      <skill upstream="everything-claude-code">iterative-retrieval</skill>
+      <skill>markdown-to-html</skill>
+      <skill upstream="awesome-copilot">premium-frontend-ui</skill>
+      <skill upstream="everything-claude-code">python-patterns</skill>
+      <skill upstream="everything-claude-code">verification-loop</skill>
+      <skill upstream="everything-claude-code">videodb</skill>
+      <skill upstream="awesome-copilot">web-coder</skill>
+      <skill upstream="superpowers">writing-plans</skill>
+    </skills>
+    <agents>
+      <agent>architect.md</agent>
+      <agent>build-error-resolver.md</agent>
+      <agent>code-reviewer.md</agent>
+      <agent>python-reviewer.md</agent>
+      <agent>security-reviewer.md</agent>
+    </agents>
+    <commands />
+  </category>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- DAILY (日常): everyday productivity — docs, reports, workflows -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <category id="DAILY" cn="日常">
+    <skills>
+      <skill upstream="everything-claude-code">autonomous-loops</skill>
+      <skill upstream="everything-claude-code">deep-research</skill>
+      <skill>knowledge-distillation-from-discussion</skill>
+      <skill upstream="anthropics-skills">pptx</skill>
+      <skill upstream="anthropics-skills">skill-creator</skill>
+      <skill>tech-doc-writing</skill>
+    </skills>
+    <agents>
+      <agent>loop-operator.md</agent>
+      <agent>planner.md</agent>
+    </agents>
+    <commands>
+      <command>daily/plan.toml</command>
+    </commands>
+  </category>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- LAB (实验室专用): niche experimental / lab-specific utilities -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <category id="LAB" cn="实验室专用">
+    <skills>
+      <skill>weekly-report-generator</skill>
+    </skills>
+    <agents />
+    <commands />
+  </category>
+</taxonomy>

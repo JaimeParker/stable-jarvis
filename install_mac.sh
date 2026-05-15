@@ -29,6 +29,8 @@ DESC_EN["obsidian-auto-classifier"]="Intelligently organize and categorize Markd
 DESC_EN["obsidian-markdown"]="Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, etc."
 DESC_EN["obsidian-batch-yaml"]="Autonomously batch process Obsidian notes to add structured YAML frontmatter with tags, summaries, and aliases."
 DESC_EN["paper-analyzer"]="Analyze literature in Zotero, generate Markdown reports with LaTeX, and upload as Zotero Notes."
+DESC_EN["paper-code-audit"]="Three-way cross-validation of paper claims, official code, and personal notes."
+DESC_EN["paper-deep-reader"]="Deep read: Zotero MCP to Obsidian knowledge base to 6-section deep report with chunked summaries and KB cross-referencing."
 DESC_EN["paper-finder"]="Discover recent arXiv papers matching a research profile and generate Obsidian-compatible notes."
 DESC_EN["web-research"]="Provides a structured approach to conducting comprehensive web research."
 DESC_EN["continuous-agent-loop"]="Patterns for continuous autonomous agent loops with quality gates and recovery."
@@ -63,6 +65,8 @@ DESC_CN["obsidian-auto-classifier"]="在 Obsidian 保险库中智能地组织和
 DESC_CN["obsidian-markdown"]="创建和编辑带有 wikilinks、嵌入、callouts 等功能的 Obsidian 风格 Markdown。"
 DESC_CN["obsidian-batch-yaml"]="自主批量处理 Obsidian 笔记，添加带有标签、摘要和别名的结构化 YAML 前置数据。"
 DESC_CN["paper-analyzer"]="分析 Zotero 中的文献，生成带 LaTeX 的 Markdown 报告，并上传为 Zotero 笔记。"
+DESC_CN["paper-code-audit"]="论文、官方代码与个人笔记的三方交叉验证。"
+DESC_CN["paper-deep-reader"]="精读：Zotero MCP → Obsidian 知识库 → 6-section 深度报告，支持分块摘要与 KB 横向对比。"
 DESC_CN["paper-finder"]="发现符合研究兴趣的最新 arXiv 论文，并生成 Obsidian 兼容的笔记。"
 DESC_CN["web-research"]="提供一种进行全面网络研究的结构化方法。"
 DESC_CN["continuous-agent-loop"]="具有质量门和恢复控制的连续自主智能体循环模式。"
@@ -88,15 +92,51 @@ DESC_CN["weekly-report-generator"]="根据 Obsidian 笔记自动生成一页的�
 DESC_CN["knowledge-distillation-from-discussion"]="将原始讨论和会议记录提炼为结构化的永久知识笔记，遵循 Zettelkasten 方法论。"
 
 # --- Asset Categorization ---
-RESEARCH_SKILLS=("arxiv-search" "exa-search" "notion-to-markdown" "obsidian-auto-classifier" "obsidian-markdown" "obsidian-batch-yaml" "paper-analyzer" "paper-finder" "web-research")
-RESEARCH_AGENTS=("doc-updater.md")
-RESEARCH_COMMANDS=("paper/analyze.toml")
-CODING_SKILLS=("brainstorming" "continuous-agent-loop" "continuous-learning" "continuous-learning-v2" "cpp-coding-standards" "docker-patterns" "executing-plans" "iterative-retrieval" "markdown-to-html" "premium-frontend-ui" "python-patterns" "verification-loop" "videodb" "web-coder" "writing-plans")
-CODING_AGENTS=("architect.md" "build-error-resolver.md" "code-reviewer.md" "python-reviewer.md" "security-reviewer.md")
-DAILY_SKILLS=("autonomous-loops" "tech-doc-writing" "skill-creator" "deep-research" "knowledge-distillation-from-discussion")
-DAILY_AGENTS=("loop-operator.md" "planner.md")
-DAILY_COMMANDS=("daily/plan.toml")
-LAB_SKILLS=( "pptx" "weekly-report-generator" )
+# All categories, skills, agents, and commands are defined in skill-taxonomy.xml.
+# The parse_taxonomy() function reads this file and populates the arrays below.
+
+CATEGORY_IDS=()
+declare -A CATEGORY_CN
+
+parse_taxonomy() {
+    local xml_file
+    xml_file="$(dirname "$0")/skill-taxonomy.xml"
+    if [ ! -f "$xml_file" ]; then
+        echo -e "${C_YELLOW_BOLD}ERROR: skill-taxonomy.xml not found at $xml_file${C_RESET}"
+        exit 1
+    fi
+    eval "$(python3 <<PYEOF
+import xml.etree.ElementTree as ET
+tree = ET.parse('$xml_file')
+root = tree.getroot()
+for cat in root.findall('category'):
+    cid = cat.get('id')
+    cn = cat.get('cn', '')
+    print('CATEGORY_IDS+=("' + cid + '")')
+    print('CATEGORY_CN["' + cid + '"]="' + cn + '"')
+print()
+for cat in root.findall('category'):
+    cid = cat.get('id')
+    skills = [s.text.strip() for s in cat.findall('skills/skill') if s.text]
+    agents = [a.text.strip() for a in cat.findall('agents/agent') if a.text]
+    commands = [c.text.strip() for c in cat.findall('commands/command') if c.text]
+    if skills:
+        print(cid + '_SKILLS=(' + ' '.join('"' + s + '"' for s in skills) + ')')
+    else:
+        print(cid + '_SKILLS=()')
+    if agents:
+        print(cid + '_AGENTS=(' + ' '.join('"' + a + '"' for a in agents) + ')')
+    else:
+        print(cid + '_AGENTS=()')
+    if commands:
+        print(cid + '_COMMANDS=(' + ' '.join('"' + c + '"' for c in commands) + ')')
+    else:
+        print(cid + '_COMMANDS=()')
+PYEOF
+)"
+}
+
+parse_taxonomy
 
 # --- Helper Functions ---
 
@@ -105,17 +145,12 @@ display_categories() {
     echo -e "${C_WHITE_BOLD}Available Asset Categories (可用资产类别)${C_RESET}"
     echo -e "${C_WHITE_BOLD}----------------------------------${C_RESET}"
 
-    local category_names=("RESEARCH" "CODING" "DAILY" "LAB_SKILLS")
-    local category_cns=("科研" "编程" "日常" "实验室专用")
-    local skill_arrays=("RESEARCH_SKILLS" "CODING_SKILLS" "DAILY_SKILLS" "LAB_SKILLS")
-
-    for i in "${!category_names[@]}"; do
-        local cat_name="${category_names[$i]}"
-        local cat_cn="${category_cns[$i]}"
-        local skills_ref="${skill_arrays[$i]}[@]"
+    for cid in "${CATEGORY_IDS[@]}"; do
+        local cn="${CATEGORY_CN[$cid]}"
+        local skills_ref="${cid}_SKILLS[@]"
         local skills=("${!skills_ref}")
 
-        echo -e "\n${C_BOLD}${C_BLUE}[$cat_name] ($cat_cn)${C_RESET}"
+        echo -e "\n${C_BOLD}${C_BLUE}[$cid] ($cn)${C_RESET}"
         for skill in "${skills[@]}"; do
             echo -e "  - ${C_BOLD}$skill${C_RESET}"
             echo -e "    - ${C_CYAN}EN:${C_RESET} ${DESC_EN[$skill]}"
@@ -202,7 +237,7 @@ echo -e "${C_WHITE_BOLD}----------------------------------------------------${C_
 read -p "  -> Install RESEARCH assets (科研)? [y/N]: " research_choice_g
 read -p "  -> Install CODING assets (编程)? [y/N]: " coding_choice_g
 read -p "  -> Install DAILY assets (日常)? [y/N]: " daily_choice_g
-read -p "  -> Install LAB_SKILLS assets (实验室专用)? [y/N]: " lab_choice_g
+read -p "  -> Install LAB assets (实验室专用)? [y/N]: " lab_choice_g
 [[ "$research_choice_g" =~ ^[Yy]$ ]] && INSTALL_RESEARCH_GLOBAL=true
 [[ "$coding_choice_g" =~ ^[Yy]$ ]] && INSTALL_CODING_GLOBAL=true
 [[ "$daily_choice_g" =~ ^[Yy]$ ]] && INSTALL_DAILY_GLOBAL=true
@@ -220,7 +255,7 @@ if $ANY_LOCAL_PROMPTS; then
     ! $INSTALL_RESEARCH_GLOBAL && read -p "  -> Install RESEARCH assets (科研)? [y/N]: " rcl && [[ "$rcl" =~ ^[Yy]$ ]] && INSTALL_RESEARCH_LOCAL=true
     ! $INSTALL_CODING_GLOBAL && read -p "  -> Install CODING assets (编程)? [y/N]: " ccl && [[ "$ccl" =~ ^[Yy]$ ]] && INSTALL_CODING_LOCAL=true
     ! $INSTALL_DAILY_GLOBAL && read -p "  -> Install DAILY assets (日常)? [y/N]: " dcl && [[ "$dcl" =~ ^[Yy]$ ]] && INSTALL_DAILY_LOCAL=true
-    ! $INSTALL_LAB_GLOBAL && read -p "  -> Install LAB_SKILLS assets (实验室专用)? [y/N]: " lcl && [[ "$lcl" =~ ^[Yy]$ ]] && INSTALL_LAB_LOCAL=true
+    ! $INSTALL_LAB_GLOBAL && read -p "  -> Install LAB assets (实验室专用)? [y/N]: " lcl && [[ "$lcl" =~ ^[Yy]$ ]] && INSTALL_LAB_LOCAL=true
 else
     echo "All categories selected for global installation. Nothing to install locally. (所有类别均已选择全局安装，无需本地安装。)"
 fi

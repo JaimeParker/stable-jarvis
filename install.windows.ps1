@@ -29,6 +29,8 @@ $Descriptions = @{
     "obsidian-markdown"         = @{ EN="Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, etc."; CN="创建和编辑带有 wikilinks、嵌入、callouts 等功能的 Obsidian 风格 Markdown。" };
     "obsidian-batch-yaml"       = @{ EN="Autonomously batch process Obsidian notes to add structured YAML frontmatter with tags, summaries, and aliases."; CN="自主批量处理 Obsidian 笔记，添加带有标签、摘要和别名的结构化 YAML 前置数据。" };
     "paper-analyzer"            = @{ EN="Analyze literature in Zotero, generate Markdown reports with LaTeX, and upload as Zotero Notes."; CN="分析 Zotero 中的文献，生成带 LaTeX 的 Markdown 报告，并上传为 Zotero 笔记。" };
+    "paper-code-audit"          = @{ EN="Three-way cross-validation of paper claims, official code, and personal notes."; CN="论文、官方代码与个人笔记的三方交叉验证。" };
+    "paper-deep-reader"         = @{ EN="Deep read: Zotero MCP to Obsidian knowledge base to 6-section deep report with chunked summaries and KB cross-referencing."; CN="精读：Zotero MCP → Obsidian 知识库 → 6-section 深度报告，支持分块摘要与 KB 横向对比。" };
     "paper-finder"              = @{ EN="Discover recent arXiv papers matching a research profile and generate Obsidian-compatible notes."; CN="发现符合研究兴趣的最新 arXiv 论文，并生成 Obsidian 兼容的笔记。" };
     "web-research"              = @{ EN="Provides a structured approach to conducting comprehensive web research."; CN="提供一种进行全面网络研究的结构化方法。" };
     "continuous-agent-loop"     = @{ EN="Patterns for continuous autonomous agent loops with quality gates and recovery."; CN="具有质量门和恢复控制的连续自主智能体循环模式。" };
@@ -55,13 +57,30 @@ $Descriptions = @{
 }
 
 # --- Asset Categorization ---
-$RESEARCH_SKILLS = @("arxiv-search", "exa-search", "notion-to-markdown", "obsidian-auto-classifier", "obsidian-markdown", "obsidian-batch-yaml", "paper-analyzer", "paper-finder", "web-research")
-$RESEARCH_AGENTS = @("doc-updater.md")
-$CODING_SKILLS = @("brainstorming", "continuous-agent-loop", "continuous-learning", "continuous-learning-v2", "cpp-coding-standards", "docker-patterns", "executing-plans", "iterative-retrieval", "markdown-to-html", "premium-frontend-ui", "python-patterns", "verification-loop", "videodb", "web-coder")
-$CODING_AGENTS = @("architect.md", "build-error-resolver.md", "code-reviewer.md", "python-reviewer.md", "security-reviewer.md")
-$DAILY_SKILLS = @("autonomous-loops", "tech-doc-writing", "skill-creator", "deep-research", "knowledge-distillation-from-discussion")
-$DAILY_AGENTS = @("loop-operator.md", "planner.md")
-$LAB_SKILLS = @("pptx", "weekly-report-generator")
+# All categories, skills, agents, and commands are defined in skill-taxonomy.xml.
+$taxonomyFile = Join-Path $PSScriptRoot "skill-taxonomy.xml"
+if (-not (Test-Path $taxonomyFile)) {
+    Write-Host "ERROR: skill-taxonomy.xml not found at $taxonomyFile" -ForegroundColor Red
+    exit 1
+}
+[xml]$taxonomy = Get-Content $taxonomyFile
+
+$CATEGORY_IDS = @()
+$CATEGORY_CN = @{}
+
+foreach ($cat in $taxonomy.taxonomy.category) {
+    $cid = $cat.id
+    $CATEGORY_IDS += $cid
+    $CATEGORY_CN[$cid] = $cat.cn
+
+    $skills = if ($cat.skills.skill) { @($cat.skills.skill | ForEach-Object { $_.ToString().Trim() }) } else { @() }
+    $agents = if ($cat.agents.agent) { @($cat.agents.agent | ForEach-Object { $_.ToString().Trim() }) } else { @() }
+    $commands = if ($cat.commands.command) { @($cat.commands.command | ForEach-Object { $_.ToString().Trim() }) } else { @() }
+
+    Set-Variable -Name "${cid}_SKILLS" -Value $skills
+    Set-Variable -Name "${cid}_AGENTS" -Value $agents
+    Set-Variable -Name "${cid}_COMMANDS" -Value $commands
+}
 
 # --- Helper Functions ---
 
@@ -70,20 +89,18 @@ function Show-Categories {
     Write-Host "Available Asset Categories (可用资产类别)" -ForegroundColor White
     Write-Host "----------------------------------" -ForegroundColor White
 
-    $categories = @(
-        @{ Name="RESEARCH"; CN="科研"; Skills=$RESEARCH_SKILLS },
-        @{ Name="CODING"; CN="编程"; Skills=$CODING_SKILLS },
-        @{ Name="DAILY"; CN="日常"; Skills=$DAILY_SKILLS },
-        @{ Name="LAB_SKILLS"; CN="实验室专用"; Skills=$LAB_SKILLS }
-    )
+    foreach ($cid in $CATEGORY_IDS) {
+        $cn = $CATEGORY_CN[$cid]
+        $skills = Get-Variable -Name "${cid}_SKILLS" -ValueOnly
 
-    foreach ($cat in $categories) {
         Write-Host ""
-        Write-Host "[$($cat.Name)] ($($cat.CN))" -ForegroundColor Blue
-        foreach ($skill in $cat.Skills) {
-            Write-Host "  - $($skill)" -ForegroundColor Gray
-            Write-Host "    - EN: $($Descriptions[$skill].EN)"
-            Write-Host "    - CN: $($Descriptions[$skill].CN)"
+        Write-Host "[$cid] ($cn)" -ForegroundColor Blue
+        foreach ($skill in $skills) {
+            Write-Host "  - $skill" -ForegroundColor Gray
+            if ($Descriptions.ContainsKey($skill)) {
+                Write-Host "    - EN: $($Descriptions[$skill].EN)"
+                Write-Host "    - CN: $($Descriptions[$skill].CN)"
+            }
         }
     }
 }
@@ -163,7 +180,7 @@ Write-Host "----------------------------------------------------" -ForegroundCol
 $research_choice_g = Read-Host "  -> Install RESEARCH assets (科研)? [y/N]"
 $coding_choice_g = Read-Host "  -> Install CODING assets (编程)? [y/N]"
 $daily_choice_g = Read-Host "  -> Install DAILY assets (日常)? [y/N]"
-$lab_choice_g = Read-Host "  -> Install LAB_SKILLS assets (实验室专用)? [y/N]"
+$lab_choice_g = Read-Host "  -> Install LAB assets (实验室专用)? [y/N]"
 
 $INSTALL_RESEARCH_GLOBAL = $research_choice_g -match '^[Yy]'
 $INSTALL_CODING_GLOBAL = $coding_choice_g -match '^[Yy]'
@@ -191,7 +208,7 @@ if (-not $INSTALL_RESEARCH_GLOBAL -or -not $INSTALL_CODING_GLOBAL -or -not $INST
         if ($dcl -match '^[Yy]') { $INSTALL_DAILY_LOCAL = $true }
     }
     if (-not $INSTALL_LAB_GLOBAL) {
-        $lcl = Read-Host "  -> Install LAB_SKILLS assets (实验室专用)? [y/N]"
+        $lcl = Read-Host "  -> Install LAB assets (实验室专用)? [y/N]"
         if ($lcl -match '^[Yy]') { $INSTALL_LAB_LOCAL = $true }
     }
 } else {

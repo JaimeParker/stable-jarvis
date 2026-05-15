@@ -60,6 +60,21 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 
 本项目提供了交互式脚本，可以帮助您为指定的客户端安装技能、智能体和命令。请根据您的操作系统使用对应的脚本。
 
+**前置步骤：初始化上游技能子模块**
+
+本项目通过 git submodule 链接上游开源技能仓库。首次使用前必须初始化：
+
+```bash
+git submodule update --init --recursive
+bash scripts/sync-upstream.sh --apply
+```
+
+之后若需拉取上游最新更新：
+```bash
+git submodule update --remote
+bash scripts/sync-upstream.sh --apply
+```
+
 ### Windows 用户
 
 1.  以 **管理员身份** 打开一个新的 PowerShell 终端。
@@ -240,6 +255,12 @@ conda run -n jarvis python skills/paper-finder/find_papers.py \
 
 ```text
 stable-jarvis/
+├── skill-taxonomy.xml                # 技能分类与上游来源定义（安装脚本的数据源）
+├── upstream/                         # 上游技能仓库 (git submodules)
+│   ├── everything-claude-code/       # 来自 affaan-m/everything-claude-code
+│   ├── anthropics-skills/            # 来自 anthropics/skills
+│   ├── obsidian-skills/              # 来自 kepano/obsidian-skills
+│   └── superpowers/                  # 来自 obra/superpowers
 ├── config/                          # 本地配置模板与凭证文件
 │   ├── zotero.json.template         # Zotero API 配置模板
 │   ├── api_keys.json.template       # paper-finder 语义搜索配置模板
@@ -274,7 +295,7 @@ stable-jarvis/
 
 **非常欢迎提交 PR！** 无论您是添加新的科研技能、改进 PDF 解析引擎，还是优化“数字大脑”逻辑，您的贡献都是本项目前进的动力。
 
-如果您贡献新的技能 (skills)、智能体 (agents) 或命令 (commands)，请确保您同时在所有三个安装脚本 (`install.sh`, `install_mac.sh`, `install.windows.ps1`) 中相应类别的数组里声明它们，以便用户可以使用。
+如果您贡献新的技能 (skills)、智能体 (agents) 或命令 (commands)，请确保您在 `skill-taxonomy.xml` 相应类别中声明它们。所有三个安装脚本 (`install.sh`, `install_mac.sh`, `install.windows.ps1`) 会自动从该文件中读取分类信息。对于来自上游仓库的技能，请添加 `upstream="repo-name"` 属性。
 
 欢迎访问 [issues 页面](https://github.com/JaimeParker/JARVIS-Dev/issues) 开始贡献。
 
@@ -284,13 +305,13 @@ stable-jarvis/
 
 ## 🙏 致谢 (Acknowledgements)
 
-本仓库内置的部分 AI 智能体技能改编自以下开源生态系统：
+本仓库通过 git submodule 符号链接跟踪以下开源技能仓库：
 
--   **`arxiv-search`**, **`web-research`**: 改编自 [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/master/libs/deepagents-cli/examples/skills/)。
--   **`skill-creator`**, **`pptx`**: 改编自 [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills)。
--   **`obsidian-markdown`**: 改编自 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills)。
--   **`paper-finder`**: 改编自 [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist)。
--   **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`exa-search`**, **`tech-doc-writing`**: 改编自 [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)。
--   **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: 改编自 [obra/superpowers](https://github.com/obra/superpowers)。
+-   **`arxiv-search`**, **`web-research`**: 来自 [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/main/libs/cli/examples/skills)。
+-   **`skill-creator`**, **`pptx`**: 来自 [anthropics/skills](https://github.com/anthropics/skills)。
+-   **`obsidian-markdown`**: 来自 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills)。
+-   **`premium-frontend-ui`**, **`web-coder`**: 来自 [github/awesome-copilot](https://github.com/github/awesome-copilot)。
+-   **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`continuous-learning-v2`**, **`exa-search`**: 来自 [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)。
+-   **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: 来自 [obra/superpowers](https://github.com/obra/superpowers)。
 
-感谢原作者提供的这些核心能力。
+其余技能为本项目自行开发。感谢上述开源作者提供的核心能力。

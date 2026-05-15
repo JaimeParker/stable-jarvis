@@ -1,0 +1,18 @@
+[submodule "upstream/everything-claude-code"]
+	path = upstream/everything-claude-code
+	url = https://github.com/affaan-m/everything-claude-code.git
+[submodule "upstream/anthropics-skills"]
+	path = upstream/anthropics-skills
+	url = https://github.com/anthropics/skills.git
+[submodule "upstream/obsidian-skills"]
+	path = upstream/obsidian-skills
+	url = https://github.com/kepano/obsidian-skills.git
+[submodule "upstream/superpowers"]
+	path = upstream/superpowers
+	url = https://github.com/obra/superpowers.git
+[submodule "upstream/deepagents"]
+	path = upstream/deepagents
+	url = https://github.com/langchain-ai/deepagents.git
+[submodule "upstream/awesome-copilot"]
+	path = upstream/awesome-copilot
+	url = https://github.com/github/awesome-copilot.git

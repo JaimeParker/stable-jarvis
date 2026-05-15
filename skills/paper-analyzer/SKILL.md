@@ -1,6 +1,6 @@
 ---
 name: paper-analyzer
-description: 自动分析Zotero库中的文献，生成带LaTeX公式的Markdown报告，并将报告上传为Zotero Note。
+description: 泛读：快速分析Zotero库中的文献，单轮LLM生成摘要级Markdown报告，并上传为Zotero Note。深度精读请用paper-deep-reader。
 version: 1.7.0
 author: Zhaohong Liu
 tags:
@@ -8,7 +8,9 @@ tags:
   - paper-analysis
 ---
 
-# Paper Analyzer
+# Paper Analyzer（泛读）
+
+> **定位**：本 skill 适用于快速泛读——单轮 LLM 调用生成摘要级报告，适合快速了解论文大意。如需深度精读（6-section 分解 + 知识库横向对比 + Obsidian 笔记输出），请使用 `paper-deep-reader`。
 
 ## 🎯 目标 (Objective)
 你是一个顶级的 Robotics & AI 系统级研究员。你的核心任务是根据用户的 Prompt，连接本地 Zotero 数据库与 Cyber Brain 缓存。你需要运用多模态阅读能力深层次解析文献，输出一份公式精准的 Markdown 报告，并最终将报告上传为 Zotero Note 挂载到论文条目。

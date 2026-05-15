@@ -219,6 +219,7 @@ config/api_keys.json
 .claude/agents/
 .claude/skills/
 .state/
+3rd_party/
 
 # Ignore personalized instruction files
 GEMINI.md

@@ -58,6 +58,21 @@ To unlock the full power of Stable-JARVIS, you must have the following MCP serve
 
 This project provides interactive scripts to help you install the skills, agents, and commands. Please use the script appropriate for your operating system.
 
+**Prerequisite: Initialize upstream skill submodules**
+
+This project links upstream open-source skill repositories via git submodules. You must initialize them before first use:
+
+```bash
+git submodule update --init --recursive
+bash scripts/sync-upstream.sh --apply
+```
+
+To pull the latest upstream updates later:
+```bash
+git submodule update --remote
+bash scripts/sync-upstream.sh --apply
+```
+
 ### Windows
 
 1.  Open a new PowerShell terminal **as an Administrator**.
@@ -238,6 +253,12 @@ conda run -n jarvis python skills/paper-finder/find_papers.py \
 
 ```text
 stable-jarvis/
+├── skill-taxonomy.xml                # Skill classification & upstream source definitions (data source for install scripts)
+├── upstream/                         # Upstream skill repositories (git submodules)
+│   ├── everything-claude-code/       # From affaan-m/everything-claude-code
+│   ├── anthropics-skills/            # From anthropics/skills
+│   ├── obsidian-skills/              # From kepano/obsidian-skills
+│   └── superpowers/                  # From obra/superpowers
 ├── config/                          # Local config templates and credential files
 │   ├── zotero.json.template         # Zotero API config template
 │   ├── api_keys.json.template       # Semantic search config template for paper-finder
@@ -272,7 +293,7 @@ We want Stable-JARVIS to be a **community flywheel**: every new skill, bug fix, 
 
 **PRs are extremely welcome!** Whether you're adding a new research skill, improving the PDF parsing engine, or refining the "Cyber Brain" logic, your contributions are the fuel for this project.
 
-If you are contributing new skills, agents, or commands, please ensure you also declare them in the appropriate category arrays within all three installation scripts (`install.sh`, `install_mac.sh`, and `install.windows.ps1`) so they are available to all users.
+If you are contributing new skills, agents, or commands, please ensure you declare them in the appropriate category within `skill-taxonomy.xml`. All three installation scripts (`install.sh`, `install_mac.sh`, `install.windows.ps1`) automatically read classifications from this file. For skills sourced from upstream repositories, add the `upstream="repo-name"` attribute.
 
 Feel free to check the [issues page](https://github.com/JaimeParker/JARVIS-Dev/issues) to get started.
 
@@ -282,13 +303,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgements
 
-Some of the built-in AI agent skills in this repository are adapted from the following open-source ecosystems:
+This repository tracks the following open-source skill repositories via git submodule symlinks:
 
--   **`arxiv-search`**, **`web-research`**: Adapted from [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/master/libs/deepagents-cli/examples/skills/).
--   **`skill-creator`**, **`pptx`**: Adapted from [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills).
--   **`obsidian-markdown`**: Adapted from [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills).
--   **`paper-finder`**: Adapted from [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist).
--   **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`exa-search`**, **`tech-doc-writing`**: Adapted from [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code).
--   **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: Adapted from [obra/superpowers](https://github.com/obra/superpowers).
+-   **`arxiv-search`**, **`web-research`**: From [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/main/libs/cli/examples/skills).
+-   **`skill-creator`**, **`pptx`**: From [anthropics/skills](https://github.com/anthropics/skills).
+-   **`obsidian-markdown`**: From [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills).
+-   **`premium-frontend-ui`**, **`web-coder`**: From [github/awesome-copilot](https://github.com/github/awesome-copilot).
+-   **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`continuous-learning-v2`**, **`exa-search`**: From [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code).
+-   **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: From [obra/superpowers](https://github.com/obra/superpowers).
 
-All credit goes to the original authors for these foundational capabilities.
+All other skills are developed in-house. Credit goes to the original authors for these foundational capabilities.
