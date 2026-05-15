@@ -37,11 +37,17 @@ Follow this iterative, batch-based process to execute the skill.
 
 For each batch of 5 notes, perform the following steps for every note:
 
-#### A. Read & Analyze
-1.  **Read Note:** Use `mcp_obsidian_read_note` to load the full content, including any existing YAML.
-2.  **Analyze Content:** Analyze the body text to generate the following metadata:
+#### A. Read Taxonomy & Analyze
+1.  **Read Tag Taxonomy (MANDATORY):** Before generating any tags, you MUST read the controlled tag vocabulary at `60 System/Tag Taxonomy.md`. This file defines the approved tag categories:
+    - **L1 — Domain**: `reinforcement-learning`, `robotics`, `motion-planning`, `trajectory-optimization`, `optimal-control`, `control-systems`
+    - **L2 — Methodology**: `offline-rl`, `offline-to-online`, `model-based-rl`, `world-models`, `imitation-learning`, `residual-rl`, `hierarchical-rl`, `diffusion-policy`, `real-world-rl`, `exploration`, `fine-tuning`, `reward-design`, `value-function`, `policy-gradient`
+    - **L3 — Algorithm/Tool**: `sac`, `ppo`, `cql`, `cal-ql`, `iql`, `td-mpc`, `flow-matching`, `isaac-lab`, `px4`, `rlinf`, `maniskill`
+    - **L4 — Project**: `aerial-grasping`, `aerial-manipulation`, `quadrotor-control`, `quadrotor-dynamics`, `ai-lab`, `fast-perching`, `agile-flight`
+    - **L5 — Note Type**: `discussion`, `moc`, `paper-reading`, `design-doc`, `training-diagnostics`, `implementation-plan`, `sop`, `research-philosophy`
+2.  **Read Note:** Use `mcp_obsidian_read_note` to load the full content, including any existing YAML.
+3.  **Analyze Content:** Analyze the body text to generate the following metadata:
     - `summary`: A concise, 1-2 sentence TL;DR of the core insight.
-    - `tags`: 2-4 highly relevant conceptual tags (e.g., `reinforcement-learning`, `system-architecture`).
+    - `tags`: 2-4 highly relevant conceptual tags. **Priority rule**: always select from the existing taxonomy (L1-L5) first. Only create a new tag if no existing tag captures the concept, and only if the concept applies to at least 2+ notes in the vault. All tags must be **lowercase kebab-case** (e.g., `reinforcement-learning`, NOT `Reinforcement_Learning` or `RL`). Never create tags from hex color codes, code keywords (e.g., `include`, `define`), or numeric values.
     - `aliases`: 1-3 alternative titles or keywords for easier cross-linking.
 
 #### B. Intelligent Merge Logic
@@ -53,7 +59,18 @@ For each batch of 5 notes, perform the following steps for every note:
     - **Preserve Others:** Keep all other existing fields (e.g., `date`, `type`, `source`) exactly as they are.
 3.  **Construct New YAML:** Assemble the merged fields into a clean YAML block at the top of the file.
 
-#### C. Write Update
+#### C. Tag Validation (Post-Generation Check)
+Before writing, validate the generated tags:
+1.  **Format Check**: All tags must be lowercase with hyphens (kebab-case). Reject tags that contain underscores, uppercase letters, spaces, or special characters.
+2.  **Noise Rejection**: Reject tags that are:
+    - Hex color codes (3, 6, or 8 character hex strings like `333`, `f9f`, `fff3a3a6`)
+    - Code keywords (`include`, `file`, `define`, `config`, `common`, `index`)
+    - Pure numbers
+    - Less than 2 characters
+3.  **Singleton Warning**: If a newly created tag is not in the taxonomy, flag it for review. It should only be added if it applies to at least 2 notes.
+4.  **Deduplicate**: Remove exact duplicates and case-variants (e.g., `Offline-RL` and `offline-rl` → keep `offline-rl`).
+
+#### D. Write Update
 1.  **Apply Update:** Use `mcp_obsidian_patch_note` (if replacing only the top block) or `mcp_obsidian_write_note` to save the updated note.
 2.  **Log Progress:** Keep a brief internal log of which files have been updated in this turn.
 
@@ -109,6 +126,8 @@ If a user provides more than 5 items (folders or notes), they will automatically
 ## Technical Constraints
 
 - **CRITICAL: NO CONTENT MODIFICATION:** You **MUST NOT** under any circumstances modify, reformat, or delete the original body content of the note (everything below the second `---` delimiter). This skill is strictly for YAML frontmatter enhancement.
+- **Tag Taxonomy Compliance:** All generated tags must be validated against `60 System/Tag Taxonomy.md`. Prefer existing taxonomy tags; new tags require justification and must follow kebab-case format.
+- **No Noise Tags:** Never create tags from hex color codes (e.g., `#fff3a3a6`), code keywords (e.g., `#include`), or numeric values. These are parser artifacts, not semantic tags.
 - **Atomicity:** Ensure the note content below the YAML block remains completely unchanged.
 - **Safety:** If a note read fails or content is ambiguous, skip that note and move to the next to prevent stalling the loop.
 - **Formatting:** Always use valid YAML syntax (e.g., spaces after colons, correct list formatting).
