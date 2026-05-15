@@ -25,11 +25,24 @@ tags:
 
 ## 配置
 
-运行前确保：
+所有 API key 统一在 `stable-jarvis/.env` 中管理：
+
+```bash
+cp .env.example .env   # 然后编辑 .env 填入真实 key
+```
+
+`deep_read.py` 自动加载 `.env`。
+
+| 变量 | 说明 |
+|------|------|
+| `LLM_PROVIDER` | 6 轮分析的 LLM 提供商（deepseek/openai/anthropic/qwen） |
+| `LLM_MODEL` | LLM 模型名 |
+| `EMBEDDING_PROVIDER` | embedding 提供商（qwen/openai/local） |
+| `EMBEDDING_MODEL` | embedding 模型名 |
+
+其他依赖：
 - `zotero-mcp` 已启动
 - `obsidian` MCP 已配置
-- （可选）`research-helper` 已安装：`pip install -e 3rd_party/paperwise`
-- （可选）embedding provider 已配置：`EMBEDDING_PROVIDER=qwen|openai|local`
 
 ---
 
@@ -115,32 +128,35 @@ python scripts/search_obsidian.py --embed "{title}\n{abstract}" --top-k 5
 
 ### 阶段 4：6 轮深度分析
 
-**前提**：读取 `reference/section-prompts.md` 获取完整的 6 个 section prompt 模板。
-
-每轮分析是**独立的 LLM 调用**，共用同一个 system prompt 和 kb_section。
-
-**System Prompt**：
-```
-你是一位资深 AI 研究员，正在为自己撰写论文精读笔记。
-写作要求：
-- 语言为学术中文，表达精确，不啰嗦
-- 每个 section 至少 200 字，重要内容可更长
-- 用具体数字、公式、方法名支撑论点，不写空话
-- 遇到方法细节时，解释清楚其设计动机，不只是罗列
-- 知识库中有相关论文时，做有实质内容的横向对比，指出异同
-- 不引用知识库和论文原文之外未出现的论文
-- 所有数学公式必须使用 Markdown 格式：行内公式用 $...$，独立公式用 $$...$$，不得使用 \( \) 或 \[ \]
+**执行脚本**（替代直接使用 Claude 会话）：
+```bash
+python scripts/deep_read.py \
+  --content <content_file>.txt \
+  --meta <meta_file>.json \
+  --kb <kb_context>.json \
+  --output <output_dir>
 ```
 
-**执行**：
-对 `reference/section-prompts.md` 中的每个 section prompt，依次：
-1. 用 `{title}`, `{content}`, `{kb_section}` 填充模板
-2. 调用 LLM（使用 Claude 当前会话能力）
-3. 保存回答
-4. 将中间结果缓存到 `{output_dir}/analysis_cache.json`
+**参数说明**：
+| 参数 | 来源 | 说明 |
+|------|------|------|
+| `--content` | 阶段 2 输出 | 论文全文（长论文已分块摘要） |
+| `--meta` | 阶段 1 输出 | JSON：title, arxiv_id, authors, published, categories |
+| `--kb` | 阶段 3 输出 | build_kb_context.py 生成的 JSON 数组 |
+| `--output` | 阶段 5 需要 | 输出目录 |
+| `--provider` | `.env` LLM_PROVIDER | 可选覆盖 |
+| `--model` | `.env` LLM_MODEL | 可选覆盖 |
+| `--force` | — | 强制重新生成（忽略缓存） |
 
-**LLM 提供商切换**：
-如果用户指定 `--provider deepseek`，使用 deepseek API 完成 6 轮调用（通过 Bash 调用 paperwise 的 paperwise CLI 或直接用 curl）。
+**脚本自动完成**：
+1. 加载 `stable-jarvis/.env` 中的 API 配置
+2. 论文超过 24,000 字符时，先分块摘要再拼接
+3. 构建 KB context section（过滤当前论文，取 top-5）
+4. 6 轮独立 LLM API 调用（每轮注入相同的 system prompt + kb context）
+5. 每轮回答缓存到 `{output_dir}/analysis_cache.json`
+6. 拼接 6 个回答为完整 `report.md`
+
+**LLM 提供商**：从 `.env` 读取 `LLM_PROVIDER` 和 `LLM_MODEL`。支持 anthropic / openai / deepseek / qwen。
 
 ---
 

@@ -5,7 +5,7 @@
 
 [English](README_en.md) | 简体中文
 
-**Stable-JARVIS** 是专为学术研究人员设计的 AI 助手框架。它利用模型上下文协议 (MCP) 架构、LLM 智能体和一系列专用的编程技能，实现了科研全生命周期的自动化：从 arXiv 检索和多维网页调研，到深度文献解析、生成结构化 Markdown 报告、管理 Obsidian “数字大脑”，以及将分析报告上传至 Zotero 中。
+**Stable-JARVIS** 是专为学术研究和知识管理设计的 AI 助手框架。它将 Obsidian 作为”数字大脑”、Zotero 作为文献处理引擎，通过 LLM 智能体 + MCP 协议自动化科研全流程：arXiv 检索、文献精读与泛读、Markdown 报告生成、笔记自动分类与 YAML 增强、以及 Notion 协作集成。
 
 Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude Code**, **Codex**, **OpenCode** 以及其他兼容 MCP 的智能体。
 
@@ -17,23 +17,11 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 -   **Obsidian (本地数字大脑)**：经过精选的本地知识库。它是一个“无尘室”，仅包含经过总结、用户验证和高信号的信息。它充当编程智能体读取和引用的外部逻辑引擎，构成了您的“数字大脑”。在这个生态系统中，Obsidian 严格用于**知识摄取与合成**——它是事实的来源，而非信息分发渠道。
 -   **Notion (交换站与输入框)**：用于协作、快速记录、数据库管理和跨团队讨论的动态平台。它充当原始信息的“收件箱”以及共享结果和发布的“输出口”。
 
-### 📁 推荐的 Obsidian 库架构 (Recommended Vault Structure)
+### 📁 Obsidian 库架构
 
-为了让 Stable-JARVIS 技能（如 `paper-finder` 和 `daily plan`）发挥最佳性能，建议您的 Obsidian 库采用以下层次结构：
+本框架围绕 Obsidian 作为"数字大脑"构建——采用 PARA 风格的层级结构（00 Inbox → 10 Projects → 20 Areas → 30 Zettelkasten → 40 Resources → 50 Archive → 60 System），由 `paper-finder` 等技能自动填充内容。
 
-```text
-/ (Vault Root)
-├── 00 Inbox/                # 新建笔记、论文草案及待分类信息的收件箱
-├── 10 Projects/             # 当前正在进行的科研项目 (Active Projects)
-├── 20 Areas/                # 持续关注的研究领域 (Research Areas)
-├── 30 Zettelkasten/         # 永久性的知识点原子笔记 (Permanent Notes)
-├── 40 Resources/            # 长期参考资料
-│   └── 42 Assets/
-│       └── Templates/       # 包含 Daily Note Template.md 等核心模板
-├── 50 Archive/              # 已完成或非活跃的项目归档
-│   └── Daily Notes/         # 存放 YYYY-MM-DD.md 格式的每日笔记
-└── 60 System/               # 库自身的元数据与配置
-```
+→ 完整架构与每层说明见 **[docs/obsidian_guide.md](docs/obsidian_guide.md)**
 
 ## 🛠️ 内置技能 (Built-in Skills)
 
@@ -54,7 +42,7 @@ Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude 
 -   **Obsidian MCP**: [bitbonsai/mcpvault](https://github.com/bitbonsai/mcpvault) — 用于与您的本地“数字大脑”交互。
 -   **Notion MCP**: [官方 Notion MCP 指南](https://developers.notion.com/guides/mcp) — 用于与您的信息交换平台同步。
 
-> 💡 **即将到来**：敬请关注我们即将推出的 **Feishu (飞书) MCP** 集成！
+> 💡 对于使用飞书的团队，推荐使用 [飞书 CLI](https://github.com/larksuite/cli) 进行集成。
 
 ## 💻 安装
 
@@ -132,6 +120,10 @@ export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
 # 克隆仓库
 git clone https://github.com/JaimeParker/stable-jarvis.git
 cd stable-jarvis
+
+# 初始化上游技能子模块并创建符号链接
+git submodule update --init --recursive
+bash scripts/sync-upstream.sh --apply
 
 # 确保你处于首选的虚拟环境中（如：conda activate jarvis）
 # 以开发者模式安装该包及其依赖

@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-**Stable-JARVIS** is an AI-powered assistant framework designed for academic researchers. It leverages Model Context Protocol (MCP) architecture, LLM agents, and a suite of specialized programmatic skills to automate the entire research lifecycle—from searching arXiv and conducting structured web-based literature reviews to generating high-fidelity Markdown reports, managing a personal "Cyber Brain" in Obsidian, and uploading analysis reports to Zotero.
+**Stable-JARVIS** is an AI-powered assistant framework designed for academic research and knowledge management. It pairs Obsidian as a "Cyber Brain" with Zotero as a literature processing engine, using LLM agents + MCP protocols to automate the full research pipeline: arXiv discovery, deep and skim reading of papers, Markdown report generation, automatic note classification and YAML enrichment, and Notion collaboration integration.
 
 Stable-JARVIS is designed to be driven by modern AI interfaces including **Gemini CLI**, **Claude Code**, **Codex**, **OpenCode**, and other MCP-compatible agents.
 
@@ -15,23 +15,11 @@ This framework is built upon a specific hierarchy of knowledge management to ens
 -   **Obsidian (The Local Cyber Brain)**: A curated, local knowledge base. It is a "clean room" containing only summarized, user-verified, and high-signal information. It functions as an external logical engine for coding agents to read and reference, effectively forming your "Cyber Brain." In this ecosystem, Obsidian is strictly for **ingestion and synthesis**—it is the source of truth, not a broad distribution channel.
 -   **Notion (The Exchange & Input Box)**: A dynamic platform for collaboration, quick notes, database management, and cross-team discussion. It acts as the "Inbox" for raw information and the "Output" for shared results and sharing.
 
-### 📁 Recommended Obsidian Vault Structure
+### 📁 Obsidian Vault Architecture
 
-To maximize the efficiency of Stable-JARVIS skills (like `paper-finder` and `daily plan`), we recommend structuring your Obsidian vault using the following logic:
+The framework is built around Obsidian as the "Cyber Brain" — using a PARA-style hierarchy (00 Inbox → 10 Projects → 20 Areas → 30 Zettelkasten → 40 Resources → 50 Archive → 60 System), auto-populated by skills such as `paper-finder`.
 
-```text
-/ (Vault Root)
-├── 00 Inbox/                # Inbox for new notes, paper drafts, and uncategorized info
-├── 10 Projects/             # Active Research Projects
-├── 20 Areas/                # Long-term research areas and interests
-├── 30 Zettelkasten/         # Permanent, atomic knowledge notes
-├── 40 Resources/            # Reference materials
-│   └── 42 Assets/
-│       └── Templates/       # Core templates (e.g., Daily Note Template.md)
-├── 50 Archive/              # Archived or inactive projects
-│   └── Daily Notes/         # Daily logs in YYYY-MM-DD.md format
-└── 60 System/               # Vault metadata and configuration
-```
+→ Full architecture and layer descriptions: **[docs/obsidian_guide.md](docs/obsidian_guide.md)**
 
 ## 🛠️ Built-in Skills
 
@@ -52,7 +40,7 @@ To unlock the full power of Stable-JARVIS, you must have the following MCP serve
 -   **Obsidian MCP**: [bitbonsai/mcpvault](https://github.com/bitbonsai/mcpvault) — For interacting with your local "Cyber Brain."
 -   **Notion MCP**: [Official Notion MCP Guide](https://developers.notion.com/guides/mcp) — For syncing with your information exchange platform.
 
-> 💡 **Coming Soon**: Keep an eye out for our upcoming **Feishu MCP** integration!
+> 💡 For teams using Feishu/Lark, we recommend the [Feishu CLI](https://github.com/larksuite/cli).
 
 ## 💻 Installation
 
@@ -130,6 +118,10 @@ export STABLE_JARVIS_SEMANTIC_API_BASE_URL="https://api.your-provider.com/v1"
 # Clone the repository
 git clone https://github.com/JaimeParker/stable-jarvis.git
 cd stable-jarvis
+
+# Initialize upstream skill submodules and create symlinks
+git submodule update --init --recursive
+bash scripts/sync-upstream.sh --apply
 
 # Ensure you are in your preferred virtual environment (e.g., conda activate jarvis)
 # Install the package in editable mode with dependencies

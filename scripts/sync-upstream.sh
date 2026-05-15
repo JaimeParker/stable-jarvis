@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# sync-upstream.sh — Replace upstream-sourced skill directories with symlinks
+# sync-upstream.sh — Replace upstream-sourced skills and agents with symlinks
 #                   to git submodules. Run from the repo root.
 #
 # Usage:
@@ -25,7 +25,7 @@ if [[ "${1:-}" == "--apply" ]]; then
     DRY_RUN=false
 fi
 
-echo -e "${C_BOLD}=== Upstream Skill Sync ===${C_RESET}"
+echo -e "${C_BOLD}=== Upstream Sync ===${C_RESET}"
 if $DRY_RUN; then
     echo -e "${C_YELLOW}DRY RUN — use --apply to actually create symlinks${C_RESET}"
 fi
@@ -39,7 +39,7 @@ echo ""
 # Step 2: parse taxonomy XML to find upstream skills
 echo -e "${C_BOLD}Step 2: Reading skill-taxonomy.xml...${C_RESET}"
 
-# Python emits: REPO|PATH|SKILL lines for upstream skills
+# Python emits TYPE|REPO|PATH|NAME lines for upstream skills and agents
 parsed=$(python3 <<'PYEOF'
 import xml.etree.ElementTree as ET
 import sys
@@ -57,64 +57,75 @@ for cat in root.findall("category"):
         upstream = s.get("upstream", "")
         if upstream:
             path = s.get("path", "skills")
-            print(f"{upstream}|{path}|{name}")
+            print(f"SKILL|{upstream}|{path}|{name}")
+            upstream_count += 1
+
+for cat in root.findall("category"):
+    for a in cat.findall("agents/agent"):
+        name = (a.text or "").strip()
+        if not name:
+            continue
+        upstream = a.get("upstream", "")
+        if upstream:
+            path = a.get("path", "agents")
+            print(f"AGENT|{upstream}|{path}|{name}")
             upstream_count += 1
 
 if upstream_count == 0:
-    print("No upstream skills found in taxonomy.", file=sys.stderr)
+    print("No upstream skills or agents found in taxonomy.", file=sys.stderr)
 PYEOF
 )
 
 # Step 3: create symlinks
-echo -e "${C_BOLD}Step 3: Processing skills...${C_RESET}"
+echo -e "${C_BOLD}Step 3: Processing skills & agents...${C_RESET}"
 echo ""
 
 linked=0
 skipped=0
-while IFS='|' read -r repo path skill; do
-    src_dir="upstream/${repo}/${path}/${skill}"
-    dst_dir="skills/${skill}"
+while IFS='|' read -r type repo path name; do
+    [[ -z "$type" ]] && continue
+    src="upstream/${repo}/${path}/${name}"
+    dst="${type,,}s/${name}"   # SKILL→skills, AGENT→agents
 
-    if [ ! -d "$src_dir" ]; then
-        echo -e "  ${C_YELLOW}SKIP${C_RESET}  $skill — upstream path $src_dir not found"
+    if [ ! -d "$src" ] && [ ! -f "$src" ]; then
+        echo -e "  ${C_YELLOW}SKIP${C_RESET}  $type $name — $src not found"
         skipped=$((skipped + 1))
         continue
     fi
 
     current_target=""
-    if [ -L "$dst_dir" ]; then
-        current_target=$(readlink "$dst_dir")
+    if [ -L "$dst" ]; then
+        current_target=$(readlink "$dst")
     fi
 
-    expected_target="../upstream/${repo}/${path}/${skill}"
+    expected_target="../upstream/${repo}/${path}/${name}"
 
     if [ "$current_target" = "$expected_target" ]; then
-        echo -e "  ${C_CYAN}OK${C_RESET}    $skill → upstream/${repo}/${path}/${skill}/ (already linked)"
+        echo -e "  ${C_CYAN}OK${C_RESET}    $name → upstream/${repo}/${path}/${name} (already linked)"
         linked=$((linked + 1))
         continue
     fi
 
     if $DRY_RUN; then
-        if [ -L "$dst_dir" ]; then
-            echo -e "  ${C_GREEN}LINK${C_RESET}  $skill → upstream/${repo}/${path}/${skill}/ (would replace: $current_target)"
-        elif [ -d "$dst_dir" ]; then
-            echo -e "  ${C_GREEN}LINK${C_RESET}  $skill → upstream/${repo}/${path}/${skill}/ (would replace local dir)"
+        if [ -L "$dst" ]; then
+            echo -e "  ${C_GREEN}LINK${C_RESET}  $name → upstream/${repo}/${path}/${name} (would replace: $current_target)"
+        elif [ -d "$dst" ] || [ -f "$dst" ]; then
+            echo -e "  ${C_GREEN}LINK${C_RESET}  $name → upstream/${repo}/${path}/${name} (would replace local)"
         else
-            echo -e "  ${C_GREEN}LINK${C_RESET}  $skill → upstream/${repo}/${path}/${skill}/ (new)"
+            echo -e "  ${C_GREEN}LINK${C_RESET}  $name → upstream/${repo}/${path}/${name} (new)"
         fi
         linked=$((linked + 1))
     else
-        # Remove existing directory or symlink, then create new symlink
-        rm -rf "$dst_dir"
-        ln -s "../upstream/${repo}/skills/${skill}" "$dst_dir"
-        echo -e "  ${C_GREEN}LINK${C_RESET}  $skill → upstream/${repo}/${path}/${skill}/"
+        rm -rf "$dst"
+        ln -s "../upstream/${repo}/${path}/${name}" "$dst"
+        echo -e "  ${C_GREEN}LINK${C_RESET}  $name → upstream/${repo}/${path}/${name}"
         linked=$((linked + 1))
     fi
 done <<< "$parsed"
 
 echo ""
 echo -e "${C_BOLD}=== Summary ===${C_RESET}"
-echo -e "  Upstream skills linked: $linked"
+echo -e "  Upstream skills & agents linked: $linked"
 echo -e "  Skipped (not found):    $skipped"
 
 if $DRY_RUN; then

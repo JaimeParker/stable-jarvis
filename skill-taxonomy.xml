@@ -32,7 +32,7 @@
       <skill upstream="deepagents" path="libs/cli/examples/skills">web-research</skill>
     </skills>
     <agents>
-      <agent>doc-updater.md</agent>
+      <agent upstream="everything-claude-code" path="agents">doc-updater.md</agent>
     </agents>
     <commands>
       <command>paper/analyze.toml</command>
@@ -61,11 +61,11 @@
       <skill upstream="superpowers">writing-plans</skill>
     </skills>
     <agents>
-      <agent>architect.md</agent>
-      <agent>build-error-resolver.md</agent>
-      <agent>code-reviewer.md</agent>
-      <agent>python-reviewer.md</agent>
-      <agent>security-reviewer.md</agent>
+      <agent upstream="everything-claude-code" path="agents">architect.md</agent>
+      <agent upstream="everything-claude-code" path="agents">build-error-resolver.md</agent>
+      <agent upstream="everything-claude-code" path="agents">code-reviewer.md</agent>
+      <agent upstream="everything-claude-code" path="agents">python-reviewer.md</agent>
+      <agent upstream="everything-claude-code" path="agents">security-reviewer.md</agent>
     </agents>
     <commands />
   </category>
@@ -83,8 +83,8 @@
       <skill>tech-doc-writing</skill>
     </skills>
     <agents>
-      <agent>loop-operator.md</agent>
-      <agent>planner.md</agent>
+      <agent upstream="everything-claude-code" path="agents">loop-operator.md</agent>
+      <agent upstream="everything-claude-code" path="agents">planner.md</agent>
     </agents>
     <commands>
       <command>daily/plan.toml</command>
