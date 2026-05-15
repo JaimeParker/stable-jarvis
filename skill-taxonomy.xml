@@ -5,7 +5,8 @@
   Read by install.sh, install_mac.sh, install.windows.ps1, and sync-upstream.sh.
 
   To reclassify a skill, just move its <skill> element to another category.
-  To add a skill, add a <skill> element and a description in the install scripts.
+  To add a skill, add a <skill> element with en/cn descriptions.
+  Descriptions live here — install scripts read them via parse_taxonomy().
 
   upstream="repo-name"  → skill sourced from an upstream repo; sync-upstream.sh
                            replaces it with a symlink to upstream/<repo-name>/.
@@ -18,18 +19,34 @@
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <category id="RESEARCH" cn="科研">
     <skills>
-      <skill upstream="deepagents" path="libs/cli/examples/skills">arxiv-search</skill>
-      <skill upstream="everything-claude-code">exa-search</skill>
-      <skill>markitdown-convert</skill>
-      <skill>notion-to-markdown</skill>
-      <skill>obsidian-auto-classifier</skill>
-      <skill>obsidian-batch-yaml</skill>
-      <skill upstream="obsidian-skills">obsidian-markdown</skill>
-      <skill>paper-analyzer</skill>
-      <skill>paper-code-audit</skill>
-      <skill>paper-deep-reader</skill>
-      <skill>paper-finder</skill>
-      <skill upstream="deepagents" path="libs/cli/examples/skills">web-research</skill>
+      <skill upstream="deepagents" path="libs/cli/examples/skills"
+             en="Search arXiv preprint repository for papers in various fields."
+             cn="在 arXiv 预印本库中搜索各领域的论文。">arxiv-search</skill>
+      <skill upstream="everything-claude-code"
+             en="Neural search via Exa MCP for web, code, and company research."
+             cn="通过 Exa MCP 进行神经网络搜索，用于网络、代码和公司研究。">exa-search</skill>
+      <skill en="Convert various document formats (PDF, DOCX, PPTX, etc.) to Markdown."
+             cn="将多种文档格式（PDF、DOCX、PPTX 等）转换为 Markdown。">markitdown-convert</skill>
+      <skill en="Directly convert Notion pages to Obsidian-friendly Markdown with LaTeX normalization and image localization."
+             cn="将 Notion 页面直接转换为 Obsidian 友好的 Markdown，支持 LaTeX 规范化和图片本地化。">notion-to-markdown</skill>
+      <skill en="Intelligently organize and categorize Markdown notes within an Obsidian vault."
+             cn="在 Obsidian 保险库中智能地组织和分类 Markdown 笔记。">obsidian-auto-classifier</skill>
+      <skill en="Autonomously batch process Obsidian notes to add structured YAML frontmatter with tags, summaries, and aliases."
+             cn="自主批量处理 Obsidian 笔记，添加带有标签、摘要和别名的结构化 YAML 前置数据。">obsidian-batch-yaml</skill>
+      <skill upstream="obsidian-skills"
+             en="Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, and other Obsidian-specific syntax."
+             cn="创建和编辑 Obsidian 风格 Markdown，支持 wikilinks、嵌入、callouts 等功能。">obsidian-markdown</skill>
+      <skill en="Skim-read: analyze literature in Zotero, generate summary-level Markdown reports, and upload as Zotero Notes."
+             cn="泛读：分析 Zotero 中的文献，生成摘要级 Markdown 报告并上传为 Zotero 笔记。">paper-analyzer</skill>
+      <skill en="Three-way cross-validation of paper claims, official code, and personal notes."
+             cn="论文、官方代码与个人笔记的三方交叉验证。">paper-code-audit</skill>
+      <skill en="Deep read: Zotero MCP → Obsidian knowledge base → 6-section deep report with chunked summaries and KB cross-referencing."
+             cn="精读：Zotero MCP → Obsidian 知识库 → 6-section 深度报告，支持分块摘要与 KB 横向对比。">paper-deep-reader</skill>
+      <skill en="Discover recent arXiv papers matching a research profile and generate Obsidian-compatible notes."
+             cn="画像驱动的 arXiv 论文发现，生成 Obsidian 兼容的笔记。">paper-finder</skill>
+      <skill upstream="deepagents" path="libs/cli/examples/skills"
+             en="Provides a structured approach to conducting comprehensive web research."
+             cn="提供结构化方法进行全面的网络研究。">web-research</skill>
     </skills>
     <agents>
       <agent upstream="everything-claude-code" path="agents">doc-updater.md</agent>
@@ -44,21 +61,50 @@
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <category id="CODING" cn="编程">
     <skills>
-      <skill upstream="superpowers">brainstorming</skill>
-      <skill upstream="everything-claude-code">continuous-agent-loop</skill>
-      <skill upstream="everything-claude-code">continuous-learning</skill>
-      <skill upstream="everything-claude-code">continuous-learning-v2</skill>
-      <skill upstream="everything-claude-code">cpp-coding-standards</skill>
-      <skill upstream="everything-claude-code">docker-patterns</skill>
-      <skill upstream="superpowers">executing-plans</skill>
-      <skill upstream="everything-claude-code">iterative-retrieval</skill>
-      <skill>markdown-to-html</skill>
-      <skill upstream="awesome-copilot">premium-frontend-ui</skill>
-      <skill upstream="everything-claude-code">python-patterns</skill>
-      <skill upstream="everything-claude-code">verification-loop</skill>
-      <skill upstream="everything-claude-code">videodb</skill>
-      <skill upstream="awesome-copilot">web-coder</skill>
-      <skill upstream="superpowers">writing-plans</skill>
+      <skill upstream="superpowers"
+             en="A skill for brainstorming and generating ideas."
+             cn="结构化头脑风暴与创意生成。">brainstorming</skill>
+      <skill upstream="everything-claude-code"
+             en="Patterns for continuous autonomous agent loops with quality gates and recovery controls."
+             cn="具有质量门和恢复控制的持续自主智能体循环模式。">continuous-agent-loop</skill>
+      <skill upstream="everything-claude-code"
+             en="[DEPRECATED] Automatically extract reusable patterns from sessions. Use continuous-learning-v2."
+             cn="[已废弃] 从会话中自动提取可重用模式，请使用 continuous-learning-v2。">continuous-learning</skill>
+      <skill upstream="everything-claude-code"
+             en="Instinct-based learning system that observes sessions to create and evolve skills."
+             cn="基于本能的学习系统，通过观察会话来创建和演进技能。">continuous-learning-v2</skill>
+      <skill upstream="everything-claude-code"
+             en="C++ coding standards based on the C++ Core Guidelines for modern, safe code."
+             cn="基于 C++ Core Guidelines 的 C++ 编码标准。">cpp-coding-standards</skill>
+      <skill upstream="everything-claude-code"
+             en="Docker and Docker Compose patterns for local development, container security, and multi-service orchestration."
+             cn="Docker 和 Docker Compose 模式，用于本地开发、容器安全和多服务编排。">docker-patterns</skill>
+      <skill upstream="superpowers"
+             en="A skill for executing pre-defined plans step by step."
+             cn="按计划逐步执行预定义任务。">executing-plans</skill>
+      <skill upstream="everything-claude-code"
+             en="Pattern for progressively refining context retrieval to solve the subagent context problem."
+             cn="渐进式上下文检索模式，解决子智能体上下文问题。">iterative-retrieval</skill>
+      <skill en="Convert Markdown files to HTML with GFM, CommonMark, and standard Markdown support."
+             cn="将 Markdown 文件转换为 HTML，支持 GFM、CommonMark 等风格。">markdown-to-html</skill>
+      <skill upstream="awesome-copilot"
+             en="A comprehensive guide for crafting immersive, high-performance web experiences with advanced motion and typography."
+             cn="打造沉浸式高性能 Web 体验的综合指南，涵盖高级动效、排版和架构工艺。">premium-frontend-ui</skill>
+      <skill upstream="everything-claude-code"
+             en="Pythonic idioms, PEP 8 standards, and best practices for building robust Python applications."
+             cn="Pythonic 惯用法、PEP 8 标准及健壮 Python 应用最佳实践。">python-patterns</skill>
+      <skill upstream="everything-claude-code"
+             en="A comprehensive verification system for Claude Code sessions."
+             cn="Claude Code 会话综合验证系统。">verification-loop</skill>
+      <skill upstream="everything-claude-code"
+             en="See, Understand, and Act on video and audio content from various sources."
+             cn="观察、理解和操作来自各种来源的视频与音频内容。">videodb</skill>
+      <skill upstream="awesome-copilot"
+             en="Expert 10x engineer with comprehensive knowledge of web development, internet protocols, and web standards."
+             cn="10x 专家级 Web 开发工程师，精通 HTML/CSS/JS/HTTP/Web 标准。">web-coder</skill>
+      <skill upstream="superpowers"
+             en="Use when you have a spec or requirements for a multi-step task, before touching code."
+             cn="编码前为复杂任务创建详细执行计划。">writing-plans</skill>
     </skills>
     <agents>
       <agent upstream="everything-claude-code" path="agents">architect.md</agent>
@@ -75,12 +121,22 @@
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <category id="DAILY" cn="日常">
     <skills>
-      <skill upstream="everything-claude-code">autonomous-loops</skill>
-      <skill upstream="everything-claude-code">deep-research</skill>
-      <skill>knowledge-distillation-from-discussion</skill>
-      <skill upstream="anthropics-skills">pptx</skill>
-      <skill upstream="anthropics-skills">skill-creator</skill>
-      <skill>tech-doc-writing</skill>
+      <skill upstream="everything-claude-code"
+             en="Patterns and architectures for autonomous Claude Code loops."
+             cn="自主 Claude Code 循环的模式与架构。">autonomous-loops</skill>
+      <skill upstream="everything-claude-code"
+             en="Multi-source deep research using firecrawl and exa MCPs."
+             cn="使用 firecrawl 和 exa MCP 进行多源深度研究。">deep-research</skill>
+      <skill en="Distills raw discussions and meeting notes into structured, permanent knowledge notes following Zettelkasten methodology."
+             cn="将原始讨论和会议记录提炼为结构化永久知识笔记，遵循 Zettelkasten 方法论。">knowledge-distillation-from-discussion</skill>
+      <skill upstream="anthropics-skills"
+             en="Create, read, and edit .pptx presentations, from content extraction to generation."
+             cn="创建、读取和编辑 .pptx 演示文稿。">pptx</skill>
+      <skill upstream="anthropics-skills"
+             en="Create new skills, modify existing skills, and measure their performance."
+             cn="创建新技能、修改现有技能并衡量其性能。">skill-creator</skill>
+      <skill en="Write technical documentation, guides, and tutorials with a consistent voice."
+             cn="以一致的风格编写技术文档、指南和教程。">tech-doc-writing</skill>
     </skills>
     <agents>
       <agent upstream="everything-claude-code" path="agents">loop-operator.md</agent>
@@ -96,7 +152,8 @@
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <category id="LAB" cn="实验室专用">
     <skills>
-      <skill>weekly-report-generator</skill>
+      <skill en="Automatically synthesizes progress from Obsidian daily notes into a professional one-page PPTX weekly report."
+             cn="从 Obsidian 每日笔记自动合成专业单页 PPTX 周报。">weekly-report-generator</skill>
     </skills>
     <agents />
     <commands />

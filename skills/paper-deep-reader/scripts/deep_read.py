@@ -31,6 +31,9 @@ import os
 import sys
 from pathlib import Path
 
+# Trigger .env loading before any os.environ reads
+import stable_jarvis  # noqa: F401
+
 # ── Section prompts (inlined for zero-import-friction) ────────
 
 SYSTEM_PROMPT = """\

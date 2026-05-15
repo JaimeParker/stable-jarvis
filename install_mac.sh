@@ -20,104 +20,44 @@ C_GREEN_BOLD='\e[1;32m'
 
 # Use associative arrays for descriptions for easier lookup.
 # English Descriptions
-declare -A DESC_EN
-DESC_EN["arxiv-search"]="Search arXiv preprint repository for papers in various fields."
-DESC_EN["deep-research"]="Multi-source deep research using firecrawl and exa MCPs."
-DESC_EN["exa-search"]="Neural search via Exa MCP for web, code, and company research."
-DESC_EN["notion-to-markdown"]="Directly convert Notion pages to Obsidian-friendly Markdown."
-DESC_EN["obsidian-auto-classifier"]="Intelligently organize and categorize Markdown notes within an Obsidian vault."
-DESC_EN["obsidian-markdown"]="Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, etc."
-DESC_EN["obsidian-batch-yaml"]="Autonomously batch process Obsidian notes to add structured YAML frontmatter with tags, summaries, and aliases."
-DESC_EN["paper-analyzer"]="Analyze literature in Zotero, generate Markdown reports with LaTeX, and upload as Zotero Notes."
-DESC_EN["paper-code-audit"]="Three-way cross-validation of paper claims, official code, and personal notes."
-DESC_EN["paper-deep-reader"]="Deep read: Zotero MCP to Obsidian knowledge base to 6-section deep report with chunked summaries and KB cross-referencing."
-DESC_EN["paper-finder"]="Discover recent arXiv papers matching a research profile and generate Obsidian-compatible notes."
-DESC_EN["web-research"]="Provides a structured approach to conducting comprehensive web research."
-DESC_EN["continuous-agent-loop"]="Patterns for continuous autonomous agent loops with quality gates and recovery."
-DESC_EN["continuous-learning"]="Automatically extract reusable patterns from sessions and save them as learned skills."
-DESC_EN["continuous-learning-v2"]="Instinct-based learning system that observes sessions to create and evolve skills."
-DESC_EN["cpp-coding-standards"]="C++ coding standards based on the C++ Core Guidelines for modern, safe code."
-DESC_EN["docker-patterns"]="Docker and Docker Compose patterns for local development and container orchestration."
-DESC_EN["iterative-retrieval"]="Pattern for progressively refining context retrieval to solve subagent context problems."
-DESC_EN["markdown-to-html"]="Convert Markdown files to HTML using marked.js, pandoc, or custom scripts with GFM and CommonMark support."
-DESC_EN["premium-frontend-ui"]="A comprehensive guide for crafting immersive, high-performance web experiences with advanced motion and typography."
-DESC_EN["web-coder"]="Expert web development engineer with comprehensive knowledge of HTML, CSS, JavaScript, web APIs, HTTP, and web standards."
-DESC_EN["python-patterns"]="Pythonic idioms, PEP 8 standards, and best practices for robust Python apps."
-DESC_EN["skill-creator"]="Create new skills, modify existing skills, and measure their performance."
-DESC_EN["verification-loop"]="A comprehensive verification system for Claude Code sessions."
-DESC_EN["videodb"]="See, Understand, and Act on video and audio content from various sources."
-DESC_EN["autonomous-loops"]="Patterns and architectures for autonomous Claude Code loops."
-DESC_EN["brainstorming"]="A skill for brainstorming and generating ideas."
-DESC_EN["executing-plans"]="A skill for executing pre-defined plans."
-DESC_EN["tech-doc-writing"]="Write technical documentation, guides, and tutorials with a consistent voice."
-DESC_EN["writing-plans"]="A skill for creating detailed plans for complex tasks."
-DESC_EN["pptx"]="Create, read, and edit .pptx presentations, from content extraction to generation."
-DESC_EN["weekly-report-generator"]="Automatically generates a 1-page weekly progress report PPTX from Obsidian notes."
-DESC_EN["knowledge-distillation-from-discussion"]="Distills raw discussions and meeting notes into structured, permanent knowledge notes following Zettelkasten methodology."
-
-# Chinese Descriptions
-declare -A DESC_CN
-DESC_CN["arxiv-search"]="在 arXiv 预印本库中搜索各领域的论文。"
-DESC_CN["deep-research"]="使用 firecrawl 和 exa MCPs 进行多源深度研究。"
-DESC_CN["exa-search"]="通过 Exa MCP 进行神经网络搜索，用于网络、代码和公司研究。"
-DESC_CN["notion-to-markdown"]="将 Notion 页面直接转换为 Obsidian 友好的 Markdown。"
-DESC_CN["obsidian-auto-classifier"]="在 Obsidian 保险库中智能地组织和分类 Markdown 笔记。"
-DESC_CN["obsidian-markdown"]="创建和编辑带有 wikilinks、嵌入、callouts 等功能的 Obsidian 风格 Markdown。"
-DESC_CN["obsidian-batch-yaml"]="自主批量处理 Obsidian 笔记，添加带有标签、摘要和别名的结构化 YAML 前置数据。"
-DESC_CN["paper-analyzer"]="分析 Zotero 中的文献，生成带 LaTeX 的 Markdown 报告，并上传为 Zotero 笔记。"
-DESC_CN["paper-code-audit"]="论文、官方代码与个人笔记的三方交叉验证。"
-DESC_CN["paper-deep-reader"]="精读：Zotero MCP → Obsidian 知识库 → 6-section 深度报告，支持分块摘要与 KB 横向对比。"
-DESC_CN["paper-finder"]="发现符合研究兴趣的最新 arXiv 论文，并生成 Obsidian 兼容的笔记。"
-DESC_CN["web-research"]="提供一种进行全面网络研究的结构化方法。"
-DESC_CN["continuous-agent-loop"]="具有质量门和恢复控制的连续自主智能体循环模式。"
-DESC_CN["continuous-learning"]="从会话中自动提取可重用模式并将其保存为学习到的技能。"
-DESC_CN["continuous-learning-v2"]="基于本能的学习系统，通过观察会话来创建和演进技能。"
-DESC_CN["cpp-coding-standards"]="基于 C++ 核心指南的 C++ 编码标准，用于现代、安全的代码。"
-DESC_CN["docker-patterns"]="用于本地开发和容器编排的 Docker 和 Docker Compose 模式。"
-DESC_CN["iterative-retrieval"]="用于逐步优化上下文检索以解决子智能体上下文问题的模式。"
-DESC_CN["markdown-to-html"]="将 Markdown 文件转换为 HTML，支持 marked.js、pandoc 或自定义脚本，兼容 GFM 和 CommonMark。"
-DESC_CN["premium-frontend-ui"]="打造沉浸式高性能 Web 体验的综合指南，涵盖高级动效、排版和架构工艺。"
-DESC_CN["web-coder"]="专家级 Web 开发工程师，全面掌握 HTML、CSS、JavaScript、Web API、HTTP 和 Web 标准。"
-DESC_CN["python-patterns"]="用于构建健壮 Python 应用程序的 Pythonic 惯用法、PEP 8 标准和最佳实践。"
-DESC_CN["skill-creator"]="创建新技能、修改现有技能并衡量其性能。"
-DESC_CN["verification-loop"]="一个用于 Claude Code 会话的综合验证系统。"
-DESC_CN["videodb"]="观察、理解和操作来自各种来源的视频和音频内容。"
-DESC_CN["autonomous-loops"]="用于自主 Claude Code 循环的模式和架构。"
-DESC_CN["brainstorming"]="一个用于头脑风暴和产生想法的技能。"
-DESC_CN["executing-plans"]="一个用于执行预定义计划的技能。"
-DESC_CN["tech-doc-writing"]="以一致的风格编写技术文档、指南和教程。"
-DESC_CN["writing-plans"]="一个为复杂任务创建详细计划的技能。"
-DESC_CN["pptx"]="创建、读取和编辑 .pptx 演示文稿，从内容提取到生成。"
-DESC_CN["weekly-report-generator"]="根据 Obsidian 笔记自动生成一页的每周进展报告 PPTX。"
-DESC_CN["knowledge-distillation-from-discussion"]="将原始讨论和会议记录提炼为结构化的永久知识笔记，遵循 Zettelkasten 方法论。"
-
 # --- Asset Categorization ---
 # All categories, skills, agents, and commands are defined in skill-taxonomy.xml.
 # The parse_taxonomy() function reads this file and populates the arrays below.
 
 CATEGORY_IDS=()
-declare -A CATEGORY_CN
+declare -A CATEGORY_CN DESC_EN DESC_CN
 
 parse_taxonomy() {
-    local xml_file
-    xml_file="$(dirname "$0")/skill-taxonomy.xml"
-    if [ ! -f "$xml_file" ]; then
-        echo -e "${C_YELLOW_BOLD}ERROR: skill-taxonomy.xml not found at $xml_file${C_RESET}"
-        exit 1
-    fi
-    eval "$(python3 <<PYEOF
+	    local xml_file
+	    xml_file="$(dirname "$0")/skill-taxonomy.xml"
+	    if [ ! -f "$xml_file" ]; then
+	        echo -e "${C_YELLOW_BOLD}ERROR: skill-taxonomy.xml not found at $xml_file${C_RESET}"
+	        exit 1
+	    fi
+	    eval "$(python3 <<PYEOF
 import xml.etree.ElementTree as ET
 tree = ET.parse('$xml_file')
 root = tree.getroot()
+# Category IDs and Chinese names
 for cat in root.findall('category'):
     cid = cat.get('id')
     cn = cat.get('cn', '')
     print('CATEGORY_IDS+=("' + cid + '")')
     print('CATEGORY_CN["' + cid + '"]="' + cn + '"')
 print()
+# Skill lists and descriptions (en/cn attributes on <skill> elements)
 for cat in root.findall('category'):
     cid = cat.get('id')
-    skills = [s.text.strip() for s in cat.findall('skills/skill') if s.text]
+    skills = []
+    for s in cat.findall('skills/skill'):
+        name = s.text.strip() if s.text else ''
+        if not name:
+            continue
+        skills.append(name)
+        desc_en = s.get('en', '')
+        desc_cn = s.get('cn', '')
+        print('DESC_EN["' + name + '"]="' + desc_en.replace('"', '\\"') + '"')
+        print('DESC_CN["' + name + '"]="' + desc_cn.replace('"', '\\"') + '"')
     agents = [a.text.strip() for a in cat.findall('agents/agent') if a.text]
     commands = [c.text.strip() for c in cat.findall('commands/command') if c.text]
     if skills:
@@ -134,7 +74,7 @@ for cat in root.findall('category'):
         print(cid + '_COMMANDS=()')
 PYEOF
 )"
-}
+	}
 
 parse_taxonomy
 

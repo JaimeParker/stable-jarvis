@@ -60,7 +60,7 @@ cp .env.example .env   # 然后编辑 .env 填入真实 key
 1. 根据用户提供的标题/关键词/arxiv ID，调用 `zotero-mcp` 的 `search_library` 找到论文
 2. 获取 `item_key`（父条目）、PDF attachment key
 3. 调用 `get_item_details` 获取完整元数据（标题、作者、abstract、published date、arxiv ID）
-4. 记录以下变量供后续阶段使用：
+4. 记录以下变量并保存为 `temp/deep-reader/meta.json`：
    - `item_key` — Zotero 父条目 key
    - `attachment_key` — PDF attachment key
    - `title` — 论文标题
@@ -68,6 +68,7 @@ cp .env.example .env   # 然后编辑 .env 填入真实 key
    - `authors` — 作者列表
    - `published` — 发表日期
    - `arxiv_id` — arXiv ID
+   - `categories` — 领域分类
 
 ---
 
@@ -77,9 +78,13 @@ cp .env.example .env   # 然后编辑 .env 填入真实 key
 - 如果 PDF 页数估计 < 20 页：直接用 Claude 多模态能力读取 PDF 内容
 - 如果 PDF 页数 >= 20 页或无法判断：运行提取脚本
 
-**提取脚本**：
+**提取脚本**（默认输出 Markdown，保留标题、LaTeX 公式、表格等结构信息）：
 ```bash
-python scripts/extract_pdf_text.py --pdf <pdf_path> --output <output_path>.txt
+python scripts/extract_pdf_text.py --pdf <pdf_path> --output temp/deep-reader/paper.md
+```
+如需纯文本：
+```bash
+python scripts/extract_pdf_text.py --pdf <pdf_path> --output temp/deep-reader/paper.txt --plain
 ```
 
 **长论文分块摘要**：
@@ -96,15 +101,13 @@ python scripts/extract_pdf_text.py --pdf <pdf_path> --output <output_path>.txt
 
 ### 阶段 3：构建 KB 上下文
 
-替代 ChromaDB 的知识库上下文，三路合并：
+替代 ChromaDB 的知识库上下文，三路合并。中间文件放 `temp/deep-reader/`。
 
 **3a — Zotero 语义检索**
-```bash
-# 使用 Zotero MCP semantic_search
-```
 调用 `zotero-mcp` 的 `semantic_search`，query = `{title}\n{abstract}`，topK=10，minScore=0.3。
 过滤掉当前论文（按 arxiv_id），保留 top-5。
 格式化为 KBEntry：`{title, arxiv_id, text(abstract), published, source="zotero"}`。
+保存为 `temp/deep-reader/zotero_kb.json`。
 
 **3b — Obsidian 内容搜索**
 调用 `obsidian` MCP 的 `search_notes`，query = `{title}` 的前 50 个字符，limit=10。
@@ -129,51 +132,69 @@ python scripts/search_obsidian.py --build --force
 
 **语义搜索**：
 ```bash
-python scripts/search_obsidian.py --embed "{title}\n{abstract}" --top-k 5
+python scripts/search_obsidian.py --embed "{title}\n{abstract}" --top-k 5 > temp/deep-reader/obsidian_kb.json
 ```
 
 `--embed` 若无缓存会报错，此时需先 `--build`。
 格式化为 KBEntry：`{title, arxiv_id, text, published, source="obsidian-embed"}`。
 
 **合并去重**：
+```bash
+python scripts/build_kb_context.py \
+  --zotero temp/deep-reader/zotero_kb.json \
+  --obsidian temp/deep-reader/obsidian_kb.json \
+  --exclude {arxiv_id} \
+  --top-k 5 \
+  --output temp/deep-reader/kb_context.json
+```
 - 按 arxiv_id 去重（优先级：zotero > obsidian-embed > obsidian）
 - 排除当前论文
 - 取 top-5
-- 构建 `kb_section` 字符串注入后续 prompt
 
 ---
 
 ### 阶段 4：6 轮深度分析
 
-**执行脚本**（替代直接使用 Claude 会话）：
+**前置条件**：`temp/deep-reader/` 下已准备好 `paper.md`（或 `.txt`）、`meta.json`、`kb_context.json`。
+
+**执行**：
 ```bash
 python scripts/deep_read.py \
-  --content <content_file>.txt \
-  --meta <meta_file>.json \
-  --kb <kb_context>.json \
-  --output <output_dir>
+  --content temp/deep-reader/paper.md \
+  --meta temp/deep-reader/meta.json \
+  --kb temp/deep-reader/kb_context.json \
+  --output outputs/deep-reader/{arxiv_id}
 ```
 
 **参数说明**：
+
 | 参数 | 来源 | 说明 |
 |------|------|------|
-| `--content` | 阶段 2 输出 | 论文全文（长论文已分块摘要） |
-| `--meta` | 阶段 1 输出 | JSON：title, arxiv_id, authors, published, categories |
-| `--kb` | 阶段 3 输出 | build_kb_context.py 生成的 JSON 数组 |
-| `--output` | 阶段 5 需要 | 输出目录 |
+| `--content` | 阶段 2 | Markdown 论文全文（长论文会自动分块摘要） |
+| `--meta` | 阶段 1 | JSON：title, arxiv_id, authors, published, categories |
+| `--kb` | 阶段 3 | `build_kb_context.py` 合并后的 JSON 数组（可选，无 KB 用 `-`） |
+| `--output` | — | 输出目录，建议 `outputs/deep-reader/{arxiv_id}` |
 | `--provider` | `.env` LLM_PROVIDER | 可选覆盖 |
 | `--model` | `.env` LLM_MODEL | 可选覆盖 |
 | `--force` | — | 强制重新生成（忽略缓存） |
 
+**监控与验收流程**（必须执行，不可启动后不管）：
+
+1. **后台启动**：用 Bash `run_in_background` 启动 `deep_read.py`，记录 task ID
+2. **轮询检查**：每 30-60s 读取 task 输出文件（`tail -n 20 <output_file>`），观察进度行（`第 X/6 轮`）
+3. **验收结果**：
+   - 若看到 `报告已生成 → outputs/deep-reader/{arxiv_id}/report.md` → 成功，进入阶段 5
+   - 若输出包含 `Error` 或 `AuthenticationError` → 通知用户修复配置后重试（缓存会跳过已完成的轮次）
+   - 若超过 10 分钟仍在 `第 X/6 轮` 停住 → 可能 LLM API 超时，重新运行同一命令利用缓存续传
+4. **重试安全**：`analysis_cache.json` 已保存每轮答案，重新运行会复用已完成的轮次，只补跑失败的轮次
+
 **脚本自动完成**：
-1. 加载 `stable-jarvis/.env` 中的 API 配置
+1. 加载 `stable_jarvis/.env` 中的 API 配置
 2. 论文超过 24,000 字符时，先分块摘要再拼接
 3. 构建 KB context section（过滤当前论文，取 top-5）
 4. 6 轮独立 LLM API 调用（每轮注入相同的 system prompt + kb context）
 5. 每轮回答缓存到 `{output_dir}/analysis_cache.json`
 6. 拼接 6 个回答为完整 `report.md`
-
-**LLM 提供商**：从 `.env` 读取 `LLM_PROVIDER` 和 `LLM_MODEL`。支持 anthropic / openai / deepseek / qwen。
 
 ---
 
@@ -189,8 +210,11 @@ python scripts/deep_read.py \
   - 若存在，添加 wikilink：`[[note_name]]`
   - 若不存在，仅用文本引用
 
+**报告路径**：`outputs/deep-reader/{arxiv_id}/report.md`。
+
 **写入 Obsidian**：
 使用 `obsidian` MCP 的 `write_note`，路径为 `00 Inbox/{safe_title}.md`。
+报告内容来自 `outputs/deep-reader/{arxiv_id}/report.md`。
 
 **Frontmatter 格式**：
 ```yaml
