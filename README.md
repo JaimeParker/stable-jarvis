@@ -5,130 +5,43 @@
 
 [English](README_en.md) | 简体中文
 
-**Stable-JARVIS** 是专为学术研究和知识管理设计的 AI 助手框架。它将 Obsidian 作为”数字大脑”、Zotero 作为文献处理引擎，通过 LLM 智能体 + MCP 协议自动化科研全流程：arXiv 检索、文献精读与泛读、Markdown 报告生成、笔记自动分类与 YAML 增强、以及 Notion 协作集成。
+**Stable-JARVIS** 是专为学术研究打造的 AI 助手框架，以 **Zotero** 为文献处理引擎、**Obsidian** 为数字大脑，通过 LLM 智能体 + MCP 协议自动化科研全流程。
 
-Stable-JARVIS 旨在由现代 AI 接口驱动，包括 **Gemini CLI**, **Claude Code**, **Codex**, **OpenCode** 以及其他兼容 MCP 的智能体。
-
-## 🧠 笔记管理哲学：数字大脑 (Cyber Brain)
-
-本框架基于特定的知识管理层级构建，以确保用户及其 AI 智能体拥有最高的执行效率：
-
--   **Zotero (实验室)**：深度、仔细阅读文献的核心工作区。这是原始数据 (PDF) 被深度处理和分析的地方。
--   **Obsidian (本地数字大脑)**：经过精选的本地知识库。它是一个“无尘室”，仅包含经过总结、用户验证和高信号的信息。它充当编程智能体读取和引用的外部逻辑引擎，构成了您的“数字大脑”。在这个生态系统中，Obsidian 严格用于**知识摄取与合成**——它是事实的来源，而非信息分发渠道。
--   **Notion (交换站与输入框)**：用于协作、快速记录、数据库管理和跨团队讨论的动态平台。它充当原始信息的“收件箱”以及共享结果和发布的“输出口”。
-
-### 📁 Obsidian 库架构
-
-本框架围绕 Obsidian 作为"数字大脑"构建——采用 PARA 风格的层级结构（00 Inbox → 10 Projects → 20 Areas → 30 Zettelkasten → 40 Resources → 50 Archive → 60 System），由 `paper-finder` 等技能自动填充内容。
-
-→ 完整架构与每层说明见 **[docs/obsidian_guide.md](docs/obsidian_guide.md)**
-
-## 🛠️ 内置技能 (Built-in Skills)
-
-框架包含多个可供智能体调用的专用技能：
-
--   **`paper-analyzer`**: 泛读技能。编排 Zotero-MCP、多模态 PDF 阅读和 Zotero Web API，单轮 LLM 生成摘要级报告并上传为 Zotero Note。
--   **`paper-deep-reader`**: 精读技能。Zotero MCP → Obsidian 知识库 → 6-section 深度报告。支持分块摘要、KB 横向对比、多 LLM 提供商、wikilinks 输出。
--   **`paper-finder`**: 基于研究兴趣画像的论文发现技能。按 profile 检索 arXiv，执行词法+可选语义排序，并输出 Obsidian 可直接摄取的 Markdown 笔记。
--   **`weekly-report-generator`**: 自动将 Obsidian 每日笔记中的进度合成到专业的单页 PPTX 幻灯片中。
--   **`notion-to-markdown`**: 将 Notion 页面无缝迁移到本地 Obsidian 库中，并实现完美的 LaTeX 公式和图像本地化。
--   **`obsidian-auto-classifier`**: 根据内容和意图，智能地对库中的笔记进行分类和归档。
--   ...
-
-## 🧩 依赖与 MCP 服务器
-
-要释放 Stable-JARVIS 的全部威力，您必须在客户端中安装并配置以下 MCP 服务器：
-
--   **Zotero MCP**: [cookjohn/zotero-mcp](https://github.com/cookjohn/zotero-mcp) — 用于库搜索和元数据检索。
--   **Obsidian MCP**: [bitbonsai/mcpvault](https://github.com/bitbonsai/mcpvault) — 用于与您的本地“数字大脑”交互。
--   **Notion MCP**: [官方 Notion MCP 指南](https://developers.notion.com/guides/mcp) — 用于与您的信息交换平台同步。
-
-> 💡 对于使用飞书的团队，推荐使用 [飞书 CLI](https://github.com/larksuite/cli) 进行集成。
-
-## 💻 安装
-
-本项目提供了交互式脚本，可以帮助您为指定的客户端安装技能、智能体和命令。请根据您的操作系统使用对应的脚本。
-
-**前置步骤：初始化上游技能子模块**
-
-本项目通过 git submodule 链接上游开源技能仓库。首次使用前必须初始化：
-
-```bash
-git submodule update --init --recursive
-bash scripts/sync-upstream.sh --apply
-```
-
-之后若需拉取上游最新更新：
-```bash
-git submodule update --remote
-bash scripts/sync-upstream.sh --apply
-```
-
-### Windows 用户
-
-1.  以 **管理员身份** 打开一个新的 PowerShell 终端。
-2.  进入到仓库的根目录。
-3.  如果这是您第一次运行脚本，您可能需要允许脚本执行，请运行：
-    ```powershell
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-    ```
-4.  运行安装脚本：
-    ```powershell
-    .\install.windows.ps1
-    ```
-
-### macOS / Linux 用户
-
-1.  打开一个终端。
-2.  进入到仓库的根目录。
-3.  运行安装脚本：
-    ```bash
-    bash install.sh
-    ```
-    *（macOS 用户也可以使用 `bash install_mac.sh`）*
-
-脚本将引导您选择客户端并选择要安装的资产类别。
+框架由 `skills/` 和 `agents/` 两个核心目录驱动——技能封装了可复用的 AI 工作流（文献检索、论文精读、笔记分类、格式转换等），智能体提供专业领域审查能力（代码审查、架构设计、安全审计等）。兼容 Claude Code、Gemini CLI、Codex、OpenCode 等支持 MCP 的客户端。
 
 ---
 
-## 🔒 API 密钥配置
+## 核心能力
 
-所有 API 密钥统一在项目根目录的 `.env` 文件中管理：
+Stable-JARVIS 的能力分为三大类。详见 **[docs/features.md](docs/features.md)**。
 
-```bash
-# 从模板创建 .env
-cp .env.example .env
-# 编辑 .env，填入真实 key
-```
+### 文献处理
 
-**`.env` 中的变量一览**：
+从论文发现到深度精读的完整工具链：
 
-```bash
-# ── LLM（paper-deep-reader 精读）────────────────────
-LLM_PROVIDER=deepseek
-LLM_MODEL=deepseek-v4-pro
-DEEPSEEK_API_KEY=sk-your-key-here
+- **`paper-finder`** — 画像驱动的 arXiv 论文发现，输出 Obsidian 笔记
+- **`paper-analyzer`** — 文献泛读，单轮 LLM 生成摘要级报告并上传 Zotero Note
+- **`paper-deep-reader`** — 文献精读，6-section 深度报告，Zotero与Obsidian知识库联合分析，wikilinks 输出
+- **`paper-code-audit`** — 论文配套代码可复现性审计
 
-# ── Embedding（paper-deep-reader + paper-finder）─────
-EMBEDDING_PROVIDER=qwen
-EMBEDDING_MODEL=Qwen/Qwen3-Embedding-8B
-EMBEDDING_API_KEY=sk-your-key-here
-EMBEDDING_BASE_URL=https://api.siliconflow.cn/v1
+### 数据转换与知识管理
 
-# ── Zotero（paper-analyzer + paper-deep-reader）──────
-ZOTERO_LIBRARY_ID=your_library_id
-ZOTERO_API_KEY=your_api_key
-ZOTERO_LIBRARY_TYPE=user
+跨平台知识迁移与笔记增强：
 
-# ── Exa Search（exa-search skill）────────────────────
-EXA_API_KEY=your-exa-key-here
-```
+- **`notion-to-markdown`** — Notion → Obsidian 无缝迁移，LaTeX 规范化
+- **`obsidian-auto-classifier`** — 智能笔记分类与归档
+- **`obsidian-batch-yaml`** — 批量 AI 生成 frontmatter（tags、summary、aliases）
+- **`markitdown-convert`** — 多格式（PDF/DOCX/PPTX）转 Markdown
+- **`weekly-report-generator`** — 从 Obsidian 每日笔记自动合成 PPTX 周报
+- **`knowledge-distillation-from-discussion`** — 讨论记录中提炼结构化知识
 
-> 💡 `.env` 已被 `.gitignore` 排除，不会提交到 git。`stable_jarvis` 包在 import 时自动加载 `.env`。也可以直接设置同名系统环境变量（优先级高于 `.env`）。
+### 编程与自动化
+
+来自上游开源社区的 15+ 编程规范、设计模式和自动化技能，涵盖 Python/C++ 编码标准、Docker 模式、持续学习系统、前端设计等。另有 8 个专业审查智能体（架构、代码、安全、构建等）。
 
 ---
 
-## 🚀 安装
+## 安装
 
 ```bash
 # 克隆仓库
@@ -139,33 +52,118 @@ cd stable-jarvis
 git submodule update --init --recursive
 bash scripts/sync-upstream.sh --apply
 
-# 确保你处于首选的虚拟环境中（如：conda activate jarvis）
 # 以开发者模式安装该包及其依赖
 pip install -e .
 
-# 如需使用 paper-finder 的语义搜索（--semantic），请安装 semantic 扩展依赖
+# 如需使用 paper-finder 语义搜索（--semantic），安装 semantic 扩展
 pip install -e '.[semantic]'
 ```
 
-## ⚙️ 配置
+之后若需拉取上游最新更新：
 
-批注引擎需要 Zotero API 凭证。你可以通过环境变量或配置文件提供这些信息。[Notion helper page](https://zhliu25.notion.site/stable-jarvis-3191d1c4d39280b68608e1430ef82dcb)
+```bash
+git submodule update --remote
+bash scripts/sync-upstream.sh --apply
+```
 
-### 🛠️ 个性化定制 (必读)
+### 平台安装脚本
 
-在开始使用之前，您**必须**完成以下初始化：
+项目提供了交互式脚本，帮助为指定客户端安装技能、智能体和命令：
 
-1.  **API 密钥**: `cp .env.example .env`，然后编辑 `.env` 填入您的真实 API key。所有 skill 统一从此文件读取配置。
-2.  **指令文件**: 根据您使用的客户端选择对应文件。Gemini 用户请将 `GEMINI.md.template` 重命名为 `GEMINI.md`；Codex 用户请将 `AGENTS.md.template` 复制为 `AGENTS.md`。将占位符替换为您具体的研究领域和姓名。
-3.  **每日计划命令**: `daily plan` 需要您自行配置；项目已提供模板 `commands/daily/plan.toml.template`，请复制为 `commands/daily/plan.toml` 后按您的项目实际情况修改。
+- **Windows**：以管理员身份运行 PowerShell，执行 `.\install.windows.ps1`（首次可能需要 `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`）
+- **macOS / Linux**：执行 `bash install.sh`（macOS 也可用 `bash install_mac.sh`）
+
+脚本会引导你选择客户端和要安装的资产类别。
+
+---
+
+## 配置
+
+### API 密钥
+
+所有 API 密钥统一在项目根目录的 `.env` 文件中管理：
+
+```bash
+cp .env.example .env
+# 编辑 .env，填入真实 key
+```
+
+主要变量：
+
+```bash
+# LLM（paper-deep-reader 精读）
+LLM_PROVIDER=deepseek
+LLM_MODEL=deepseek-v4-pro
+DEEPSEEK_API_KEY=sk-your-key-here
+
+# Embedding（paper-deep-reader + paper-finder）
+EMBEDDING_PROVIDER=qwen
+EMBEDDING_MODEL=Qwen/Qwen3-Embedding-8B
+EMBEDDING_API_KEY=sk-your-key-here
+EMBEDDING_BASE_URL=https://api.siliconflow.cn/v1
+
+# Zotero（paper-analyzer + paper-deep-reader）
+ZOTERO_LIBRARY_ID=your_library_id
+ZOTERO_API_KEY=your_api_key
+ZOTERO_LIBRARY_TYPE=user
+
+# Exa Search（exa-search skill）
+EXA_API_KEY=your-exa-key-here
+```
+
+> `.env` 已被 `.gitignore` 排除。`stable_jarvis` 包在 import 时自动加载 `.env`。同名系统环境变量优先级更高。
+
+### 客户端指令文件
+
+根据使用的客户端选择对应模板：
+
+- **Gemini CLI**：重命名 `GEMINI.md.template` → `GEMINI.md`
+- **Codex**：复制 `AGENTS.md.template` → `AGENTS.md`
+
+将占位符替换为你的研究领域和姓名。
+
+### 其他初始化
+
+- **每日计划**：复制 `commands/daily/plan.toml.template` → `commands/daily/plan.toml`，按项目修改
+- **研究画像**：参考 `config/research-interest.example.json` 创建你的检索画像
 
 ### Embedding 推荐
 
-如果您使用 SiliconFlow 的 embedding 服务，推荐从 `Qwen/Qwen3-Embedding-8B` 开始，`EMBEDDING_BASE_URL` 设为 `https://api.siliconflow.cn/v1`。详见 [SiliconFlow Embedding Models](https://cloud.siliconflow.cn/me/models?types=embedding)。
+使用 SiliconFlow 服务时，推荐从 `Qwen/Qwen3-Embedding-8B` 开始，`EMBEDDING_BASE_URL` 设为 `https://api.siliconflow.cn/v1`。详见 [SiliconFlow Models](https://cloud.siliconflow.cn/me/models?types=embedding)。
 
-## 📖 快速开始
+---
 
-### 1. PDF 转 Markdown
+## 依赖与 MCP 服务器
+
+要发挥全部能力，需要在客户端中配置以下 MCP 服务器：
+
+- **Zotero MCP**: [cookjohn/zotero-mcp](https://github.com/cookjohn/zotero-mcp) — 文献库搜索与元数据检索
+- **Obsidian MCP**: [bitbonsai/mcpvault](https://github.com/bitbonsai/mcpvault) — 本地数字大脑交互
+- **Notion MCP**: [官方 Notion MCP 指南](https://developers.notion.com/guides/mcp) — 协作平台同步
+
+> 使用飞书的团队推荐 [飞书 CLI](https://github.com/larksuite/cli) 进行集成。
+
+---
+
+## 笔记管理哲学：数字大脑
+
+本框架基于特定的知识管理层级构建，确保用户与 AI 智能体拥有最高的执行效率：
+
+- **Zotero (实验室)**：深度阅读文献的核心工作区，原始数据（PDF）被深度处理和分析的地方。
+- **Obsidian (本地数字大脑)**：经过精选的本地知识库，仅包含已总结、用户验证的高信号信息。它充当智能体读取和引用的外部逻辑引擎，严格用于**知识摄取与合成**。
+- **Notion (交换站)**：协作、快速记录、数据库管理的动态平台，充当原始信息的"收件箱"和共享结果的"输出口"。
+
+### Obsidian 库架构
+
+采用 PARA 风格层级结构（00 Inbox → 10 Projects → 20 Areas → 30 Zettelkasten → 40 Resources → 50 Archive → 60 System），由 `paper-finder` 等技能自动填充内容。
+
+→ 完整架构见 **[docs/obsidian_guide.md](docs/obsidian_guide.md)**
+
+---
+
+## 快速开始
+
+### PDF 转 Markdown
 
 ```python
 from stable_jarvis import PDFConverter
@@ -174,12 +172,12 @@ converter = PDFConverter()
 result = converter.convert("paper.pdf")
 
 if result.success:
-    print(result.markdown) # 可供 LLM 阅读的 Markdown 内容
+    print(result.markdown)  # 可供 LLM 阅读的 Markdown 内容
 ```
 
-### 2. 提取图像与元数据
+### 提取图像与元数据
 
-从论文中提取图表并生成结构化清单。
+从论文中提取图表并生成结构化清单，配合 Markdown 输出可生成带图报告：
 
 ```python
 from stable_jarvis import PDFConverter
@@ -199,81 +197,39 @@ converter.save_image_manifest(metadata, "./figures/manifest.json")
 # 输出示例: [{"filename": "ABC12345_fig1.png", "page": 1, "description": "Figure at the top of page 1"}]
 ```
 
-### 3. 画像驱动的论文发现（输出 Obsidian 笔记）
+更多功能（论文发现 CLI 等）详见 **[docs/features.md](docs/features.md)**。
 
-```bash
-# 运行基于 profile 的检索与排序，输出 Markdown 笔记
-conda run -n jarvis python skills/paper-finder/find_papers.py \
-    --profile path/to/research-interest.json \
-    --output path/to/obsidian/inbox
+---
 
-# 启用语义排序（自动从 .env 读取 EMBEDDING_* 配置）
-conda run -n jarvis python skills/paper-finder/find_papers.py \
-    --profile path/to/research-interest.json \
-    --output path/to/obsidian/inbox \
-    --semantic
-```
+## 贡献与社区飞轮
 
-## 📁 项目结构
+欢迎提交 PR。无论是添加新技能、改进 PDF 解析，还是优化数字大脑逻辑。
 
-```text
-stable-jarvis/
-├── skill-taxonomy.xml                # 技能分类与上游来源定义（安装脚本的数据源）
-├── upstream/                         # 上游技能仓库 (git submodules)
-│   ├── everything-claude-code/       # 来自 affaan-m/everything-claude-code
-│   ├── anthropics-skills/            # 来自 anthropics/skills
-│   ├── obsidian-skills/              # 来自 kepano/obsidian-skills
-│   └── superpowers/                  # 来自 obra/superpowers
-├── .env.example                     # 统一 API 密钥配置模板
-├── config/                          # 本地配置文件
-│   └── research-interest.example.json  # 研究兴趣画像示例
-├── commands/                        # 面向客户端/智能体的命令模板
-│   ├── daily/                       # 每日计划命令
-│   └── paper/                       # 论文相关命令
-├── src/
-│   ├── stable_jarvis/
-│   │   ├── annotation/              # 无损 Zotero 批注引擎
-│   │   │   ├── annotator.py         # 高级批注 API
-│   │   │   ├── config.py            # 凭证配置
-│   │   │   ├── coordinates.py       # PyMuPDF 坐标提取
-│   │   │   └── zotero_client.py     # Zotero Web API 交互
-│   │   ├── notion_to_obsidian/      # Notion 页面迁移到 Obsidian
-│   │   ├── paper_finder/            # 画像驱动的 arXiv 检索、排序与 Obsidian 输出
-│   │   └── report_generator/        # PDF 提取与转换
-│   │       └── converter.py         # PDF 转 Markdown 与图像提取
-│   ├── scripts/                     # 供技能 (skills) 调用的 CLI 执行脚本
-│   └── tests/                       # 单元测试
-├── skills/                          # 专用的 AI 智能体技能 (Agent Skills)
-│   ├── paper-finder/                # 论文发现 skill 包装层与提示词
-│   ├── paper-analyzer/              # 深度论文分析 skill
-│   └── ...
-├── pyproject.toml                   # 项目元数据与构建配置
-└── README_en.md                     # 英文文档
-```
+**贡献规则：**
 
-## 🤝 贡献与社区飞轮 (Flywheel)
+- **上游技能**（来自开源社区）：请先向上游仓库提交修改，然后通过 `sync-upstream.sh --apply` 同步回本仓库。参见 `skill-taxonomy.xml` 中的 `upstream` 属性确认技能来源。
+- **自研技能**：直接 PR 到本仓库。新增技能/智能体/命令时，请在 `skill-taxonomy.xml` 相应类别中声明。
 
-我们希望将 Stable-JARVIS 打造为一个**社区飞轮**：每一个新技能、每一次 Bug 修复或文档改进，都会让整个学术生态系统对每个人来说都变得更快、更智能。
+欢迎访问 [issues 页面](https://github.com/JaimeParker/stable-jarvis/issues) 开始贡献。
 
-**非常欢迎提交 PR！** 无论您是添加新的科研技能、改进 PDF 解析引擎，还是优化“数字大脑”逻辑，您的贡献都是本项目前进的动力。
+---
 
-如果您贡献新的技能 (skills)、智能体 (agents) 或命令 (commands)，请确保您在 `skill-taxonomy.xml` 相应类别中声明它们。所有三个安装脚本 (`install.sh`, `install_mac.sh`, `install.windows.ps1`) 会自动从该文件中读取分类信息。对于来自上游仓库的技能，请添加 `upstream="repo-name"` 属性。
+## 许可证
 
-欢迎访问 [issues 页面](https://github.com/JaimeParker/JARVIS-Dev/issues) 开始贡献。
+本项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
 
-## 📄 许可证
+---
 
-本项目采用 MIT 许可证 - 详情请参阅 [LICENSE](LICENSE) 文件。
-
-## 🙏 致谢 (Acknowledgements)
+## 致谢
 
 本仓库通过 git submodule 符号链接跟踪以下开源技能仓库：
 
--   **`arxiv-search`**, **`web-research`**: 来自 [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents/tree/main/libs/cli/examples/skills)。
--   **`skill-creator`**, **`pptx`**: 来自 [anthropics/skills](https://github.com/anthropics/skills)。
--   **`obsidian-markdown`**: 来自 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills)。
--   **`premium-frontend-ui`**, **`web-coder`**: 来自 [github/awesome-copilot](https://github.com/github/awesome-copilot)。
--   **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`continuous-learning-v2`**, **`exa-search`**: 来自 [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)。
--   **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: 来自 [obra/superpowers](https://github.com/obra/superpowers)。
+- **`arxiv-search`**, **`web-research`**: 来自 [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents)
+- **`skill-creator`**, **`pptx`**: 来自 [anthropics/skills](https://github.com/anthropics/skills)
+- **`obsidian-markdown`**: 来自 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills)
+- **`premium-frontend-ui`**, **`web-coder`**: 来自 [github/awesome-copilot](https://github.com/github/awesome-copilot)
+- **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`continuous-learning-v2`**, **`exa-search`**: 来自 [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)
+- **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: 来自 [obra/superpowers](https://github.com/obra/superpowers)
+- **`paper-finder`** 的源代码来自 [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist)
 
 其余技能为本项目自行开发。感谢上述开源作者提供的核心能力。
