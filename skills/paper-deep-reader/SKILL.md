@@ -44,6 +44,8 @@ cp .env.example .env   # 然后编辑 .env 填入真实 key
 - `zotero-mcp` 已启动
 - `obsidian` MCP 已配置
 
+本 skill 的 Python 脚本位于 `scripts/` 子目录（相对于 skill 安装目录）。执行时请 `cd` 到 skill 目录或以绝对路径调用。
+
 ---
 
 ## 工作流（6 阶段）

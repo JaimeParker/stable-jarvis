@@ -31,6 +31,8 @@
              cn="将 Notion 页面直接转换为 Obsidian 友好的 Markdown，支持 LaTeX 规范化和图片本地化。">notion-to-markdown</skill>
       <skill en="Intelligently organize and categorize Markdown notes within an Obsidian vault."
              cn="在 Obsidian 保险库中智能地组织和分类 Markdown 笔记。">obsidian-auto-classifier</skill>
+      <skill en="Semantic (embedding-based) search over Obsidian vault notes — build a full-text vector index and query by conceptual meaning."
+             cn="对 Obsidian 保险库笔记进行语义（嵌入）搜索——构建全文向量索引并按概念意义查询。">obsidian-semantic-search</skill>
       <skill en="Autonomously batch process Obsidian notes to add structured YAML frontmatter with tags, summaries, and aliases."
              cn="自主批量处理 Obsidian 笔记，添加带有标签、摘要和别名的结构化 YAML 前置数据。">obsidian-batch-yaml</skill>
       <skill upstream="obsidian-skills"

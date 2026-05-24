@@ -21,7 +21,9 @@ from pathlib import Path
 
 from stable_jarvis.llm import embed, embed_one  # noqa: F401 — embed() used in cmd_build
 
-CACHE_FILE = Path("outputs/.obsidian_embeddings.json")
+_SHARED_CACHE = Path("temp/obsidian/embeddings.json")
+_LEGACY_CACHE = Path("outputs/.obsidian_embeddings.json")
+CACHE_FILE = _SHARED_CACHE if _SHARED_CACHE.exists() else _LEGACY_CACHE
 CHUNK_SIZE = 2000  # characters per note to embed
 
 

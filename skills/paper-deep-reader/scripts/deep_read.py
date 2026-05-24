@@ -189,7 +189,7 @@ def _build_kb_section(kb_entries: list[dict], current_arxiv_id: str) -> str:
     print(f"[KB] 知识库提供 {len(entries)} 篇相关论文：", file=sys.stderr)
     for e in entries:
         print(f"  - {e.get('title', '')} ({e.get('arxiv_id', 'N/A')})", file=sys.stderr)
-    return KB_SECTION_TEMPLATE.format(entries="\n\n".join(lines))
+    return _safe_format(KB_SECTION_TEMPLATE, entries="\n\n".join(lines))
 
 
 def _chunk_text(text: str, size: int = 12000, overlap: int = 500) -> list[str]:
@@ -211,6 +211,19 @@ def _summarize_chunks(title: str, chunks: list[str], complete_fn) -> str:
         )
         summaries.append(complete_fn(SYSTEM_PROMPT, prompt, max_tokens=1000))
     return "\n\n".join(f"[第{i+1}段摘要]\n{s}" for i, s in enumerate(summaries))
+
+
+def _safe_format(template: str, **kwargs) -> str:
+    """Replace {key} placeholders without interpreting curly braces in values.
+
+    Python's str.format() treats any {…} in the substituted values as
+    nested placeholders, so LaTeX like ``\\min_{i=1,2}`` in LLM answers
+    triggers KeyError.  This helper only replaces the named keys.
+    """
+    result = template
+    for key, value in kwargs.items():
+        result = result.replace("{" + key + "}", str(value))
+    return result
 
 
 def _prepare_content(title: str, full_text: str, complete_fn) -> str:
@@ -274,7 +287,8 @@ def main():
         answers = []
         for i, prompt_tpl in enumerate(SECTION_PROMPTS):
             print(f"[deep_read] 第 {i+1}/6 轮 LLM 分析中...", file=sys.stderr)
-            prompt = prompt_tpl.format(
+            prompt = _safe_format(
+                prompt_tpl,
                 title=title,
                 content=content,
                 kb_section=kb_section,
@@ -290,7 +304,8 @@ def main():
         print(f"[deep_read] 缓存已保存 → {cache_path}", file=sys.stderr)
 
     # Render and write report
-    report = REPORT_TEMPLATE.format(
+    report = _safe_format(
+        REPORT_TEMPLATE,
         title=title,
         authors=meta.get("authors", "Unknown"),
         published=meta.get("published", ""),

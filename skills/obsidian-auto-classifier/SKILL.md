@@ -30,9 +30,18 @@ Compare the note's profile against the discovered taxonomy:
 - **Projects/Areas**: Move based on active project names found in the text.
 - **Archive**: Move finalized research, completed project logs, or legacy notes to `50 Archive`.
 
-### 4. Verified Execution
+### 4. MOC Synchronization
+After moving a note, the agent MUST update the relevant Map of Content (MOC) in `30 Zettelkasten/33 Maps of Content/`.
+- **Action**: Read the MOC file that corresponds to the note's domain (e.g., `MOC-Reinforcement Learning.md` for RL papers, `MOC-Robotics and Embodied AI.md` for robotics).
+- **Add Entry**: Insert the note as a wikilink with a brief one-line description under the appropriate section heading.
+- **Format**: `- [[Note Filename|Short Alias]]: One-sentence description of the note's contribution.`
+- **New Section**: If no existing section fits, create a new one following the MOC's heading convention.
+- **Cross-MOC**: If the note spans multiple domains, add it to all relevant MOCs.
+
+### 5. Verified Execution
 - **Move**: Use `move_note` (via MCP) or `Move-Item` (via Shell) to relocate the note.
 - **Cleanup**: If the note was moved from a temporary folder (like `00 Inbox`), confirm the source is clean.
+- **MOC Update**: Ensure the corresponding Map of Content has been updated (see Section 4).
 - **Metadata Update**: (Optional) Call `update_frontmatter` to reflect the new category or update the `modified` timestamp.
 
 ## Example Obsidian Triggers
