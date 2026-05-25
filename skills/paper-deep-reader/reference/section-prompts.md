@@ -1,13 +1,50 @@
-# Section Prompts for Deep Reading
+# Prompt System for Deep Reading
 
-These 6 prompts are used in Phase 4 of the deep reading workflow. Each is an independent LLM call.
+The 6 analysis prompts, system prompt, report template, and chunk-summary prompt are no longer hardcoded in `deep_read.py`. They are stored as individual `.md` files under `prompts/{category}/` and loaded at runtime.
 
----
-
-## System Prompt（所有 section 共用）
+## Architecture
 
 ```
-你是一位资深 AI 研究员，正在为自己撰写论文精读笔记。
+prompts/
+├── categories.toml          # Category registry (name, description, keywords, persona)
+├── default/                 # Generic academic prompts (fallback)
+│   ├── system.md
+│   ├── section-1.md through section-6.md
+│   ├── report-template.md
+│   └── chunk-summary.md
+└── ai-ml/                   # AI/ML-specific prompts
+    ├── system.md
+    ├── section-1.md through section-6.md
+    ├── report-template.md
+    └── chunk-summary.md
+```
+
+Each `.md` file contains the raw prompt text with `{placeholder}` variables for substitution:
+- `{title}` — paper title
+- `{content}` — paper full text (or chunk-summarized)
+- `{kb_section}` — knowledge base context section
+- `{q1}`..`{q6}` (report template only) — the 6 analysis answers
+
+## How It Works
+
+1. **Phase 0**: `classify_paper.py` reads `categories.toml` and matches the paper to a category via LLM
+2. **Phase 4**: `deep_read.py --prompt-set {category}` loads all 9 prompt files from `prompts/{category}/`
+3. The loaded prompts are used exactly as the old hardcoded constants were
+
+## Adding a New Category
+
+1. Create `prompts/{category}/` directory with all 9 `.md` files
+2. Add a `[categories.{category}]` section to `prompts/categories.toml`
+3. No code changes needed
+
+## Category: ai-ml (AI / Machine Learning)
+
+The prompts previously hardcoded in `deep_read.py` (before the 2025-05 refactor). Persona: "资深 AI 研究员".
+
+### System Prompt
+
+```
+你是一位资深 AI+Robotics 研究员，正在为自己撰写论文精读笔记。
 写作要求：
 - 语言为学术中文，表达精确，不啰嗦
 - 每个 section 至少 200 字，重要内容可更长
@@ -18,188 +55,28 @@ These 6 prompts are used in Phase 4 of the deep reading workflow. Each is an ind
 - 所有数学公式必须使用 Markdown 格式：行内公式用 $...$，独立公式用 $$...$$，不得使用 \( \) 或 \[ \]
 ```
 
+### Section Prompts
+
+See the individual files in `prompts/ai-ml/section-*.md`.
+
+## Category: default (Generic Academic)
+
+General-purpose prompts suitable for any academic discipline. Persona: "资深学术研究者". Uses broader, discipline-agnostic language (e.g., "方法或理论框架" instead of "模型架构", "实验/实证分析" instead of "实验设计与结果").
+
+See `prompts/default/` for the full prompt text.
+
 ## KB Section Template
 
-当 kb_section 非空时，注入到每个 section prompt 的 `{kb_section}` 占位符。格式：
+The KB context injection template remains in `deep_read.py` as it's purely structural:
 
 ```markdown
 ## 知识库上下文（已读论文，可用于对比）
 
-- **论文标题1** (YYYY, arxiv:XXXX.XXXXX)
-  摘要前600字符...
-
-- **论文标题2** (YYYY, arxiv:XXXX.XXXXX)
-  摘要前600字符...
+{entries}
 
 ---
 ```
 
----
+## Report Template
 
-## Section 1: 研究问题与动机
-
-**最低字数**：200
-
-**Prompt**：
-```
-请深入分析这篇论文的研究问题与动机，至少 200 字：
-- 领域背景：该问题属于哪个研究方向，当前主流方法是什么
-- 核心痛点：现有方法存在哪些根本性缺陷或局限
-- 研究动机：作者为什么认为这个问题值得解决，重要性体现在哪里
-- 论文目标：作者的核心 claim 是什么
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}
-```
-
----
-
-## Section 2: 核心方法
-
-**最低字数**：300
-
-**Prompt**：
-```
-请深入分析这篇论文的核心方法，至少 300 字：
-- 整体架构：方法的总体设计思路和模块划分
-- 关键创新：与此前方法相比，最核心的技术创新是什么，解决了哪个具体问题
-- 重要细节：关键模块的设计（可引用公式、超参数、算法步骤），并解释每个设计选择背后的动机
-- 实现要点：训练策略、目标函数、推理方式中有哪些值得注意的地方
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}
-```
-
----
-
-## Section 3: 实验设计与结果
-
-**最低字数**：200
-
-**Prompt**：
-```
-请深入分析这篇论文的实验部分，至少 200 字：
-- 任务与数据集：评估了哪些任务，使用了哪些数据集，规模如何
-- 基线选取：与哪些方法进行了比较，这些基线的选取是否合理
-- 主要结果：关键指标上的具体数字，提升幅度是否显著
-- 消融实验：哪些组件被单独验证，结论是什么
-- 结果可信度：实验设计有无明显缺陷或遗漏
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}
-```
-
----
-
-## Section 4: 与相关工作的比较
-
-**最低字数**：200
-
-**Prompt**：
-```
-请将这篇论文与相关工作进行深入比较，至少 200 字：
-- 优势：本文方法在哪些方面明显优于已有工作，技术层面的原因是什么
-- 不足：相比相关工作，本文在哪些场景或指标上仍有差距
-- 差异化：本文与最相近的工作的本质区别是什么
-
-【重要】若知识库中有相关论文，请优先与其进行具体对比，引用时注明论文标题和 arxiv ID。
-不要编造知识库和论文原文中未出现的引用。
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}
-```
-
----
-
-## Section 5: 局限性与未来工作
-
-**最低字数**：150
-
-**Prompt**：
-```
-请分析这篇论文的局限性与未来方向，至少 150 字：
-- 作者承认的局限：论文中明确提到的不足或适用范围限制
-- 未被承认的潜在问题：你认为该方法可能存在但作者未讨论的问题
-- 未来工作：论文提出或你认为值得探索的后续研究方向，尽量具体
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}
-```
-
----
-
-## Section 6: 我的评价与启发
-
-**最低字数**：150
-
-**Prompt**：
-```
-请写出你对这篇论文的个人评价与研究启发，至少 150 字：
-- 论文价值：这篇论文在领域内的贡献和地位如何
-- 方法迁移：核心思路是否可以迁移到其他问题，如何迁移
-- 对自己研究的启发：这篇论文给你带来了哪些具体的想法或新的研究问题
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}
-```
-
----
-
-## 最终报告模板
-
-```markdown
-# {title}
-
-**作者**：{authors}
-**发表时间**：{published}
-**Arxiv ID**：{arxiv_id}
-**领域**：{categories}
-
----
-
-## 1. 研究问题与动机
-
-{q1}
-
-## 2. 核心方法
-
-{q2}
-
-## 3. 实验设计与结果
-
-{q3}
-
-## 4. 与相关工作的比较
-
-{q4}
-
-## 5. 局限性与未来工作
-
-{q5}
-
-## 6. 我的评价与启发
-
-{q6}
-```
-
-## 长论文分块摘要 Prompt
-
-当提取文本超过 24,000 字符时使用：
-
-```
-这是论文《{title}》的第 {i}/{total} 段，请提取方法、实验、结论等关键信息，输出 400 字以内的中文摘要：
-
-{chunk}
-```
+Each category has its own `report-template.md`. The section headings can differ between categories (e.g., default uses "核心方法与框架" while ai-ml uses "核心方法").

@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """Execute 6-round deep reading analysis via external LLM API calls.
 
-Reuses section prompts to generate a deep-reading
+Reuses per-category section prompts to generate a deep-reading
 report. Claude Code orchestrates Phases 1-3 and 5-6; this script handles
 Phase 4: the actual 6 independent LLM API calls.
 
+Prompt sets are stored in ../prompts/{category}/ as individual .md files.
+See prompts/categories.toml for available categories.
+
 Usage:
-    python deep_read.py \
-        --content paper_text.txt \
-        --meta paper_meta.json \
-        --kb kb_context.json \
-        --output ./outputs/my_paper \
-        --provider deepseek \
+    python deep_read.py \\
+        --content paper_text.txt \\
+        --meta paper_meta.json \\
+        --kb kb_context.json \\
+        --output ./outputs/my_paper \\
+        --prompt-set ai-ml \\
+        --provider deepseek \\
         --model deepseek-chat
 
 Input files:
@@ -34,100 +38,9 @@ from pathlib import Path
 # Trigger .env loading before any os.environ reads
 import stable_jarvis  # noqa: F401
 
-# ── Section prompts (inlined for zero-import-friction) ────────
+# ── Prompt loading ────────────────────────────────────────────────────────────
 
-SYSTEM_PROMPT = """\
-你是一位资深 AI 研究员，正在为自己撰写论文精读笔记。
-写作要求：
-- 语言为学术中文，表达精确，不啰嗦
-- 每个 section 至少 200 字，重要内容可更长
-- 用具体数字、公式、方法名支撑论点，不写空话
-- 遇到方法细节时，解释清楚其设计动机，不只是罗列
-- 知识库中有相关论文时，做有实质内容的横向对比，指出异同
-- 不引用知识库和论文原文之外未出现的论文
-- 所有数学公式必须使用 Markdown 格式：行内公式用 $...$，独立公式用 $$...$$，不得使用 \\( \\) 或 \\[ \\]\
-"""
-
-SECTION_PROMPTS = [
-    # q1: 研究问题与动机
-    """\
-请深入分析这篇论文的研究问题与动机，至少 200 字：
-- 领域背景：该问题属于哪个研究方向，当前主流方法是什么
-- 核心痛点：现有方法存在哪些根本性缺陷或局限
-- 研究动机：作者为什么认为这个问题值得解决，重要性体现在哪里
-- 论文目标：作者的核心 claim 是什么
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}""",
-
-    # q2: 核心方法
-    """\
-请深入分析这篇论文的核心方法，至少 300 字：
-- 整体架构：方法的总体设计思路和模块划分
-- 关键创新：与此前方法相比，最核心的技术创新是什么，解决了哪个具体问题
-- 重要细节：关键模块的设计（可引用公式、超参数、算法步骤），并解释每个设计选择背后的动机
-- 实现要点：训练策略、目标函数、推理方式中有哪些值得注意的地方
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}""",
-
-    # q3: 实验设计与结果
-    """\
-请深入分析这篇论文的实验部分，至少 200 字：
-- 任务与数据集：评估了哪些任务，使用了哪些数据集，规模如何
-- 基线选取：与哪些方法进行了比较，这些基线的选取是否合理
-- 主要结果：关键指标上的具体数字，提升幅度是否显著
-- 消融实验：哪些组件被单独验证，结论是什么
-- 结果可信度：实验设计有无明显缺陷或遗漏
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}""",
-
-    # q4: 与相关工作的比较
-    """\
-请将这篇论文与相关工作进行深入比较，至少 200 字：
-- 优势：本文方法在哪些方面明显优于已有工作，技术层面的原因是什么
-- 不足：相比相关工作，本文在哪些场景或指标上仍有差距
-- 差异化：本文与最相近的工作的本质区别是什么
-
-【重要】若知识库中有相关论文，请优先与其进行具体对比，引用时注明论文标题和 arxiv ID。
-不要编造知识库和论文原文中未出现的引用。
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}""",
-
-    # q5: 局限性与未来工作
-    """\
-请分析这篇论文的局限性与未来方向，至少 150 字：
-- 作者承认的局限：论文中明确提到的不足或适用范围限制
-- 未被承认的潜在问题：你认为该方法可能存在但作者未讨论的问题
-- 未来工作：论文提出或你认为值得探索的后续研究方向，尽量具体
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}""",
-
-    # q6: 我的评价与启发
-    """\
-请写出你对这篇论文的个人评价与研究启发，至少 150 字：
-- 论文价值：这篇论文在领域内的贡献和地位如何
-- 方法迁移：核心思路是否可以迁移到其他问题，如何迁移
-- 对自己研究的启发：这篇论文给你带来了哪些具体的想法或新的研究问题
-
-{kb_section}论文标题：{title}
-
-论文内容：
-{content}""",
-]
+PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
 
 KB_SECTION_TEMPLATE = """\
 ## 知识库上下文（已读论文，可用于对比）
@@ -137,40 +50,38 @@ KB_SECTION_TEMPLATE = """\
 ---
 """
 
-REPORT_TEMPLATE = """\
-# {title}
 
-**作者**：{authors}
-**发表时间**：{published}
-**Arxiv ID**：{arxiv_id}
-**领域**：{categories}
+def _load_prompt_set(category: str) -> dict:
+    """Load all prompt files from prompts/{category}/.
 
----
+    Returns dict with keys: system, sections (list of 6), report_template,
+    chunk_summary.
+    """
+    prompt_dir = PROMPTS_DIR / category
+    if not prompt_dir.is_dir():
+        print(f"Error: Prompt set '{category}' not found at {prompt_dir}", file=sys.stderr)
+        available = [d.name for d in PROMPTS_DIR.iterdir() if d.is_dir()]
+        print(f"  Available categories: {', '.join(sorted(available))}", file=sys.stderr)
+        sys.exit(1)
 
-## 1. 研究问题与动机
+    def _read(filename: str) -> str:
+        path = prompt_dir / filename
+        if not path.exists():
+            print(f"Error: Missing prompt file: {path}", file=sys.stderr)
+            sys.exit(1)
+        return path.read_text(encoding="utf-8").strip()
 
-{q1}
+    sections = []
+    for i in range(1, 7):
+        sections.append(_read(f"section-{i}.md"))
 
-## 2. 核心方法
+    return {
+        "system": _read("system.md"),
+        "sections": sections,
+        "report_template": _read("report-template.md"),
+        "chunk_summary": _read("chunk-summary.md"),
+    }
 
-{q2}
-
-## 3. 实验设计与结果
-
-{q3}
-
-## 4. 与相关工作的比较
-
-{q4}
-
-## 5. 局限性与未来工作
-
-{q5}
-
-## 6. 我的评价与启发
-
-{q6}
-"""
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -201,15 +112,19 @@ def _chunk_text(text: str, size: int = 12000, overlap: int = 500) -> list[str]:
     return chunks
 
 
-def _summarize_chunks(title: str, chunks: list[str], complete_fn) -> str:
+def _summarize_chunks(title: str, chunks: list[str], complete_fn,
+                      chunk_prompt_tpl: str) -> str:
     summaries = []
     total = len(chunks)
     for i, chunk in enumerate(chunks):
-        prompt = (
-            f"这是论文《{title}》的第 {i+1}/{total} 段，"
-            "请提取方法、实验、结论等关键信息，输出 400 字以内的中文摘要：\n\n" + chunk
+        prompt = _safe_format(
+            chunk_prompt_tpl,
+            title=title,
+            i=str(i + 1),
+            total=str(total),
+            chunk=chunk,
         )
-        summaries.append(complete_fn(SYSTEM_PROMPT, prompt, max_tokens=1000))
+        summaries.append(complete_fn("", prompt, max_tokens=1000))
     return "\n\n".join(f"[第{i+1}段摘要]\n{s}" for i, s in enumerate(summaries))
 
 
@@ -226,11 +141,12 @@ def _safe_format(template: str, **kwargs) -> str:
     return result
 
 
-def _prepare_content(title: str, full_text: str, complete_fn) -> str:
+def _prepare_content(title: str, full_text: str, complete_fn,
+                     chunk_prompt_tpl: str) -> str:
     if len(full_text) <= 24000:
         return full_text
     chunks = _chunk_text(full_text)
-    return _summarize_chunks(title, chunks, complete_fn)
+    return _summarize_chunks(title, chunks, complete_fn, chunk_prompt_tpl)
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -241,10 +157,22 @@ def main():
     ap.add_argument("--meta", required=True, type=Path, help="Paper metadata JSON")
     ap.add_argument("--kb", type=Path, default=None, help="KB context JSON (omit to skip)")
     ap.add_argument("--output", "-o", required=True, type=Path, help="Output directory")
-    ap.add_argument("--provider", default=None, help="LLM provider (anthropic|openai|deepseek|qwen)")
+    ap.add_argument("--prompt-set", default="default",
+                    help="Prompt category from prompts/ (default: default)")
+    ap.add_argument("--provider", default=None,
+                    help="LLM provider (anthropic|openai|deepseek|qwen)")
     ap.add_argument("--model", default=None, help="LLM model name")
     ap.add_argument("--force", action="store_true", help="Regenerate even if cached")
     args = ap.parse_args()
+
+    # Load prompts from category directory
+    prompts = _load_prompt_set(args.prompt_set)
+    system_prompt = prompts["system"]
+    section_prompts = prompts["sections"]
+    report_template = prompts["report_template"]
+    chunk_summary_tpl = prompts["chunk_summary"]
+
+    print(f"[deep_read] Prompt set: {args.prompt_set}", file=sys.stderr)
 
     # Resolve provider/model from CLI > env
     provider = args.provider or os.environ.get("LLM_PROVIDER", "anthropic")
@@ -281,11 +209,11 @@ def main():
     if not answers:
         from stable_jarvis.llm import complete
 
-        content = _prepare_content(title, content_text, complete)
+        content = _prepare_content(title, content_text, complete, chunk_summary_tpl)
         kb_section = _build_kb_section(kb_entries, arxiv_id)
 
         answers = []
-        for i, prompt_tpl in enumerate(SECTION_PROMPTS):
+        for i, prompt_tpl in enumerate(section_prompts):
             print(f"[deep_read] 第 {i+1}/6 轮 LLM 分析中...", file=sys.stderr)
             prompt = _safe_format(
                 prompt_tpl,
@@ -294,18 +222,20 @@ def main():
                 kb_section=kb_section,
             )
             try:
-                answer = complete(SYSTEM_PROMPT, prompt, max_tokens=4096)
+                answer = complete(system_prompt, prompt, max_tokens=4096)
             except Exception as exc:
                 answer = f"[Error in section {i+1}: {exc}]"
                 print(f"[deep_read] Error: {exc}", file=sys.stderr)
             answers.append(answer)
 
-        cache_path.write_text(json.dumps(answers, ensure_ascii=False, indent=2), encoding="utf-8")
+        cache_path.write_text(
+            json.dumps(answers, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
         print(f"[deep_read] 缓存已保存 → {cache_path}", file=sys.stderr)
 
     # Render and write report
     report = _safe_format(
-        REPORT_TEMPLATE,
+        report_template,
         title=title,
         authors=meta.get("authors", "Unknown"),
         published=meta.get("published", ""),

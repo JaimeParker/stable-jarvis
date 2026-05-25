@@ -1,0 +1,47 @@
+# Paper category registry for paper-deep-reader prompt selection.
+# Each category maps to a subdirectory in prompts/ containing:
+#   system.md, section-1.md..section-6.md, report-template.md, chunk-summary.md
+#
+# The "persona" field is injected into system.md's {persona} placeholder.
+# "keywords" help the classifier match papers to categories.
+
+[categories.default]
+name = "通用学术"
+description = "适用于无法归类到特定领域的通用学术论文。涵盖理论分析、实验研究、综述等各类学术写作。分析方法通用，不预设特定领域知识。"
+persona = "你是一位资深学术研究者，正在为自己撰写论文精读笔记。"
+keywords = []
+
+[categories.ai-ml]
+name = "AI/机器学习"
+description = "人工智能与机器学习论文，包括深度学习、强化学习、自然语言处理、计算机视觉、生成模型、表示学习等。以方法创新和实验验证为核心，注重基准对比和消融实验。"
+persona = "你是一位资深 AI 研究员，正在为自己撰写论文精读笔记。"
+keywords = [
+    "machine learning",
+    "deep learning",
+    "reinforcement learning",
+    "world model",
+    "neural network",
+    "transformer",
+    "LLM",
+    "large language model",
+    "NLP",
+    "natural language processing",
+    "computer vision",
+    "representation learning",
+    "generative model",
+    "diffusion model",
+    "policy gradient",
+    "imitation learning",
+    "self-supervised learning",
+    "foundation model",
+    "attention mechanism",
+    "graph neural network",
+    "variational autoencoder",
+    "GAN",
+    "adversarial",
+    "contrastive learning",
+    "fine-tuning",
+    "pre-training",
+    "tokenization",
+    "sequence modeling",
+]

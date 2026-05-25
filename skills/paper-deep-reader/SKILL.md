@@ -16,6 +16,7 @@ tags:
 
 ## 核心能力
 
+- **自适应 prompt 选择**：根据论文标题和摘要自动匹配领域专用 prompt（AI/ML、通用学术等），找不到匹配则用 default
 - **分块摘要压缩**：长论文超过阈值时自动分块，每块先 LLM 摘要再拼接，确保全貌不丢
 - **6-section 分解分析**：每轮 LLM 独立调用，各有针对性 prompt，避免上下文挤压
 - **知识库横向对比**：Zotero MCP `semantic_search` + Obsidian `search_notes` + 可选 embedding 语义搜索
@@ -48,7 +49,32 @@ cp .env.example .env   # 然后编辑 .env 填入真实 key
 
 ---
 
-## 工作流（6 阶段）
+## Prompt 系统
+
+本 skill 使用可扩展的领域专用 prompt 体系。Prompt 文件位于 `prompts/` 目录：
+
+```
+prompts/
+├── categories.toml          # 领域注册表（名称、描述、关键词、persona）
+├── default/                 # 通用学术 prompt（兜底）
+│   ├── system.md            # 系统提示（persona + 写作要求）
+│   ├── section-1.md         # 研究问题与动机
+│   ├── section-2.md         # 核心方法与框架
+│   ├── section-3.md         # 实验/实证分析
+│   ├── section-4.md         # 与相关工作的比较
+│   ├── section-5.md         # 局限性与未来工作
+│   ├── section-6.md         # 我的评价与启发
+│   ├── report-template.md   # 最终报告模板
+│   └── chunk-summary.md     # 长论文分块摘要 prompt
+└── ai-ml/                   # AI/机器学习专用 prompt
+    └── ... (同 default 结构)
+```
+
+**添加新领域**：在 `categories.toml` 中注册，然后在 `prompts/` 下创建同名目录放入 9 个 `.md` 文件即可。无需修改任何代码。
+
+---
+
+## 工作流（7 阶段）
 
 严格按以下阶段顺序执行。
 
@@ -74,7 +100,21 @@ cp .env.example .env   # 然后编辑 .env 填入真实 key
 
 ---
 
-### 阶段 2：提取全文
+### 阶段 2：选择 Prompt 集合
+
+根据阶段 1 获取的论文标题和摘要，匹配合适的领域专用 prompt。
+
+**步骤：**
+1. 读取 `prompts/categories.toml`，了解所有可用领域（名称、描述、关键词）
+2. 根据论文标题和摘要，分析论文属于哪个领域
+3. 选择最匹配的领域目录名（如 `ai-ml`），记录为 `PROMPT_SET`
+4. 若无明确匹配，`PROMPT_SET=default`
+
+无需脚本——直接根据 `categories.toml` 中的描述和关键词判断即可。
+
+---
+
+### 阶段 3：提取全文
 
 **判断策略**：
 - 如果 PDF 页数估计 < 20 页：直接用 Claude 多模态能力读取 PDF 内容
@@ -101,7 +141,7 @@ python scripts/extract_pdf_text.py --pdf <pdf_path> --output temp/deep-reader/pa
 
 ---
 
-### 阶段 3：构建 KB 上下文
+### 阶段 4：构建 KB 上下文
 
 替代 ChromaDB 的知识库上下文，三路合并。中间文件放 `temp/deep-reader/`。
 
@@ -155,7 +195,7 @@ python scripts/build_kb_context.py \
 
 ---
 
-### 阶段 4：6 轮深度分析
+### 阶段 5：6 轮深度分析
 
 **前置条件**：`temp/deep-reader/` 下已准备好 `paper.md`（或 `.txt`）、`meta.json`、`kb_context.json`。
 
@@ -165,8 +205,10 @@ python scripts/deep_read.py \
   --content temp/deep-reader/paper.md \
   --meta temp/deep-reader/meta.json \
   --kb temp/deep-reader/kb_context.json \
-  --output outputs/deep-reader/{arxiv_id}
+  --output outputs/deep-reader/{arxiv_id} \
+  --prompt-set {PROMPT_SET}
 ```
+其中 `{PROMPT_SET}` 为阶段 2 选择的领域目录名（如 `ai-ml`、`default`）。
 
 **参数说明**：
 
@@ -176,6 +218,7 @@ python scripts/deep_read.py \
 | `--meta` | 阶段 1 | JSON：title, arxiv_id, authors, published, categories |
 | `--kb` | 阶段 3 | `build_kb_context.py` 合并后的 JSON 数组（可选，无 KB 用 `-`） |
 | `--output` | — | 输出目录，建议 `outputs/deep-reader/{arxiv_id}` |
+| `--prompt-set` | 阶段 2 | 领域 prompt 目录名（`ai-ml` / `default` / 自定义） |
 | `--provider` | `.env` LLM_PROVIDER | 可选覆盖 |
 | `--model` | `.env` LLM_MODEL | 可选覆盖 |
 | `--force` | — | 强制重新生成（忽略缓存） |
@@ -200,7 +243,7 @@ python scripts/deep_read.py \
 
 ---
 
-### 阶段 5：写报告到 Obsidian
+### 阶段 6：写报告到 Obsidian
 
 **报告模板**（参见 `reference/section-prompts.md` 中的 REPORT_TEMPLATE）。
 
@@ -237,7 +280,7 @@ kb_related:
 
 ---
 
-### 阶段 6：可选上传 Zotero Note
+### 阶段 7：可选上传 Zotero Note
 
 如果用户请求上传：
 1. 将 Markdown 报告转换为 HTML（保留 LaTeX、wikilinks 转文本链接）
