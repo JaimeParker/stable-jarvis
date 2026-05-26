@@ -199,11 +199,11 @@ Main agent 识别论文特定的关注点——亮点、弱点、需要重点验
 
 | 要素 | 说明 |
 |------|------|
-| Task 目标 | 参考 `task-N.md` 的分析框架和输出要求 |
+| Task 目标 | 参考 `task-N.md` 的分析框架和输出要求，尽量按照要求 |
 | 论文特定关注点 | 如 "重点审查 pre-sampling phase 消融实验是否支撑方法声称" |
 | 相关论文段落 | 与该 task 最相关的论文章节或关键段落 |
 | KB context | **仅文献交叉分析 task 注入**（如 rl task-4、ai-ml task-3）。将 `zotero_kb.json` 和 `obsidian_kb.json` 的全部内容交给 subagent，由 subagent 自行判断相关性和去重 |
-| 输出格式 | Markdown，参考 task-N.md 的最低字数要求 |
+| 输出格式 | Markdown，参考 task-N.md 的最低字数要求。**所有数学公式必须使用 LaTeX 格式：行内公式用 `$...$`，独立公式用 `$$...$$`，不得使用 \( \) 或 \[ \]** |
 
 `task-N.md` 是**模板参考**——main agent 应根据具体论文调整指令，不要原文照抄。例如：若论文消融实验薄弱，应在实验分析 task 的指令中明确要求 subagent 指出这一点。
 
@@ -341,14 +341,3 @@ python scripts/upload_to_zotero.py --report <report_path> --zotero-key {item_key
 | `OBSIDIAN_VAULT` | 自动检测 | Obsidian vault 根路径 |
 
 ---
-
-## 与 paper-analyzer 对比
-
-| 维度 | paper-analyzer（泛读） | paper-deep-reader（精读） |
-|------|----------------------|--------------------------|
-| LLM 调用 | 单轮 | 6 subagent 并行 + main agent 审查 |
-| 长论文 | 上下文窗口截断 | 主 agent 自行分块处理 |
-| KB 对比 | 无 | Zotero 语义 + Obsidian 向量检索 |
-| 输出 | Zotero Note | Obsidian vault（wikilinks + frontmatter） |
-| 上下文 | 单轮无状态 | 共享会话上下文，agent 间协同 |
-| 适用场景 | 快速了解大意 | 深度理解、文献对比、知识积累 |
