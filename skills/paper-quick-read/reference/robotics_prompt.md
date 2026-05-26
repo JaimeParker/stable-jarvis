@@ -37,3 +37,5 @@ Point out any explicit or implicit correlations between this paper and the other
 Stated Limitations: What limitations or weaknesses did the authors explicitly state?
 
 Implied Weaknesses: Based on their experiments and results, what potential weaknesses or unaddressed issues do you infer? (e.g., Was it only tested in sim? Does it seem computationally expensive? Did they compare against weak baselines?).
+
+Output in Chinese. Use original English for technical terms.

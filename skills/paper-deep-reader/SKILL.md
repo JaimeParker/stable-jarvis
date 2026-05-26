@@ -1,6 +1,6 @@
 ---
 name: paper-deep-reader
-description: 精读文献。快速泛读请用paper-analyzer。
+description: 精读文献。快速泛读请用paper-quick-read。
 version: 1.0.0
 author: Zhaohong Liu
 tags:
@@ -12,7 +12,7 @@ tags:
 
 # Paper Deep Reader（精读）
 
-> **定位**：本 skill 实现深度论文精读——main agent 全局理解 + 6 个 subagent 并行分析 + Zotero/Obsidian 知识库横向对比 + Obsidian vault 结构化输出。如需快速泛读（单轮摘要），请使用 `paper-analyzer`。
+> **定位**：本 skill 实现深度论文精读——main agent 全局理解 + 6 个 subagent 并行分析 + Zotero/Obsidian 知识库横向对比 + Obsidian vault 结构化输出。如需快速泛读（单轮摘要），请使用 `paper-quick-read`。
 
 ## 核心能力
 

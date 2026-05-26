@@ -1,6 +1,6 @@
 ---
-name: paper-analyzer
-description: 泛读：快速分析Zotero库中的文献，单轮LLM生成摘要级Markdown报告，并上传为Zotero Note。深度精读请用paper-deep-reader。
+name: paper-quick-read
+description: 泛读：快速概览Zotero库中的文献，单轮LLM生成摘要级Markdown报告，并上传为Zotero Note。深度精读请用paper-deep-reader。
 version: 1.7.0
 author: Zhaohong Liu
 tags:
@@ -8,9 +8,9 @@ tags:
   - paper-analysis
 ---
 
-# Paper Analyzer（泛读）
+# Paper Quick Read（泛读）
 
-> **定位**：本 skill 适用于快速泛读——单轮 LLM 调用生成摘要级报告，适合快速了解论文大意。如需深度精读（6-section 分解 + 知识库横向对比 + Obsidian 笔记输出），请使用 `paper-deep-reader`。
+> **定位**：本 skill 适用于快速泛读——单轮 LLM 调用生成摘要级报告，帮助快速判断论文是否值得深读。如需深度精读（subagent 并行分析 + 知识库横向对比 + Obsidian 笔记输出），请使用 `paper-deep-reader`。
 
 ## 🎯 目标 (Objective)
 你是一个顶级的 Robotics & AI 系统级研究员。你的核心任务是根据用户的 Prompt，连接本地 Zotero 数据库与 Cyber Brain 缓存。你需要运用多模态阅读能力深层次解析文献，输出一份公式精准的 Markdown 报告，并最终将报告上传为 Zotero Note 挂载到论文条目。
@@ -75,14 +75,14 @@ python src/scripts/upload_report_note.py --report "./temp/ABC123_report.md" --zo
 
 **第一步：文献领域分类与框架加载 (Classification & Template Selection)**
 请先阅读论文的摘要和引言，判断其所属的核心研究领域，并按以下优先级决定使用的分析模板：
-1. **Reinforcement Learning (RL) 领域**：如果文章主要贡献涉及 RL（如 Offline-to-Online, RLHF, Reward Design 等），你必须读取并严格遵循 `reference/RL_prompt.md` 中的结构进行深度拆解。
+1. **Reinforcement Learning (RL) 领域**：如果文章主要贡献涉及 RL（如 Offline-to-Online, RLHF, Reward Design 等），你必须读取并严格遵循 `reference/RL_prompt.md` 中的结构进行快速分析。
 2. **Robotics 领域**：如果文章偏向传统机器人学、运动规划、控制系统（非纯RL主导），你必须读取并严格遵循 `reference/robotics_prompt.md` 中的结构进行分析。
 3. **General AI / 其他学术领域**：如果都不属于上述两类，请严格使用下方的**【通用进阶学术报告模板】**。
 
 **第二步：执行总结与核心约束 (Report Generation Rules)**
 无论你使用哪种模板生成报告，都必须在 Markdown 文本中严格遵守以下两条底层约束：
 - **逻辑层级**：保持极高的学术严谨性，不要只停留在表面翻译，要深入拆解"为什么这么做 (Derivation & Motivation)"。
-- **公式无损 (Lossless Math)**：所有的数学推导、损失函数、动力学方程等必须使用原生 LaTeX 语法输出。**行内公式使用 `$...$`，独立公式使用 `$$...$$`（使用独立公式时，`$$` 的上方和下方必须各空一行）**。
+- **公式最小化 (Minimal Math)**：只保留最核心的 1-2 个公式（如最终损失函数）。其余推导用文字描述。行内公式使用 `$...$`，独立公式使用 `$$...$$`。Zotero Note 的 LaTeX 渲染能力有限，避免复杂多行推导。
 
 ---
 
@@ -118,7 +118,7 @@ $$
 
 **关键约束：**
 - **学术框架**：按照 Motivation, Method, Experiments, Limitations 的框架组织
-- **公式无损**：所有数学公式使用 LaTeX 语法（`$...$` 或 `$$...$$`，使用 `$$...$$` 时需要上下各空一行）
+- **公式最小化**：只保留核心公式，用 LaTeX 语法（`$...$` 或 `$$...$$`），其余用文字描述
 - **输出语言**：使用中文输出，但对专业术语保持英文原文
 
 ---
