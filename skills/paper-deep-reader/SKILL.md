@@ -122,7 +122,7 @@ prompts/
 ### 阶段 3：提取全文
 
 **判断策略**：
-- 如果 PDF 页数估计 < 20 页：直接用 Claude 多模态能力读取 PDF 内容
+- 如果 PDF 页数估计 < 20 页：用 Claude 多模态能力或 zotero mcp 读取 PDF 内容
 - 如果 PDF 页数 >= 20 页或无法判断：运行提取脚本
 
 **提取脚本**（默认输出 Markdown，保留标题、LaTeX 公式、表格等结构信息）：
@@ -220,16 +220,64 @@ Main agent 识别论文特定的关注点——亮点、弱点、需要重点验
 
 ---
 
-**5d — Main agent 合并与 double-check**
+**5d — 第一次组装（纯拼接，不做编辑）**
 
-Main agent 收集全部 subagent 产出后：
-1. **矛盾检查**：各 task 产出之间是否存在不一致或互相矛盾的判断
-2. **事实验证**：对照论文原文验证关键数值和声称
-3. **完整性检查**：是否遗漏重要分析维度
-4. **渲染报告**：参考 `prompts/{PROMPT_SET}/report-template.md` 的结构建议，整合所有 subagent 产出为最终报告
-5. 写入 `outputs/deep-reader/{arxiv_id}/report.md`
+Main agent 收集全部 task-subagent 的原始产出后，按 `report-template.md` 的结构进行纯拼接：
+- 章节顺序排列 + 标题层级统一
+- 移除 subagent 产出的前言/后记废话（如 "Now I will write the section..."）
+- **不对分析内容做任何编辑、精简或润色**——subagent 的细节（算法步骤、公式推导、Loss 追踪）是报告的核心价值
+- 如果没有明显问题，产生第一版组装报告 `report-v1.md`
 
-此步骤替代了旧的 Section 7（整合审查 API 调用）——main agent 拥有完整上下文，交叉审查更可靠。
+---
+
+**5e — 事实核查（Fact-Check Subagent）**
+
+Spawn 1 个 fact-check subagent，专门对照论文原文核查所有 task-subagent 产出的准确性。
+
+**输入**：论文原文 + 全部 task-subagent 原始产出 + 第一版组装报告
+
+**核心约束**：极度依赖原文——每个判断必须有原文具体引用（章节号或原文摘录），不允许凭记忆或常识判断。
+
+**输出格式**——逐条差异报告，每条标注：
+- ✅ **正确**：声明与原文一致，附原文证据
+- ❌ **错误**：声明与原文矛盾，附原文正确信息 + 建议修正
+- ⚠️ **不可验证**：原文未涉及此声明（可能是 subagent 的合理推断或外部知识），标注为不可验证
+- 🔶 **部分偏差**：数字正确但结论夸大、遗漏关键限定条件等情况，附修正建议
+
+**不做的事**：
+- 不检查 subagent 之间的内部一致性（那是 5f 主 agent 的活）
+- 不生成新的分析内容
+- 不修改 subagent 产出
+
+此 subagent 的指令直接写在 Phase 5e 中，不需要独立的 `task-N.md` 文件——它不是 per-category 的，职责固定。
+
+---
+
+**5f — Main agent 审阅 + 修正循环（硬上限 3 轮）**
+
+Main agent 审阅 fact-check subagent 的核查报告：
+
+**若 ❌ + 🔶 数量较少**（10 条以内且无重大事实错误）→ 直接进入 5g，主 agent 按核查报告修正报告。
+
+**若 ❌ + 🔶 较多或存在重大事实错误** → 将具体问题发回对应的 task-subagent，要求重新核查修正。修正后：
+1. 回到 5d 重新拼接修正后的产出
+2. 回到 5e fact-check subagent 重新审查（可只审修正部分）
+3. 回到 5f 主 agent 再次评估
+
+**硬上限：3 轮**（5e→5f→修正→5e→5f→修正→5e→5f→5g）。超过 3 轮后接受剩余问题，在报告末尾标注 "第 N 轮核查，剩余 X 条未解决"。
+
+---
+
+**5g — Main agent 最终修正与写入**
+
+Main agent 根据事实核查结果对组装报告做最终修正：
+1. 按 fact-check 报告中 ✅ 确认的保持原样
+2. 按 ❌ 和 🔶 逐条修正（使用 fact-check subagent 提供的正确信息）
+3. ⚠️ 不可验证项 → 在报告中标注 "[来源：subagent 推断，原文未直接涉及]" 或直接移除
+4. 内部一致性检查：各 task 产出之间是否存在矛盾（同一数字在不同 section 中的不同表述等）
+5. 写入最终版 `outputs/deep-reader/{arxiv_id}/report.md`
+
+此流程确保报告的**事实准确性由原文锚定**，而非依赖 LLM 记忆。
 
 ---
 
