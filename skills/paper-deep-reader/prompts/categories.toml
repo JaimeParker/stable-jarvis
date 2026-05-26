@@ -1,9 +1,9 @@
 # Paper category registry for paper-deep-reader prompt selection.
 # Each category maps to a subdirectory in prompts/ containing:
-#   system.md, section-1.md..section-6.md, report-template.md, chunk-summary.md
+#   system.md, task-N.md, report-template.md
 #
-# The "persona" field is injected into system.md's {persona} placeholder.
-# "keywords" help the classifier match papers to categories.
+# "keywords" help the agent match papers to categories during Phase 2.
+# When multiple categories match, prefer the more specific one (e.g., rl > ai-ml > default).
 
 [categories.default]
 name = "通用学术"
@@ -13,13 +13,11 @@ keywords = []
 
 [categories.ai-ml]
 name = "AI/机器学习"
-description = "人工智能与机器学习论文，包括深度学习、强化学习、自然语言处理、计算机视觉、生成模型、表示学习等。以方法创新和实验验证为核心，注重基准对比和消融实验。"
+description = "通用人工智能与机器学习论文：深度学习、NLP、计算机视觉、生成模型、表示学习等。以方法创新和实验验证为核心，注重基准对比和消融实验。不适用于有单独分类的领域（如纯RL论文请用rl分类）。"
 persona = "你是一位资深 AI 研究员，正在为自己撰写论文精读笔记。"
 keywords = [
     "machine learning",
     "deep learning",
-    "reinforcement learning",
-    "world model",
     "neural network",
     "transformer",
     "LLM",
@@ -30,8 +28,6 @@ keywords = [
     "representation learning",
     "generative model",
     "diffusion model",
-    "policy gradient",
-    "imitation learning",
     "self-supervised learning",
     "foundation model",
     "attention mechanism",
@@ -40,8 +36,43 @@ keywords = [
     "GAN",
     "adversarial",
     "contrastive learning",
-    "fine-tuning",
     "pre-training",
     "tokenization",
     "sequence modeling",
+]
+
+[categories.rl]
+name = "RL/强化学习"
+description = "强化学习与机器人论文：Offline-to-Online RL、Foundation/Diffusion Model微调、Real-World RL、策略学习、Q函数学习、探索策略等。以方法推导链、算法设计、实验验证为核心，注重公式演进、实际部署可行性和sim-to-real考量。"
+persona = "你是一位资深 RL 研究员（Professor-level），研究方向为 Offline-to-Online RL、Foundation/Diffusion Models 微调、以及 Real-World RL。正在为自己撰写论文精读笔记。"
+keywords = [
+    "reinforcement learning",
+    "offline-to-online",
+    "RL fine-tuning",
+    "offline RL",
+    "online RL",
+    "policy gradient",
+    "actor-critic",
+    "Q-learning",
+    "SAC",
+    "PPO",
+    "imitation learning",
+    "behavior cloning",
+    "diffusion policy",
+    "robot learning",
+    "sim-to-real",
+    "real-world RL",
+    "model-based RL",
+    "model-free RL",
+    "exploration",
+    "world model",
+    "manipulation",
+    "locomotion",
+    "dexterous manipulation",
+    "reward shaping",
+    "curriculum learning",
+    "hierarchical RL",
+    "multi-task RL",
+    "transfer learning",
+    "domain randomization",
 ]

@@ -1,6 +1,6 @@
 ---
 name: paper-deep-reader
-description: 精读：Zotero MCP → Obsidian 知识库 → 6-section 深度报告。支持分块摘要、KB横向对比、多LLM提供商、wikilinks输出。快速泛读请用paper-analyzer。
+description: 精读文献。快速泛读请用paper-analyzer。
 version: 1.0.0
 author: Zhaohong Liu
 tags:
@@ -12,17 +12,14 @@ tags:
 
 # Paper Deep Reader（精读）
 
-> **定位**：本 skill 实现深度论文精读——6 轮独立 LLM 调用分解分析 + Zotero/Obsidian 知识库横向对比 + Obsidian vault 结构化输出。如需快速泛读（单轮摘要），请使用 `paper-analyzer`。
+> **定位**：本 skill 实现深度论文精读——main agent 全局理解 + 6 个 subagent 并行分析 + Zotero/Obsidian 知识库横向对比 + Obsidian vault 结构化输出。如需快速泛读（单轮摘要），请使用 `paper-analyzer`。
 
 ## 核心能力
 
 - **自适应 prompt 选择**：根据论文标题和摘要自动匹配领域专用 prompt（AI/ML、通用学术等），找不到匹配则用 default
-- **分块摘要压缩**：长论文超过阈值时自动分块，每块先 LLM 摘要再拼接，确保全貌不丢
-- **6-section 分解分析**：每轮 LLM 独立调用，各有针对性 prompt，避免上下文挤压
+- **Subagent 并行分析**：main agent 形成全局认知后，定制 6 个 subagent 并行撰写各 section，共享上下文，最后 main agent 合并审查
 - **知识库横向对比**：Zotero MCP `semantic_search` + Obsidian `search_notes` + 可选 embedding 语义搜索
-- **多 LLM 提供商**：支持 anthropic / openai / deepseek / qwen
 - **Obsidian 原生输出**：报告写入 vault，自动生成 `[[wikilinks]]` + frontmatter
-- **缓存复用**：每轮 LLM 回答缓存，避免重复调用
 
 ## 配置
 
@@ -32,12 +29,10 @@ tags:
 cp .env.example .env   # 然后编辑 .env 填入真实 key
 ```
 
-`deep_read.py` 从 `stable_jarvis` 包统一加载 `.env` 配置。
+`stable_jarvis` 包统一加载 `.env` 配置。
 
 | 变量 | 说明 |
 |------|------|
-| `LLM_PROVIDER` | 6 轮分析的 LLM 提供商（deepseek/openai/anthropic/qwen） |
-| `LLM_MODEL` | LLM 模型名 |
 | `EMBEDDING_PROVIDER` | embedding 提供商（qwen/openai/local） |
 | `EMBEDDING_MODEL` | embedding 模型名 |
 
@@ -56,21 +51,31 @@ cp .env.example .env   # 然后编辑 .env 填入真实 key
 ```
 prompts/
 ├── categories.toml          # 领域注册表（名称、描述、关键词、persona）
-├── default/                 # 通用学术 prompt（兜底）
+├── default/                 # 通用学术 prompt（兜底，4 tasks）
 │   ├── system.md            # 系统提示（persona + 写作要求）
-│   ├── section-1.md         # 研究问题与动机
-│   ├── section-2.md         # 核心方法与框架
-│   ├── section-3.md         # 实验/实证分析
-│   ├── section-4.md         # 与相关工作的比较
-│   ├── section-5.md         # 局限性与未来工作
-│   ├── section-6.md         # 我的评价与启发
-│   ├── report-template.md   # 最终报告模板
-│   └── chunk-summary.md     # 长论文分块摘要 prompt
-└── ai-ml/                   # AI/机器学习专用 prompt
-    └── ... (同 default 结构)
+│   ├── task-1.md            # 研究问题与背景
+│   ├── task-2.md            # 核心方法与框架
+│   ├── task-3.md            # 实证分析与相关工作
+│   ├── task-4.md            # 局限性与批判性评价
+│   └── report-template.md   # 报告结构建议
+├── ai-ml/                   # AI/机器学习专用 prompt（5 tasks）
+│   ├── task-1.md            # 研究问题与动机
+│   ├── task-2.md            # 方法与算法设计
+│   ├── task-3.md            # 相关工作与KB交叉分析
+│   ├── task-4.md            # 实验与消融分析
+│   ├── task-5.md            # 局限性与个人启发
+│   └── ... (system.md + report-template.md)
+└── rl/                      # RL/强化学习专用 prompt（6 tasks）
+    ├── task-1.md            # Introduction & Related Work
+    ├── task-2.md            # Algorithm & Architecture（含Mermaid）
+    ├── task-3.md            # Formula Derivation & Theorems
+    ├── task-4.md            # Literature Cross-Analysis（KB注入）
+    ├── task-5.md            # Experiments & Results
+    ├── task-6.md            # Weaknesses & Inspiration
+    └── ... (system.md + report-template.md)
 ```
 
-**添加新领域**：在 `categories.toml` 中注册，然后在 `prompts/` 下创建同名目录放入 9 个 `.md` 文件即可。无需修改任何代码。
+**添加新领域**：在 `categories.toml` 中注册，然后在 `prompts/` 下创建同名目录，放入 `system.md`、`task-N.md`（数量自定）、`report-template.md` 即可。无需修改任何代码。
 
 ---
 
@@ -129,117 +134,102 @@ python scripts/extract_pdf_text.py --pdf <pdf_path> --output temp/deep-reader/pa
 python scripts/extract_pdf_text.py --pdf <pdf_path> --output temp/deep-reader/paper.txt --plain
 ```
 
-**长论文分块摘要**：
-当提取文本超过 24,000 字符时，按 12,000 字符分块（重叠 500），每块用 LLM 摘要成 400 字中文，拼接为后续 prompt 的 `{content}`。
-
-分块摘要 prompt：
-```
-这是论文《{title}》的第 {i}/{total} 段，请提取方法、实验、结论等关键信息，输出 400 字以内的中文摘要：
-
-{chunk}
-```
+**长论文处理**：主 agent 自行分块摘要后派发 subagent，无需外部脚本。
 
 ---
 
 ### 阶段 4：构建 KB 上下文
 
-替代 ChromaDB 的知识库上下文，三路合并。中间文件放 `temp/deep-reader/`。
+两路独立搜索，不做去重/过滤/截断——subagent 有能力自行判断相关性。中间文件放 `temp/deep-reader/`。
 
-**3a — Zotero 语义检索**
+**4a — Zotero 语义检索**
 调用 `zotero-mcp` 的 `semantic_search`，query = `{title}\n{abstract}`，topK=10，minScore=0.3。
-过滤掉当前论文（按 arxiv_id），保留 top-5。
-格式化为 KBEntry：`{title, arxiv_id, text(abstract), published, source="zotero"}`。
-保存为 `temp/deep-reader/zotero_kb.json`。
+格式化为 `{title, text(abstract), published, source="zotero"}`，保存为 `temp/deep-reader/zotero_kb.json`。
 
-**3b — Obsidian 内容搜索**
-调用 `obsidian` MCP 的 `search_notes`，query = `{title}` 的前 50 个字符，limit=10。
-读取匹配的笔记，提取其 wikilinks 和摘要内容。
-格式化为 KBEntry：`{title(from note), arxiv_id(from frontmatter), text(first 600 chars), source="obsidian"}`。
+**4b — Obsidian 语义搜索**
+直接复用 `obsidian-semantic-search` skill 的向量库（共享 `temp/obsidian/embeddings.json`）。
 
-**3c — Obsidian 语义搜索（可选）**
-需要配置 embedding provider（`.env` 中 `EMBEDDING_PROVIDER`）和 `OBSIDIAN_VAULT`（已在 `.env` 中配置）。
-
-**构建向量索引**（约 1-2 分钟，取决于 vault 大小）：
+索引管理遵循 `obsidian-semantic-search` SKILL.md 的判断逻辑：
 ```bash
-python scripts/search_obsidian.py --build
+# 检查索引状态
+python skills/obsidian-semantic-search/scripts/build_index.py --stats
+
+# 按需增量更新或 --force 重建
+python skills/obsidian-semantic-search/scripts/build_index.py
 ```
 
-若缓存已存在，脚本会跳过并显示缓存年龄。此时应**询问用户**：
-> Obsidian 向量缓存已存在（X 条，Y 小时前）。最近 vault 是否有较大更新？是否需要 --force 重建？
-
-用户确认后用 `--force` 重建：
+搜索：
 ```bash
-python scripts/search_obsidian.py --build --force
+python skills/obsidian-semantic-search/scripts/search.py \
+  "{title}\n{abstract}" --top-k 10 > temp/deep-reader/obsidian_kb.json
 ```
+格式化为 `{title, text, path, source="obsidian-embed"}`。
 
-**语义搜索**：
-```bash
-python scripts/search_obsidian.py --embed "{title}\n{abstract}" --top-k 5 > temp/deep-reader/obsidian_kb.json
-```
-
-`--embed` 若无缓存会报错，此时需先 `--build`。
-格式化为 KBEntry：`{title, arxiv_id, text, published, source="obsidian-embed"}`。
-
-**合并去重**：
-```bash
-python scripts/build_kb_context.py \
-  --zotero temp/deep-reader/zotero_kb.json \
-  --obsidian temp/deep-reader/obsidian_kb.json \
-  --exclude {arxiv_id} \
-  --top-k 5 \
-  --output temp/deep-reader/kb_context.json
-```
-- 按 arxiv_id 去重（优先级：zotero > obsidian-embed > obsidian）
-- 排除当前论文
-- 取 top-5
+两路结果直接交给 Phase 5，由文献交叉分析 subagent 自行判断哪些论文真正相关、标题相似的做去重——不做预过滤或预截断。
 
 ---
 
-### 阶段 5：6 轮深度分析
+### 阶段 5：Subagent 并行深度分析
 
-**前置条件**：`temp/deep-reader/` 下已准备好 `paper.md`（或 `.txt`）、`meta.json`、`kb_context.json`。
+**无需外部脚本**。Main agent 驱动整个分析流程。
 
-**执行**：
-```bash
-python scripts/deep_read.py \
-  --content temp/deep-reader/paper.md \
-  --meta temp/deep-reader/meta.json \
-  --kb temp/deep-reader/kb_context.json \
-  --output outputs/deep-reader/{arxiv_id} \
-  --prompt-set {PROMPT_SET}
-```
-其中 `{PROMPT_SET}` 为阶段 2 选择的领域目录名（如 `ai-ml`、`default`）。
+**前置条件**：`temp/deep-reader/` 下已准备好论文全文（`.md` 或 `.txt`）、`meta.json`、`zotero_kb.json`、`obsidian_kb.json`。
 
-**参数说明**：
+**若论文过长**（超过约 24,000 字符），主 agent 自行分块摘要后再派发——无需外部脚本。
 
-| 参数 | 来源 | 说明 |
-|------|------|------|
-| `--content` | 阶段 2 | Markdown 论文全文（长论文会自动分块摘要） |
-| `--meta` | 阶段 1 | JSON：title, arxiv_id, authors, published, categories |
-| `--kb` | 阶段 3 | `build_kb_context.py` 合并后的 JSON 数组（可选，无 KB 用 `-`） |
-| `--output` | — | 输出目录，建议 `outputs/deep-reader/{arxiv_id}` |
-| `--prompt-set` | 阶段 2 | 领域 prompt 目录名（`ai-ml` / `default` / 自定义） |
-| `--provider` | `.env` LLM_PROVIDER | 可选覆盖 |
-| `--model` | `.env` LLM_MODEL | 可选覆盖 |
-| `--force` | — | 强制重新生成（忽略缓存） |
+---
 
-**监控与验收流程**（必须执行，不可启动后不管）：
+**5a — Main agent 形成全局认知**
 
-1. **后台启动**：用 Bash `run_in_background` 启动 `deep_read.py`，记录 task ID
-2. **轮询检查**：每 30-60s 读取 task 输出文件（`tail -n 20 <output_file>`），观察进度行（`第 X/6 轮`）
-3. **验收结果**：
-   - 若看到 `报告已生成 → outputs/deep-reader/{arxiv_id}/report.md` → 成功，进入阶段 5
-   - 若输出包含 `Error` 或 `AuthenticationError` → 通知用户修复配置后重试（缓存会跳过已完成的轮次）
-   - 若超过 10 分钟仍在 `第 X/6 轮` 停住 → 可能 LLM API 超时，重新运行同一命令利用缓存续传
-4. **重试安全**：`analysis_cache.json` 已保存每轮答案，重新运行会复用已完成的轮次，只补跑失败的轮次
+Main agent 读取以下内容，形成对论文的整体理解：
+1. 论文全文（或分块摘要后的 condensed 版本）
+2. KB 搜索结果（`zotero_kb.json` 和 `obsidian_kb.json`）
+3. `prompts/{PROMPT_SET}/` 下所有 `task-*.md` 作为 subagent 任务参考模板
+4. `prompts/{PROMPT_SET}/report-template.md` 了解最终报告结构
 
-**脚本自动完成**：
-1. 加载 `stable_jarvis/.env` 中的 API 配置
-2. 论文超过 24,000 字符时，先分块摘要再拼接
-3. 构建 KB context section（过滤当前论文，取 top-5）
-4. 6 轮独立 LLM API 调用（每轮注入相同的 system prompt + kb context）
-5. 每轮回答缓存到 `{output_dir}/analysis_cache.json`
-6. 拼接 6 个回答为完整 `report.md`
+Main agent 识别论文特定的关注点——亮点、弱点、需要重点验证的声明、与 KB 论文的关键差异等。
+
+---
+
+**5b — Main agent 定制 subagent 任务**
+
+`task-*.md` 文件的数量决定了 subagent 数量（rl=6, ai-ml=5, default=4）。每个 task 定义一个 subagent 的职责范围。
+
+针对每个 task-N.md，main agent 编写定制指令，包含：
+
+| 要素 | 说明 |
+|------|------|
+| Task 目标 | 参考 `task-N.md` 的分析框架和输出要求 |
+| 论文特定关注点 | 如 "重点审查 pre-sampling phase 消融实验是否支撑方法声称" |
+| 相关论文段落 | 与该 task 最相关的论文章节或关键段落 |
+| KB context | **仅文献交叉分析 task 注入**（如 rl task-4、ai-ml task-3）。将 `zotero_kb.json` 和 `obsidian_kb.json` 的全部内容交给 subagent，由 subagent 自行判断相关性和去重 |
+| 输出格式 | Markdown，参考 task-N.md 的最低字数要求 |
+
+`task-N.md` 是**模板参考**——main agent 应根据具体论文调整指令，不要原文照抄。例如：若论文消融实验薄弱，应在实验分析 task 的指令中明确要求 subagent 指出这一点。
+
+---
+
+**5c — 并行 spawn subagent**
+
+使用 `Agent` 工具并行 spawn 所有 subagent（数量 = `task-*.md` 文件数）。所有 subagent：
+- 共享同一会话的论文全文上下文
+- 接收 main agent 定制的 task 指令
+- 各自返回对应 task 的 Markdown 产出
+
+无需缓存——subagent 天然有上下文。
+
+---
+
+**5d — Main agent 合并与 double-check**
+
+Main agent 收集全部 subagent 产出后：
+1. **矛盾检查**：各 task 产出之间是否存在不一致或互相矛盾的判断
+2. **事实验证**：对照论文原文验证关键数值和声称
+3. **完整性检查**：是否遗漏重要分析维度
+4. **渲染报告**：参考 `prompts/{PROMPT_SET}/report-template.md` 的结构建议，整合所有 subagent 产出为最终报告
+5. 写入 `outputs/deep-reader/{arxiv_id}/report.md`
+
+此步骤替代了旧的 Section 7（整合审查 API 调用）——main agent 拥有完整上下文，交叉审查更可靠。
 
 ---
 
@@ -248,7 +238,7 @@ python scripts/deep_read.py \
 **报告模板**（参见 `reference/section-prompts.md` 中的 REPORT_TEMPLATE）。
 
 **生成最终 Markdown**：
-- 填充 6 个 section 的回答
+- 填充各 subagent 的产出（main agent 已完成合并审查）
 - 生成 frontmatter（yaml）
 - 添加 KB 相关论文的 `[[wikilinks]]`：
   - 对 KB 中找到的每篇论文，检查 Obsidian vault 中是否存在同名笔记
@@ -300,9 +290,6 @@ python scripts/upload_to_zotero.py --report <report_path> --zotero-key {item_key
 |------|--------|------|
 | `EMBEDDING_PROVIDER` | `qwen` | embedding 提供商：qwen/openai/local |
 | `EMBEDDING_MODEL` | 自动 | 覆盖默认 embedding 模型 |
-| `LLM_PROVIDER` | 当前会话 | 6 轮分析的 LLM 提供商（默认用 Claude） |
-| `CHUNK_SIZE` | `12000` | 分块大小（字符） |
-| `CHUNK_OVERLAP` | `500` | 分块重叠（字符） |
 | `OBSIDIAN_VAULT` | 自动检测 | Obsidian vault 根路径 |
 
 ---
@@ -311,9 +298,9 @@ python scripts/upload_to_zotero.py --report <report_path> --zotero-key {item_key
 
 | 维度 | paper-analyzer（泛读） | paper-deep-reader（精读） |
 |------|----------------------|--------------------------|
-| LLM 调用 | 单轮 | 6 轮独立 |
-| 长论文 | 上下文窗口截断 | 分块摘要压缩 |
-| KB 对比 | 无 | Zotero + Obsidian + embedding |
+| LLM 调用 | 单轮 | 6 subagent 并行 + main agent 审查 |
+| 长论文 | 上下文窗口截断 | 主 agent 自行分块处理 |
+| KB 对比 | 无 | Zotero 语义 + Obsidian 向量检索 |
 | 输出 | Zotero Note | Obsidian vault（wikilinks + frontmatter） |
-| 缓存 | 无 | analysis_cache.json |
+| 上下文 | 单轮无状态 | 共享会话上下文，agent 间协同 |
 | 适用场景 | 快速了解大意 | 深度理解、文献对比、知识积累 |

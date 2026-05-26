@@ -9,24 +9,20 @@
 
 ## 1. 研究问题与动机
 
-{q1}
+（Task 1 产出）
 
 ## 2. 核心方法
 
-{q2}
+（Task 2 产出：Method & Algorithm Design）
 
-## 3. 实验设计与结果
+## 3. 实验分析
 
-{q3}
+（Task 4 产出：Experiments & Ablation Analysis）
 
-## 4. 与相关工作的比较
+## 4. 相关工作与文献对比
 
-{q4}
+（Task 3 产出：Related Work & KB Cross-Analysis）
 
-## 5. 局限性与未来工作
+## 5. 局限性与个人启发
 
-{q5}
-
-## 6. 我的评价与启发
-
-{q6}
+（Task 5 产出：Limitations & Personal Insights）
