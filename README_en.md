@@ -231,5 +231,6 @@ This repository tracks the following open-source skill repositories via git subm
 - **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`continuous-learning-v2`**, **`exa-search`**: From [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)
 - **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: From [obra/superpowers](https://github.com/obra/superpowers)
 - **`paper-finder`** source code from [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist)
+- **`paper-deep-reader`** feedback ideas from [laotu0418](https://github.com/laotu0418)
 
 All other skills are developed in-house. Credit goes to the original authors for these foundational capabilities.

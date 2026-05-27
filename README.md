@@ -231,5 +231,6 @@ converter.save_image_manifest(metadata, "./figures/manifest.json")
 - **`autonomous-loops`**, **`verification-loop`**, **`deep-research`**, **`iterative-retrieval`**, **`python-patterns`**, **`cpp-coding-standards`**, **`videodb`**, **`docker-patterns`**, **`continuous-agent-loop`**, **`continuous-learning`**, **`continuous-learning-v2`**, **`exa-search`**: 来自 [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)
 - **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: 来自 [obra/superpowers](https://github.com/obra/superpowers)
 - **`paper-finder`** 的源代码来自 [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist)
+- **`paper-deep-reader`** 的反馈思想来自 [laotu0418](https://github.com/laotu0418)
 
 其余技能为本项目自行开发。感谢上述开源作者提供的核心能力。

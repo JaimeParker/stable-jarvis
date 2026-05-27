@@ -38,8 +38,8 @@
       <skill upstream="obsidian-skills"
              en="Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, and other Obsidian-specific syntax."
              cn="创建和编辑 Obsidian 风格 Markdown，支持 wikilinks、嵌入、callouts 等功能。">obsidian-markdown</skill>
-      <skill en="Skim-read: analyze literature in Zotero, generate summary-level Markdown reports, and upload as Zotero Notes."
-             cn="泛读：分析 Zotero 中的文献，生成摘要级 Markdown 报告并上传为 Zotero 笔记。">paper-analyzer</skill>
+      <skill en="Quick read: rapidly skim papers in Zotero, generate concise summary reports, and upload as Zotero Notes. For deep reading use paper-deep-reader."
+             cn="泛读：快速翻阅 Zotero 文献，生成简洁摘要报告并上传为 Zotero 笔记。深度精读请用 paper-deep-reader。">paper-quick-read</skill>
       <skill en="Three-way cross-validation of paper claims, official code, and personal notes."
              cn="论文、官方代码与个人笔记的三方交叉验证。">paper-code-audit</skill>
       <skill en="Deep read: Zotero MCP → Obsidian knowledge base → 6-section deep report with chunked summaries and KB cross-referencing."
