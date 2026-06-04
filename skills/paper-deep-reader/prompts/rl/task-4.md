@@ -18,4 +18,4 @@
 - 是否使用了与先前论文相似的 backbone 或 loss 组件？（如 IQL-style advantage、CQL 的保守项）
 - 是否站在某个技术路线的基础上做了改进？
 
-输出格式：Markdown，至少 250 字。必须注明每篇对比论文的标题。不编造未出现在知识库或论文原文中的引用。
+输出格式：Markdown，至少 250 字。必须注明每篇对比论文的标题。提及的论文/方法若 Obsidian vault 中有对应笔记，使用 `[[wikilink]]` 链接（参考 `note-mapping.md` 或自行 `search_notes` 查找）。不编造未出现在知识库或论文原文中的引用。

@@ -169,6 +169,32 @@ python skills/obsidian-semantic-search/scripts/search.py \
 
 ---
 
+### 阶段 4.5：知识库方向搜索与用户确认
+
+在撰写 global-understanding.md 之前，主 agent 必须基于 Phase 4 的 KB 搜索结果，系统性地搜索 Obsidian vault 中与论文相关的笔记，整理候选分析方向供用户选择。
+
+**4.5a — 搜索知识库中的相关笔记**
+
+1. 从论文中提取关键方法名、概念、相关论文（如 "IQL", "AWR", "CFGRL", "LWD", "SERL", "flow matching", "advantage conditioning" 等）
+2. 使用 Obsidian `search_notes` 逐个搜索，找出 vault 中已有的笔记
+3. 结合 Phase 4 的 Zotero KB 和 Obsidian 搜索结果，整理候选分析方向列表
+
+**4.5b — 呈现候选方向供用户选择**
+
+方向列表格式：每个方向包含「主题名称」「涉及的知识库笔记」「建议的对比角度/问题」。按方法级粒度组织，每个方向是一个具体的方法论对比点。
+
+使用 `AskUserQuestion` 呈现（multiSelect: true，最多 4 个问题，每问题 2-4 个选项）：
+- 问题格式如 "以下哪些分析方向你希望重点展开？"
+- 选项格式如 "vs. IQL：RECAP 的 MC estimator 与 IQL expectile TD 的价值估计哲学对比"
+- 用户可全选、部分选、或不选（不选则按 main agent 判断）
+
+**4.5c — 将选择结果写入 global-understanding.md**
+
+用户选择的方向写入 `global-understanding.md` 的「重点分析方向」部分。未选中的方向可以简要提及但不做重点展开。
+
+---
+
+
 ### 阶段 5：Subagent 并行深度分析
 
 **无需外部脚本**。Main agent 驱动整个分析流程。
@@ -199,6 +225,14 @@ Main agent 识别论文特定的关注点——亮点、弱点、需要重点验
 | Task 边界表 | 每个 task 的**独占内容范围** + **禁止涉及的内容**（防止跨 task 重叠）+ **篇幅预算**（按复杂度：简单 50-70 行 / 中等 80-120 行 / 复杂 120-180 行） |
 | 跨 task 注意事项 | 已知可能重叠的区域（如 "DIVL 的核心机制由 Task 2 负责架构描述、Task 3 负责公式推导，两者不得交叉展开"） |
 
+**5a 额外产出：写入 `temp/deep-reader/note-mapping.md`**，作为所有 subagent 的共享 wikilink 参考表。格式：
+
+| 方法/论文名 | Obsidian 笔记路径 | Wikilink | 备注 |
+|------------|-----------------|----------|------|
+| IQL | IQL Summary 中文版 | `[[IQL Summary 中文版|IQL]]` | 价值函数对比 |
+
+主 agent 不需要穷举——subagent 后续可以自己通过 Obsidian search 补充。此文件确保报告中涉及的论文/方法在 vault 中有笔记时使用 `[[wikilink]]` 而非纯文本引用。
+
 此文件是 subagent 之间唯一的协调机制——没有它，6 个 subagent 就是 6 个独立审稿人各自写完整报告。
 
 ---
@@ -221,6 +255,7 @@ Main agent 识别论文特定的关注点——亮点、弱点、需要重点验
 | 输出格式 | Markdown，参考 task-N.md 的最低字数要求。**所有数学公式必须使用 LaTeX 格式：行内公式用 `$...$`，独立公式用 `$$...$$`，不得使用 \( \) 或 \[ \]**。**要求 subagent 使用 `##` 作为最高层级标题（不使用 `#`），并明确告知其产出将嵌入报告模板的哪个章节位置**（如 "你的产出将嵌入 `## 1. 研究问题与动机` 下"），以便 subagent 理解自身内容在整体报告中的定位 |
 | 嵌入位置 | 告知 subagent 其产出将被嵌入报告模板的哪个章节（如 `## 1. 研究问题与动机`、`### 2.1 算法与架构`）。这帮助 subagent 理解内容定位，也为主 agent 后续组装时的标题降级提供依据 |
 | 篇幅预算 | 根据 5a 的复杂度评估，为当前 task 分配预期行数范围（简单 50-70 / 中等 80-120 / 复杂 120-180）。同时告知 subagent 哪些主题由其他 task 负责，不得越界 |
+| Obsidian 参考 | 告知 subagent 读取 `note-mapping.md` 获取已有 wikilink 映射。subagent **有权使用 Obsidian MCP 的 `search_notes` 工具**自行查找 vault 中是否有对应笔记。报告中凡 vault 有笔记的方法/论文，使用 `[[wikilink]]` 替代纯文本引用 |
 
 `task-N.md` 是**模板参考**——main agent 应根据具体论文调整指令，不要原文照抄。例如：若论文消融实验薄弱，应在实验分析 task 的指令中明确要求 subagent 指出这一点。
 
@@ -231,6 +266,7 @@ Main agent 识别论文特定的关注点——亮点、弱点、需要重点验
 使用 `Agent` 工具并行 spawn 所有 subagent（数量 = `task-*.md` 文件数）。所有 subagent：
 - **每个 subagent 必须在启动时首先 Read `temp/deep-reader/global-understanding.md`**，了解：(a) 论文全局判断，(b) 自己的 task 边界和禁止范围，(c) 篇幅预算。
 - 在 spawn subagent 之前，主 agent 必须确认 `global-understanding.md` 已写入且内容完整（包含所有 task 的边界表）。
+- Subagent 拥有 Obsidian MCP 工具的访问权限（`search_notes`, `read_note` 等），可以在分析过程中主动查找和链接知识库笔记。
 - 接收 main agent 定制的 task 指令
 - 各自返回对应 task 的 Markdown 产出
 

@@ -16,4 +16,4 @@
 - 作者认为与最相关方法（通常 2-4 篇）的关键差异是什么？
 - 作者的文献综述是否全面？是否有重要遗漏？
 
-输出格式：Markdown，至少 200 字。
+输出格式：Markdown，至少 200 字。提及的论文/方法若 Obsidian vault 中有对应笔记，使用 `[[wikilink]]` 链接（参考 `note-mapping.md` 或自行 `search_notes` 查找）。
