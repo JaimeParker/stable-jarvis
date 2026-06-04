@@ -1,7 +1,7 @@
 ---
 name: paper-deep-reader
 description: 精读文献。快速泛读请用paper-quick-read。
-version: 1.0.0
+version: 1.1.0
 author: Zhaohong Liu
 tags:
   - zotero
@@ -183,7 +183,7 @@ python skills/obsidian-semantic-search/scripts/search.py \
 
 方向列表格式：每个方向包含「主题名称」「涉及的知识库笔记」「建议的对比角度/问题」。按方法级粒度组织，每个方向是一个具体的方法论对比点。
 
-使用 `AskUserQuestion` 呈现（multiSelect: true，最多 4 个问题，每问题 2-4 个选项）：
+使用 `AskUserQuestion` 呈现（multiSelect: true）：
 - 问题格式如 "以下哪些分析方向你希望重点展开？"
 - 选项格式如 "vs. IQL：RECAP 的 MC estimator 与 IQL expectile TD 的价值估计哲学对比"
 - 用户可全选、部分选、或不选（不选则按 main agent 判断）
@@ -234,11 +234,9 @@ Main agent 识别论文特定的关注点——亮点、弱点、需要重点验
 | DPPO | Diffusion Policy Policy Optimization | `[[Diffusion Policy Policy Optimization|DPPO]]` | 首次将 policy gradient 应用于扩散去噪过程 | PPO-on-diffusion 起源 |
 | Uni-O4 | Uni-O4 Summary | `[[Uni-O4 Unifying Online and Offline Deep Reinforcement Learning|Uni-O4]]` | OPE-gated PPO 统一离线/在线 RL（高斯策略，非扩散） | 迭代改进框架 |
 
-**「一句话贡献」列是关键**：它明确每个前驱工作具体做了什么，防止 subagent 因方法名相似或作者相同而混淆归属（如将 DPPO 的扩散 PG 贡献误归给 Uni-O4）。
+它明确每个前驱工作具体做了什么，防止 subagent 因方法名相似或作者相同而混淆归属。
 
 主 agent 不需要穷举——subagent 后续可以自己通过 Obsidian search 补充。此文件确保报告中涉及的论文/方法在 vault 中有笔记时使用 `[[wikilink]]` 而非纯文本引用。
-
-此文件是 subagent 之间唯一的协调机制——没有它，6 个 subagent 就是 6 个独立审稿人各自写完整报告。
 
 ---
 
@@ -345,7 +343,7 @@ Main agent 根据事实核查结果对组装报告做最终修正：
 2. 按 ❌ 和 🔶 逐条修正（使用 fact-check subagent 提供的正确信息）
 3. ⚠️ 不可验证项 → 在报告中标注 "[来源：subagent 推断，原文未直接涉及]" 或直接移除
 4. 内部一致性检查：(a) 矛盾检查——同一数字/事实在不同 section 中是否有不同表述；(b) 重叠检查——同一内容是否被多个 task 重复覆盖，如有则去冗余（保留最完整处，其余删除或引用）；(c) 交叉引用检查——一个 section 提到的关键内容在另一个 section 是否被遗漏或矛盾
-5. 写入最终版 `outputs/deep-reader/{arxiv_id}/report.md`
+5. 写入最终版 `outputs/deep-reader/{item_key}/report.md`
 
 此流程确保报告的**事实准确性由原文锚定**，而非依赖 LLM 记忆。
 
@@ -363,13 +361,13 @@ Main agent 根据事实核查结果对组装报告做最终修正：
   - 若存在，添加 wikilink：`[[note_name]]`
   - 若不存在，仅用文本引用
 
-**报告路径**：`outputs/deep-reader/{arxiv_id}/report.md`。
+**报告路径**：`outputs/deep-reader/{item_key}/report.md`。
 
 **写入 Obsidian**：
 使用 `obsidian` MCP 的 `write_note`，路径为 `00 Inbox/{safe_title}.md`。
-报告内容来自 `outputs/deep-reader/{arxiv_id}/report.md`。
+报告内容来自 `outputs/deep-reader/{item_key}/report.md`。
 
-⚠️ **关键约束**：必须 Read `outputs/deep-reader/{arxiv_id}/report.md` 获取完整报告内容后传给 `write_note`，**不得手工重新组装报告文本**——手工组装极易丢失 LaTeX `$` 分隔符。写入后立即用 `grep -c '\$'` 验证 Obsidian 笔记中的 `$` 数量与源报告一致，不一致则用 `cp` 从文件系统覆盖。
+⚠️ **关键约束**：必须获取完整报告内容后传给 `write_note`，**不手工重新组装报告文本**——手工组装极易丢失 LaTeX `$` 分隔符。
 
 **Frontmatter 格式**：
 ```yaml
@@ -378,7 +376,6 @@ tags:
   - paper-analysis
   - deep-reading
   - {domain_tags}
-arxiv_id: "{arxiv_id}"
 authors: "{authors}"
 published: "{published}"
 zotero_key: "{item_key}"
