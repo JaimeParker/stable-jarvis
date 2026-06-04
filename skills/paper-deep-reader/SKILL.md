@@ -222,14 +222,19 @@ Main agent 识别论文特定的关注点——亮点、弱点、需要重点验
 | 论文概要 | 一句话贡献 + 核心方法 + 主要结果 |
 | 复杂度评估 | **简单**（单点创新，如 BPPO）/ **中等**（2-3 个组件）/ **复杂**（系统级论文，如 LWD） |
 | 重点分析方向 | 3-5 个最值得深挖的点（引导各 task 聚焦） |
+| 技术继承关系 | 每个核心组件的明确前驱工作（如 "扩散+PG: DPPO / OPE-gated 迭代: Uni-O4 / Consistency 蒸馏: Song et al. 2023"）。**此条目专门防止 subagent 将方法归属张冠李戴** |
 | Task 边界表 | 每个 task 的**独占内容范围** + **禁止涉及的内容**（防止跨 task 重叠）+ **篇幅预算**（按复杂度：简单 50-70 行 / 中等 80-120 行 / 复杂 120-180 行） |
 | 跨 task 注意事项 | 已知可能重叠的区域（如 "DIVL 的核心机制由 Task 2 负责架构描述、Task 3 负责公式推导，两者不得交叉展开"） |
 
 **5a 额外产出：写入 `temp/deep-reader/note-mapping.md`**，作为所有 subagent 的共享 wikilink 参考表。格式：
 
-| 方法/论文名 | Obsidian 笔记路径 | Wikilink | 备注 |
-|------------|-----------------|----------|------|
-| IQL | IQL Summary 中文版 | `[[IQL Summary 中文版|IQL]]` | 价值函数对比 |
+| 方法/论文名 | Obsidian 笔记路径 | Wikilink | 一句话贡献（核心差异锚点） | 备注 |
+|------------|-----------------|----------|--------------------------|------|
+| IQL | IQL Summary 中文版 | `[[IQL Summary 中文版|IQL]]` | 隐式 Q-Learning：expectile regression 避免 OOD action 查询 | 价值函数对比 |
+| DPPO | Diffusion Policy Policy Optimization | `[[Diffusion Policy Policy Optimization|DPPO]]` | 首次将 policy gradient 应用于扩散去噪过程 | PPO-on-diffusion 起源 |
+| Uni-O4 | Uni-O4 Summary | `[[Uni-O4 Unifying Online and Offline Deep Reinforcement Learning|Uni-O4]]` | OPE-gated PPO 统一离线/在线 RL（高斯策略，非扩散） | 迭代改进框架 |
+
+**「一句话贡献」列是关键**：它明确每个前驱工作具体做了什么，防止 subagent 因方法名相似或作者相同而混淆归属（如将 DPPO 的扩散 PG 贡献误归给 Uni-O4）。
 
 主 agent 不需要穷举——subagent 后续可以自己通过 Obsidian search 补充。此文件确保报告中涉及的论文/方法在 vault 中有笔记时使用 `[[wikilink]]` 而非纯文本引用。
 
@@ -363,6 +368,8 @@ Main agent 根据事实核查结果对组装报告做最终修正：
 **写入 Obsidian**：
 使用 `obsidian` MCP 的 `write_note`，路径为 `00 Inbox/{safe_title}.md`。
 报告内容来自 `outputs/deep-reader/{arxiv_id}/report.md`。
+
+⚠️ **关键约束**：必须 Read `outputs/deep-reader/{arxiv_id}/report.md` 获取完整报告内容后传给 `write_note`，**不得手工重新组装报告文本**——手工组装极易丢失 LaTeX `$` 分隔符。写入后立即用 `grep -c '\$'` 验证 Obsidian 笔记中的 `$` 数量与源报告一致，不一致则用 `cp` 从文件系统覆盖。
 
 **Frontmatter 格式**：
 ```yaml
