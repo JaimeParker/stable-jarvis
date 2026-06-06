@@ -399,6 +399,67 @@ python scripts/upload_to_zotero.py --report <report_path> --zotero-key {item_key
 
 ---
 
+### 阶段 8（可选）：生成 good-question 桥接文件
+
+如果用户计划基于本论文的局限性设计新的研究问题，主 agent 应生成结构化桥接文件，供 `good-question` skill 直接消费。
+
+**步骤：**
+
+1. 从 Phase 5g 的最终报告（`outputs/deep-reader/{item_key}/report.md`）中提取以下结构化信息：
+   - **声称局限**（Stated Limitations）：作者自己承认的局限性
+   - **隐含弱点**（Implied Weaknesses）：主 agent 和 subagent 批判性分析揭示的潜在问题
+   - **未来方向**（Future Directions）：作者建议的和 agent 认为有价值的延伸方向
+   - **个人研究启发**（Personal Research Insights）：论文在你的研究语境下的价值、可迁移的思路、具体的实验想法
+
+2. 从 Phase 4 的 KB 搜索结果中提取相关论文列表（不去重、不截断——good-question 自行判断相关性）：
+   - `zotero_kb.json` 中的条目（title, abstract, item_key）
+   - `obsidian_kb.json` 中的条目（title, path, wikilink）
+
+3. 写入 `outputs/deep-reader/{item_key}/good-question-bridge.json`：
+
+```json
+{
+  "source_paper": {
+    "title": "{title}",
+    "item_key": "{item_key}",
+    "arxiv_id": "{arxiv_id}"
+  },
+  "stated_limitations": [
+    "具体局限描述 1",
+    "具体局限描述 2"
+  ],
+  "implied_weaknesses": [
+    "隐含弱点描述 1",
+    "隐含弱点描述 2"
+  ],
+  "future_directions": [
+    "未来方向描述 1",
+    "未来方向描述 2"
+  ],
+  "personal_insights": [
+    "个人启发描述 1",
+    "个人启发描述 2"
+  ],
+  "kb_context": {
+    "zotero_related": [
+      {"title": "...", "item_key": "...", "abstract": "..."}
+    ],
+    "obsidian_related": [
+      {"title": "...", "path": "...", "wikilink": "..."}
+    ]
+  }
+}
+```
+
+4. 告知用户：`已生成 good-question 桥接文件 outputs/deep-reader/{item_key}/good-question-bridge.json。运行 good-question skill 可直接消费此文件，基于论文局限性设计新的研究问题。`
+
+**注意**：
+- 此阶段仅按需执行（用户明确表示想基于这篇论文设计新问题，或主 agent 判断论文的局限性非常丰富值得追问）
+- 桥接文件中的各项应为**具体、可操作的陈述**，而非笼统标签（如 "计算成本高" → "扩散模型推理需 100 步去噪，单步 5ms，实时控制需 <1ms"）
+- good-question 消费此文件时会自动检测并跳过 Workflow Step 0-2，直接进入候选问题生成
+
+---
+
 ## 配置项
 
 所有配置可通过环境变量或 `.env` 文件设置：

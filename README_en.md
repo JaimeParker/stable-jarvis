@@ -23,6 +23,7 @@ A complete toolchain from paper discovery to deep reading:
 - **`paper-analyzer`** — Literature skim-reading, single-pass LLM generates summary reports and uploads as Zotero Notes
 - **`paper-deep-reader`** — Deep paper reading, 6-section reports with Zotero + Obsidian KB joint analysis, wikilinks output
 - **`paper-code-audit`** — Reproducibility audit for paper companion code repositories
+- **`good-question`** — Research question sharpening: turn vague ideas, literature gaps, or paper limitations into defensible, falsifiable scientific questions
 
 ### Data Conversion & Knowledge Management
 
@@ -232,5 +233,6 @@ This repository tracks the following open-source skill repositories via git subm
 - **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: From [obra/superpowers](https://github.com/obra/superpowers)
 - **`paper-finder`** source code from [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist)
 - **`paper-deep-reader`** feedback ideas from [laotu0418](https://github.com/laotu0418)
+- **`good-question`** research question methodology from [Rimagination/good-question](https://github.com/Rimagination/good-question)
 
 All other skills are developed in-house. Credit goes to the original authors for these foundational capabilities.

@@ -46,6 +46,9 @@
              cn="精读：Zotero MCP → Obsidian 知识库 → 6-section 深度报告，支持分块摘要与 KB 横向对比。">paper-deep-reader</skill>
       <skill en="Discover recent arXiv papers matching a research profile and generate Obsidian-compatible notes."
              cn="画像驱动的 arXiv 论文发现，生成 Obsidian 兼容的笔记。">paper-finder</skill>
+      <skill upstream="good-question"
+             en="Sharpen research questions: turn vague ideas, literature gaps, or paper limitations into defensible, falsifiable scientific questions with stakes and rivals."
+             cn="打磨研究问题：将模糊想法、文献空白或论文局限性转化为可辩护、可证伪的科学问题。">good-question</skill>
       <skill upstream="deepagents" path="libs/cli/examples/skills"
              en="Provides a structured approach to conducting comprehensive web research."
              cn="提供结构化方法进行全面的网络研究。">web-research</skill>

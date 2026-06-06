@@ -23,6 +23,7 @@ Stable-JARVIS 的能力分为三大类。详见 **[docs/features.md](docs/featur
 - **`paper-analyzer`** — 文献泛读，单轮 LLM 生成摘要级报告并上传 Zotero Note
 - **`paper-deep-reader`** — 文献精读，6-section 深度报告，Zotero与Obsidian知识库联合分析，wikilinks 输出
 - **`paper-code-audit`** — 论文配套代码可复现性审计
+- **`good-question`** — 研究问题打磨：将模糊想法、文献空白或论文局限性转化为可辩护、可证伪的科学问题
 
 ### 数据转换与知识管理
 
@@ -232,5 +233,6 @@ converter.save_image_manifest(metadata, "./figures/manifest.json")
 - **`brainstorming`**, **`executing-plans`**, **`writing-plans`**: 来自 [obra/superpowers](https://github.com/obra/superpowers)
 - **`paper-finder`** 的源代码来自 [zhanglg12/research-assist](https://github.com/zhanglg12/research-assist)
 - **`paper-deep-reader`** 的反馈思想来自 [laotu0418](https://github.com/laotu0418)
+- **`good-question`** 的研究问题方法论来自 [Rimagination/good-question](https://github.com/Rimagination/good-question)
 
 其余技能为本项目自行开发。感谢上述开源作者提供的核心能力。
