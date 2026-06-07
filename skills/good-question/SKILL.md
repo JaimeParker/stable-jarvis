@@ -35,6 +35,16 @@ When the workflow calls for "enhanced retrieval" (增强检索), use the followi
 
 For semantic search over Obsidian, always check index freshness first (`build_index.py --stats`) before searching. The index at `temp/obsidian/embeddings.json` is shared with `paper-deep-reader` — if a deep read was just completed, the index is likely current.
 
+### Three-Source Retrieval Strategy
+
+The tools above map to three complementary knowledge sources. Follow this tiered approach — exhaust closer sources before reaching outward:
+
+**Tier 1 — Obsidian Vault (primary)**: This is your curated cyber brain. Search exhaustively with multiple query angles before moving on. Use `mcp__obsidian__search_notes` for keyword search and `obsidian-semantic-search` for conceptual search. Follow `[[wikilinks]]` trails between notes. Read every relevant note in full.
+
+**Tier 2 — Zotero Library (secondary)**: Bridges your notes to published literature. Use `mcp__zotero-mcp__search_library` for keyword search, `mcp__zotero-mcp__semantic_search` for conceptual discovery, and `mcp__zotero-mcp__get_content` for full-text reading.
+
+**Tier 3 — Web Search (complement)**: Use `web-research`, `exa-search`, or `arxiv-search` when (a) the user requests current literature, (b) Obsidian + Zotero return insufficient results for a decisive claim, (c) the field is fast-moving and curated sources may be outdated, or (d) you need to verify whether a claimed literature gap genuinely exists. Web search results feed into the analysis body; they do not need separate listing in the final card.
+
 ### Bridge with paper-deep-reader
 
 When the user invokes `good-question` after completing a `paper-deep-reader` analysis, the deep-reader output provides a rich starting point that should be consumed directly rather than starting the workflow from zero.
@@ -261,6 +271,15 @@ For the top 1-3 questions, output this card:
 **Data/resources needed:** ...
 **Strongest reviewer objection:** ...
 **Best next action:** ...
+
+**Preliminary：**
+
+Obsidian:
+- [[Note Name 1]] — 为什么必读
+- [[Note Name 2]] — 为什么必读
+
+Zotero:
+- Paper Title (Author, Year) — 为什么必读
 ```
 
 If the user writes in Chinese, prefer this localized card:
@@ -279,6 +298,15 @@ If the user writes in Chinese, prefer this localized card:
 **需要的数据/资源：** ...
 **最强评审质疑：** ...
 **下一步动作：** ...
+
+**Preliminary：**
+
+Obsidian:
+- [[笔记名称 1]] — 为什么必读
+- [[笔记名称 2]] — 为什么必读
+
+Zotero:
+- 论文标题 (作者, 年份) — 为什么必读
 ```
 
 If the user only needs brainstorming, stop after ranked cards. If they need execution, turn the best card into a short pilot plan with milestones and decision gates.
