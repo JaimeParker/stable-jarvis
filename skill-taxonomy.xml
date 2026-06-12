@@ -132,6 +132,8 @@
       <skill upstream="everything-claude-code"
              en="Multi-source deep research using firecrawl and exa MCPs."
              cn="使用 firecrawl 和 exa MCP 进行多源深度研究。">deep-research</skill>
+      <skill en="Semantic search over Mao Zedong Selected Works (5 volumes, 230 articles) using vector embeddings."
+             cn="对毛泽东选集（五卷，230篇文章）进行语义搜索，基于向量嵌入。">mao-semantic-search</skill>
       <skill en="Distills raw discussions and meeting notes into structured, permanent knowledge notes following Zettelkasten methodology."
              cn="将原始讨论和会议记录提炼为结构化永久知识笔记，遵循 Zettelkasten 方法论。">knowledge-distillation-from-discussion</skill>
       <skill upstream="anthropics-skills"
